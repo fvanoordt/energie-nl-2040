@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nederland 2040 — Energieportfolio & Systeemkosten</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root {
+    --bg:        #f4f3ef;
+    --paper:     #ffffff;
+    --ink:       #1a1a1a;
+    --muted:     #6b6b6b;
+    --rule:      #dddad2;
+    --wind:      #1a6fa3;
+    --solar:     #d4900a;
+    --nuclear:   #b52a1c;
+    --battery:   #1e8a4a;
+    --gas:       #7f8c8d;
+    --interconn: #7b3fa0;
+    --accent:    #b52a1c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  header {
+    max-width: 960px;
+    margin: 0 auto 2rem;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 1rem;
+  }
+
+  .eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+    font-weight: normal;
+    line-height: 1.25;
+    margin-bottom: 0.45rem;
+  }
+
+  h1 em {
+    font-style: normal;
+    border-bottom: 2.5px solid var(--accent);
+    padding-bottom: 1px;
+  }
+
+  .lead {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 660px;
+  }
+
+  .layout {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 255px 1fr;
+    gap: 1.8rem;
+    align-items: start;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 1.3rem;
+    position: sticky;
+    top: 1rem;
+  }
+
+  .controls-title {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .control-group { margin-bottom: 1.25rem; }
+
+  .control-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .control-val {
+    font-weight: 400;
+    font-size: 0.71rem;
+  }
+
+  .control-sublabel {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+    line-height: 1.4;
+  }
+
+  .slider-row { display: flex; align-items: center; gap: 0.5rem; }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    background: var(--rule);
+  }
+
+  input[type=range].wind-s     { accent-color: var(--wind); }
+  input[type=range].solar-s    { accent-color: var(--solar); }
+  input[type=range].nuclear-s  { accent-color: var(--nuclear); }
+  input[type=range].battery-s  { accent-color: var(--battery); }
+  input[type=range].interconn-s{ accent-color: var(--interconn); }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 2px solid var(--paper);
+    box-shadow: 0 0 0 1px var(--ink);
+    cursor: pointer;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--rule); margin: 1rem 0; }
+
+  .scenario-btns { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .scenario-btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--rule);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    color: var(--ink);
+    transition: background 0.12s;
+    border-radius: 2px;
+  }
+  .scenario-btn:hover  { background: var(--bg); }
+  .scenario-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ── CHART AREA ── */
+  .chart-area { display: flex; flex-direction: column; gap: 1.4rem; }
+
+  /* KPI row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+
+  .kpi {
+    background: var(--paper);
+    padding: 0.85rem 0.9rem;
+    display: flex; flex-direction: column; gap: 0.18rem;
+  }
+
+  .kpi-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .kpi-value {
+    font-size: 1.45rem;
+    font-weight: normal;
+    line-height: 1;
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+  .kpi-value.warn { color: var(--accent); }
+  .kpi-value.good { color: var(--battery); }
+  .kpi-value.neut { color: var(--ink); }
+
+  .kpi-sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  /* Panels */
+  .chart-panel {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 1.3rem 1.3rem 0.9rem;
+  }
+
+  .panel-eyebrow {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .panel-title {
+    font-size: 0.95rem;
+    margin-bottom: 0.9rem;
+    line-height: 1.3;
+  }
+
+  /* Dynamic LCOE callout */
+  .lcoe-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 1rem;
+  }
+
+  .lcoe-cell {
+    background: var(--paper);
+    padding: 0.6rem 0.8rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .lcoe-tech {
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+
+  .lcoe-base {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+
+  .lcoe-effective {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .lcoe-delta {
+    font-size: 0.68rem;
+    margin-top: 0.1rem;
+  }
+  .lcoe-delta.up   { color: var(--accent); }
+  .lcoe-delta.same { color: var(--muted); }
+
+  /* Legend */
+  .legend {
+    display: flex; flex-wrap: wrap;
+    gap: 0.7rem 1.3rem;
+    margin-top: 0.8rem;
+  }
+
+  .legend-item {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .leg-line  { width: 18px; height: 3px; border-radius: 1px; }
+  .leg-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Insight */
+  .insight-box {
+    border-left: 3px solid var(--accent);
+    padding: 0.8rem 1rem;
+    background: #fef8f7;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .insight-box strong { color: var(--accent); }
+  .insight-box .ok    { color: var(--battery); font-weight: 600; }
+
+  /* SVG helpers */
+  .axis path, .axis line { stroke: var(--rule); }
+  .axis text { fill: var(--muted); font-size: 10px; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .grid line { stroke: var(--rule); stroke-dasharray: 2,3; }
+  .grid path { stroke: none; }
+
+  .footnote {
+    max-width: 960px;
+    margin: 1.8rem auto 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.65rem;
+    color: var(--muted);
+    line-height: 1.65;
+    border-top: 1px solid var(--rule);
+    padding-top: 0.9rem;
+  }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(2,1fr); }
+    .lcoe-box { grid-template-columns: 1fr; }
+    .controls { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Systeemanalyse · Nederland 2040 · Lion Hirth-methodiek uitgebreid</div>
+  <h1>Portfoliokeuze: wat kost kernenergie <em>echt</em> in een wind/zon-rijk systeem?</h1>
+  <p class="lead">Standalone LCOE's missen het kannibaliseringseffect: naarmate penetratie stijgt, dalen marktprijzen precies op productie-uren, waardoor terugverdientijden langer worden en de effectieve kapitaalkosten stijgen. Dit instrument maakt dat zichtbaar.</p>
+</header>
+
+<div class="layout">
+
+  <!-- CONTROLS -->
+  <aside class="controls">
+    <div class="controls-title">Portfolio instellen · NL 2040</div>
+
+    <div class="control-group">
+      <div class="control-label">
+        Wind offshore
+        <span class="control-val" style="color:var(--wind)" id="lbl-wind">22 GW</span>
+      </div>
+      <div class="control-sublabel">Nu 8.4 GW · realistisch 2040: 20–25 GW</div>
+      <div class="slider-row">
+        <input type="range" class="wind-s" id="sl-wind" min="5" max="35" value="22" step="1">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        Zon
+        <span class="control-val" style="color:var(--solar)" id="lbl-solar">38 GW</span>
+      </div>
+      <div class="control-sublabel">Nu 31 GW · al 150% van piekvraag</div>
+      <div class="slider-row">
+        <input type="range" class="solar-s" id="sl-solar" min="20" max="70" value="38" step="2">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        Kernenergie
+        <span class="control-val" style="color:var(--nuclear)" id="lbl-nuclear">3.2 GW</span>
+      </div>
+      <div class="control-sublabel">0 = geen kern · max = 2 EPR's · online 2040</div>
+      <div class="slider-row">
+        <input type="range" class="nuclear-s" id="sl-nuclear" min="0" max="6.4" value="3.2" step="0.8">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        Batterijen + V2G
+        <span class="control-val" style="color:var(--battery)" id="lbl-battery">20 GWh</span>
+      </div>
+      <div class="control-sublabel">Stationaire + bidirectioneel laden EVs</div>
+      <div class="slider-row">
+        <input type="range" class="battery-s" id="sl-battery" min="5" max="50" value="20" step="5">
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        Interconnectie
+        <span class="control-val" style="color:var(--interconn)" id="lbl-interconn">15 GW</span>
+      </div>
+      <div class="control-sublabel">Nu ~12 GW · richting 2040 uitgebreid</div>
+      <div class="slider-row">
+        <input type="range" class="interconn-s" id="sl-interconn" min="3" max="30" value="15" step="1">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="controls-title">Snelscenario's</div>
+    <div class="scenario-btns">
+      <button class="scenario-btn" data-s="windmax">Max wind, geen kern</button>
+      <button class="scenario-btn active" data-s="balanced">Gebalanceerd (basis)</button>
+      <button class="scenario-btn" data-s="nuclear">Kern-zwaar (2 EPR's)</button>
+      <button class="scenario-btn" data-s="island">NL als eiland (min. interconn.)</button>
+      <button class="scenario-btn" data-s="battery">Batterij-optimum</button>
+    </div>
+  </aside>
+
+  <!-- CHART AREA -->
+  <div class="chart-area">
+
+    <!-- KPI ROW -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <span class="kpi-label">Systeemkosten</span>
+        <span class="kpi-value neut" id="kpi-cost">—</span>
+        <span class="kpi-sub">€/MWh all-in, incl. kannibalisering</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Leveringszekerheid</span>
+        <span class="kpi-value neut" id="kpi-sec">—</span>
+        <span class="kpi-sub">% uren gedekt zonder import</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Curtailment</span>
+        <span class="kpi-value neut" id="kpi-curt">—</span>
+        <span class="kpi-sub">% opgewekte stroom weggegooid</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Kernmeerkosten</span>
+        <span class="kpi-value neut" id="kpi-ndelta">—</span>
+        <span class="kpi-sub">vs. zelfde zekerheid zonder kern</span>
+      </div>
+    </div>
+
+    <!-- DYNAMIC LCOE BOX -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Kannibalisering-correctie</div>
+      <div class="panel-title">Effectieve LCOE na marktwaardedepreciatie</div>
+      <div class="lcoe-box">
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--wind)">Wind offshore</div>
+          <div class="lcoe-base">€117/MWh standalone</div>
+          <div class="lcoe-effective" style="color:var(--wind)" id="lcoe-wind-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-wind-delta">—</div>
+        </div>
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--solar)">Zon</div>
+          <div class="lcoe-base">€45/MWh standalone</div>
+          <div class="lcoe-effective" style="color:var(--solar)" id="lcoe-solar-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-solar-delta">—</div>
+        </div>
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--nuclear)">Kernenergie</div>
+          <div class="lcoe-base">€160/MWh standalone</div>
+          <div class="lcoe-effective" style="color:var(--nuclear)" id="lcoe-nuc-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-nuc-delta">—</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-dot" style="background:var(--muted)"></div>Standalone LCOE = technologiekosten zonder systeeminteractie</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--accent)"></div>Effectieve LCOE = gecorrigeerd voor kannibaliseringsrisico in financiering</div>
+      </div>
+    </div>
+
+    <!-- EFFICIENT FRONTIER -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Efficient frontier</div>
+      <div class="panel-title">Systeemkosten versus leveringszekerheid — elk punt is een portfoliomix</div>
+      <svg id="svg-frontier" width="100%" height="290"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-dot" style="background:var(--wind)"></div>Wind-dominant</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--nuclear)"></div>Kern-zwaar</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--battery)"></div>Batterij-optimum</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
+      </div>
+    </div>
+
+    <!-- COST STACK -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Kostenopbouw</div>
+      <div class="panel-title">Uitgesplitst naar component (€/MWh geleverd)</div>
+      <svg id="svg-stack" width="100%" height="210"></svg>
+      <div class="legend" id="stack-legend"></div>
+    </div>
+
+    <!-- INSIGHT -->
+    <div class="insight-box" id="insight">Pas de sliders aan om de systeemeffecten te zien.</div>
+
+  </div>
+</div>
+
+<div class="footnote">
+  <strong>Methodiek:</strong>
+  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). Leveringszekerheid: schatting op basis van "dark doldrums"-kans NL (~400–600 uur/jaar wind &lt;10% én zon ~0). Gas backup: €95/MWh incl. capaciteitsvergoeding. Batterijcycluskost: €10/MWh (V2G: €6/MWh). Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  PARAMETERS
+// ════════════════════════════════════════════════════════
+const P = {
+  demand:          120,   // TWh/year
+  peakGW:          21,    // GW
+  windCF:          0.42,
+  solarCF:         0.11,
+  nuclearCF:       0.85,
+  darkHours:       500,   // hours/year: wind<10% AND solar≈0
+
+  // Standalone LCOE (€/MWh)
+  windBase:        117,
+  solarBase:       45,
+  nuclearBase:     160,
+  gasCost:         95,
+  batteryCycle:    10,
+
+  // Cannibalization: LCOE rises with penetration
+  // windKannib: how much LCOE rises per 10% penetration point
+  windKannib:      0.055,   // +5.5% per 10pp penetration
+  solarKannib:     0.065,   // solar more self-cannibalizing (correlated)
+  nuclearKannib:   0.090,   // nuclear worst: 25yr exposure + inflexibility premium
+
+  // System cost adders (€/MWh) per 10pp penetration
+  windSysSlope:    1.6,
+  solarSysSlope:   2.0,
+  nuclearSysSlope: 2.8,    // inflexible baseload in flexible system
+
+  // Interconnection
+  interconnMaxBenefit: 0.55,
+  interconnSat:    18,
+
+  // Battery curtailment absorption
+  batteryAbsorbFactor: 0.018,  // per GWh
+};
+
+// ════════════════════════════════════════════════════════
+//  DYNAMIC LCOE (kannibalisering-gecorrigeerd)
+// ════════════════════════════════════════════════════════
+function effectiveLCOE(baseLCOE, penetrationFrac, kannibFactor, interconnBenefit) {
+  // penetrationFrac: fraction of demand met by this technology
+  // kannibFactor: how fast LCOE rises
+  // interconn reduces cannibalization (can export surplus)
+  const pen = penetrationFrac * 100; // in percentage points
+  const interconnMod = 1 - interconnBenefit * 0.45;
+  const multiplier = 1 + (pen / 10) * kannibFactor * interconnMod;
+  return Math.round(baseLCOE * multiplier);
+}
+
+// ════════════════════════════════════════════════════════
+//  CORE MODEL
+// ════════════════════════════════════════════════════════
+function model(wind, solar, nuclear, battery, interconn) {
+  const windTWh    = wind    * P.windCF    * 8.76;
+  const solarTWh   = solar   * P.solarCF   * 8.76;
+  const nuclearTWh = nuclear * P.nuclearCF * 8.76;
+
+  const windPen    = windTWh    / P.demand;
+  const solarPen   = solarTWh   / P.demand;
+  const nuclearPen = nuclearTWh / P.demand;
+  const totalPen   = windPen + solarPen + nuclearPen;
+
+  // Interconnection benefit (log-saturating, erodes at high EU surplus)
+  const rawInterconn = P.interconnMaxBenefit *
+    Math.log(1 + interconn / P.interconnSat) /
+    Math.log(1 + 1);
+  const euSurplusPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
+  const ib = Math.max(0, rawInterconn - euSurplusPenalty); // effective interconn benefit
+
+  // Effective (kannibalisering-gecorrigeerde) LCOE per tech
+  const windEff    = effectiveLCOE(P.windBase,    windPen,    P.windKannib,    ib);
+  const solarEff   = effectiveLCOE(P.solarBase,   solarPen,   P.solarKannib,   ib);
+  const nuclearEff = effectiveLCOE(P.nuclearBase, nuclearPen + totalPen * 0.3,
+                                   P.nuclearKannib, ib * 0.5); // interconn helps kern minder
+
+  // Curtailment
+  const surplusPen = Math.max(0, totalPen - 0.92);
+  const batteryAbsorb = Math.min(0.4, battery * P.batteryAbsorbFactor);
+  const curtailmentRate = Math.max(0,
+    surplusPen * (1 - ib * 0.65) * (1 - batteryAbsorb)
+  );
+
+  // System cost adders
+  const windSys    = windPen    * 10 * P.windSysSlope;
+  const solarSys   = solarPen   * 10 * P.solarSysSlope;
+  const nuclearSys = nuclearPen * 10 * P.nuclearSysSlope;
+  const curtailCost = curtailmentRate * 100 * 0.5;
+
+  // Gas backup for dark doldrums
+  const darkTWh = P.darkHours * P.peakGW / 1000;
+  const battCover = Math.min(darkTWh * 0.6, battery / 1000 * P.darkHours * 0.4);
+  const interconnCover = Math.min(darkTWh * 0.45, interconn * P.darkHours / 1000 * 0.45);
+  const nucCover  = nuclearTWh * 0.18;
+  const gasBackupTWh = Math.max(0, darkTWh - battCover - interconnCover - nucCover);
+  const gasShare  = gasBackupTWh / P.demand;
+
+  // Weighted average effective LCOE
+  const wS  = Math.min(windPen,    0.95) * (1 - curtailmentRate * 0.55);
+  const sS  = Math.min(solarPen,   0.95) * (1 - curtailmentRate * 0.35);
+  const nS  = Math.min(nuclearPen, 0.95);
+  const gS  = gasShare;
+  const tot = wS + sS + nS + gS || 1;
+
+  const lcoe = (wS * windEff + sS * solarEff + nS * nuclearEff + gS * P.gasCost) / tot;
+  const sysAdder = windSys + solarSys + nuclearSys + curtailCost;
+  const totalCost = Math.round(lcoe + sysAdder);
+
+  // Delivery security
+  const base = Math.min(93,
+    58 + windPen * 22 + solarPen * 7 +
+    Math.min(4, battery * 0.25) -
+    Math.max(0, (totalPen - 1.35) * 18)
+  );
+  const nucBonus   = Math.min(4, nuclearPen * 9);
+  const interBonus = Math.min(7, interconn * 0.45);
+  const security   = Math.min(97, Math.round(base + nucBonus + interBonus));
+
+  // Cost WITHOUT nuclear (replace with extra wind + gas)
+  const altWindExtra = Math.min(4, nuclear * 0.55);
+  const altGas = gasShare + nuclearPen * 0.45;
+  const altWindPen = windPen + altWindExtra * P.windCF * 8.76 / P.demand;
+  const altWindEff = effectiveLCOE(P.windBase, altWindPen, P.windKannib, ib);
+  const altLCOE = (wS * altWindEff + sS * solarEff + altGas * P.gasCost) / (wS + sS + altGas || 1);
+  const altSys  = altWindPen * 10 * P.windSysSlope + solarSys + curtailCost * 0.88;
+  const costNoNuclear = Math.round(altLCOE + altSys);
+  const nuclearDelta = nuclear > 0 ? totalCost - costNoNuclear : 0;
+
+  return {
+    totalCost,
+    security,
+    curtailmentPct: Math.round(curtailmentRate * 100),
+    nuclearDelta,
+    windEff, solarEff, nuclearEff,
+    windDelta:   windEff    - P.windBase,
+    solarDelta:  solarEff   - P.solarBase,
+    nuclearDeltaLCOE: nuclearEff - P.nuclearBase,
+    breakdown: {
+      'Wind':          Math.round(wS * windEff    / tot),
+      'Zon':           Math.round(sS * solarEff   / tot),
+      'Kern':          Math.round(nS * nuclearEff / tot),
+      'Gas backup':    Math.round(gS * P.gasCost  / tot),
+      'Systeemkosten': Math.round(sysAdder),
+    }
+  };
+}
+
+// ════════════════════════════════════════════════════════
+//  FRONTIER CLOUD
+// ════════════════════════════════════════════════════════
+function buildFrontier() {
+  const pts = [];
+  // Wind family
+  for (let w = 8; w <= 32; w += 3) {
+    const r = model(w, 36, 0, 20, 15);
+    pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Wind ${w} GW, geen kern` });
+  }
+  // Nuclear family
+  for (let n = 0; n <= 6.4; n += 0.8) {
+    const r = model(18, 34, n, 15, 12);
+    pts.push({ x: r.security, y: r.totalCost, type: 'nuclear', tip: `Kern ${n.toFixed(1)} GW` });
+  }
+  // Battery family
+  for (let b = 5; b <= 50; b += 5) {
+    const r = model(22, 38, 0, b, 18);
+    pts.push({ x: r.security, y: r.totalCost, type: 'battery', tip: `Batterij ${b} GWh` });
+  }
+  // Interconn family
+  for (let ic = 3; ic <= 28; ic += 4) {
+    const r = model(22, 36, 0, 20, ic);
+    pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Interconn ${ic} GW` });
+  }
+  // Mixed
+  for (let w = 14; w <= 26; w += 4) {
+    for (let n = 0; n <= 4.8; n += 1.6) {
+      const r = model(w, 36, n, 20, 15);
+      pts.push({ x: r.security, y: r.totalCost,
+        type: n > 0 ? 'nuclear' : 'wind',
+        tip: `Wind ${w} GW + Kern ${n.toFixed(1)} GW` });
+    }
+  }
+  return pts;
+}
+
+const frontierPts = buildFrontier();
+const typeCol = { wind: '#1a6fa3', nuclear: '#b52a1c', battery: '#1e8a4a' };
+
+const breakdownColors = {
+  'Wind':          '#1a6fa3',
+  'Zon':           '#d4900a',
+  'Kern':          '#b52a1c',
+  'Gas backup':    '#7f8c8d',
+  'Systeemkosten': '#333333',
+};
+
+// ════════════════════════════════════════════════════════
+//  RENDER: FRONTIER
+// ════════════════════════════════════════════════════════
+function renderFrontier(cur) {
+  const el = document.getElementById('svg-frontier');
+  const W = el.clientWidth || 600;
+  const H = 290;
+  const m = { top: 18, right: 28, bottom: 42, left: 54 };
+  const iW = W - m.left - m.right;
+  const iH = H - m.top - m.bottom;
+
+  const svg = d3.select('#svg-frontier')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  const allX = frontierPts.map(d => d.x).concat([cur.security]);
+  const allY = frontierPts.map(d => d.y).concat([cur.totalCost]);
+  const xd = [d3.min(allX) - 1.5, d3.max(allX) + 1.5];
+  const yd = [d3.min(allY) - 4,   d3.max(allY) + 4];
+
+  const xSc = d3.scaleLinear().domain(xd).range([0, iW]);
+  const ySc = d3.scaleLinear().domain(yd).range([iH, 0]);
+
+  g.append('g').attr('class','grid')
+   .call(d3.axisLeft(ySc).tickSize(-iW).tickFormat('').ticks(5));
+  g.append('g').attr('class','grid').attr('transform',`translate(0,${iH})`)
+   .call(d3.axisBottom(xSc).tickSize(-iH).tickFormat('').ticks(5));
+
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
+   .call(d3.axisBottom(xSc).ticks(5).tickFormat(d => d + '%'));
+  g.append('g').attr('class','axis')
+   .call(d3.axisLeft(ySc).ticks(5).tickFormat(d => '€' + d));
+
+  // Axis labels
+  g.append('text')
+   .attr('x', iW/2).attr('y', iH + 36)
+   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Leveringszekerheid (% uren zonder import)');
+  g.append('text')
+   .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-42)
+   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Systeemkosten (€/MWh)');
+
+  // "Better" corner label
+  g.append('text')
+   .attr('x', iW - 4).attr('y', iH - 6)
+   .attr('text-anchor','end').attr('fill','#1e8a4a').attr('font-size',9)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif').attr('opacity',0.75)
+   .text('goedkoper & veiliger →');
+
+  // Cloud
+  g.selectAll('.fp')
+   .data(frontierPts).enter().append('circle')
+   .attr('class','fp')
+   .attr('cx', d => xSc(d.x)).attr('cy', d => ySc(d.y))
+   .attr('r', 4.5)
+   .attr('fill', d => typeCol[d.type])
+   .attr('opacity', 0.45)
+   .attr('stroke','none');
+
+  // Current point
+  g.append('circle')
+   .attr('cx', xSc(cur.security)).attr('cy', ySc(cur.totalCost))
+   .attr('r', 9)
+   .attr('fill','#1a1a1a')
+   .attr('stroke','#b52a1c').attr('stroke-width', 2.5);
+
+  g.append('text')
+   .attr('x', xSc(cur.security) + 13).attr('y', ySc(cur.totalCost) + 4)
+   .attr('fill','#1a1a1a').attr('font-size',9).attr('font-weight','700')
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Huidige mix');
+}
+
+// ════════════════════════════════════════════════════════
+//  RENDER: COST STACK (horizontal bar)
+// ════════════════════════════════════════════════════════
+function renderStack(breakdown) {
+  const el = document.getElementById('svg-stack');
+  const W = el.clientWidth || 600;
+  const H = 210;
+  const m = { top: 14, right: 28, bottom: 38, left: 54 };
+  const iW = W - m.left - m.right;
+  const iH = H - m.top - m.bottom;
+
+  const svg = d3.select('#svg-stack')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  const keys   = Object.keys(breakdown).filter(k => breakdown[k] > 0);
+  const values = keys.map(k => breakdown[k]);
+  const total  = values.reduce((a,b) => a+b, 0);
+
+  const xSc = d3.scaleLinear().domain([0, total]).range([0, iW]);
+  const barH = 44;
+  const barY = (iH - barH) / 2;
+
+  let cum = 0;
+  keys.forEach((k, i) => {
+    const v = values[i];
+    g.append('rect')
+     .attr('x', xSc(cum)).attr('y', barY)
+     .attr('width', Math.max(0, xSc(v) - 1)).attr('height', barH)
+     .attr('fill', breakdownColors[k]);
+    if (xSc(v) > 28) {
+      g.append('text')
+       .attr('x', xSc(cum) + xSc(v)/2).attr('y', barY + barH/2 + 4)
+       .attr('text-anchor','middle').attr('fill','#fff')
+       .attr('font-size', 10).attr('font-weight','700')
+       .attr('font-family','Helvetica Neue,Arial,sans-serif')
+       .text('€' + v);
+    }
+    cum += v;
+  });
+
+  g.append('text')
+   .attr('x', iW/2).attr('y', barY - 5)
+   .attr('text-anchor','middle').attr('fill','#1a1a1a').attr('font-size',11)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Totaal: €' + total + '/MWh');
+
+  g.append('g').attr('class','axis')
+   .attr('transform',`translate(0,${barY + barH + 1})`)
+   .call(d3.axisBottom(xSc).ticks(6).tickFormat(d => '€'+d));
+
+  document.getElementById('stack-legend').innerHTML = keys.map(k =>
+    `<div class="legend-item">
+      <div class="leg-line" style="background:${breakdownColors[k]}"></div>${k}
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  INSIGHT TEXT
+// ════════════════════════════════════════════════════════
+function insight(wind, solar, nuclear, battery, interconn, r) {
+  const lines = [];
+
+  // Kannibalisering wind
+  if (r.windDelta > 15) {
+    lines.push(`<strong>Wind-kannibalisering:</strong> door hoge penetratie stijgt de effectieve LCOE van wind van €117 naar €${r.windEff}/MWh (+€${r.windDelta}). Elke extra turbine produceert precies wanneer de prijs al laag is — banken prijzen dit risico in via hogere kapitaalkosten.`);
+  }
+
+  // Kern kannibalisering
+  if (nuclear > 0) {
+    if (r.nuclearDeltaLCOE > 20) {
+      lines.push(`<strong>Kern-kannibalisering ernstig:</strong> effectieve LCOE kernenergie stijgt van €160 naar €${r.nuclearEff}/MWh (+€${r.nuclearDeltaLCOE}). Een EPR heeft 25 jaar nodig om terug te verdienen — in een systeem met steeds meer wind en zon zijn de marktprijzen in jaar 10–25 structureel lager.`);
+    } else {
+      lines.push(`Bij de huidige wind/zon-instelling is kern-kannibalisering beperkt (+€${r.nuclearDeltaLCOE}/MWh). Voeg meer wind of zon toe om het effect te zien.`);
+    }
+    if (r.nuclearDelta > 8) {
+      lines.push(`<strong>Kernmeerkosten: +€${r.nuclearDelta}/MWh</strong> ten opzichte van een portfolio dat dezelfde leveringszekerheid haalt zonder kern (via extra wind + gas + batterijen).`);
+    } else if (r.nuclearDelta > 0) {
+      lines.push(`Kernmeerkosten zijn beperkt (+€${r.nuclearDelta}/MWh) bij deze mix — kern heeft dan nog enige restwaarde als basislast.`);
+    }
+  }
+
+  // Curtailment
+  if (r.curtailmentPct > 18) {
+    lines.push(`<strong>Hoog curtailment (${r.curtailmentPct}%):</strong> bijna een vijfde van de opgewekte stroom wordt weggegooid — dit verlengt de terugverdientijd en verhoogt effectieve LCOE voor alle technologieën.`);
+  } else if (r.curtailmentPct > 8) {
+    lines.push(`Curtailment van ${r.curtailmentPct}% is merkbaar. Meer batterijcapaciteit of interconnectie vermindert dit direct.`);
+  }
+
+  // Interconnectie bij hoge VRE
+  if (interconn < 8 && nuclear === 0 && (wind > 20 || solar > 40)) {
+    lines.push(`<strong>Lage interconnectie</strong> bij hoge wind/zon maakt kern relatief aantrekkelijker: er is dan minder escape voor overaanbod, en de waarde van stabiele basislast stijgt.`);
+  } else if (interconn > 18 && r.curtailmentPct > 10) {
+    lines.push(`Hoge interconnectie helpt, maar bij Europees overaanbod (Duitsland, België, Denemarken in dezelfde situatie) neemt de exportwaarde sterk af — het kannibaliseringseffect telt dan ook op Europese schaal.`);
+  }
+
+  // Battery vs nuclear
+  if (battery >= 35 && nuclear > 0) {
+    lines.push(`<span class="ok">Met ${battery} GWh aan batterijen + V2G</span> is vrijwel alle flexibiliteit al beschikbaar. Kern en batterijen concurreren direct: beide vullen de daluren op, maar batterijen doen dit goedkoper en zonder kannibaliseringsrisico.`);
+  }
+
+  // Security warning
+  if (r.security < 78) {
+    lines.push(`⚠️ Leveringszekerheid van ${r.security}% is kwetsbaar — het systeem is regelmatig afhankelijk van import tijdens piekschaarste (dark doldrums).`);
+  }
+
+  if (lines.length === 0) {
+    lines.push('Dit portfolio is relatief evenwichtig. Vergroot wind of kern om de kannibaliseringseffecten zichtbaar te maken.');
+  }
+
+  return lines.join('<br><br>');
+}
+
+// ════════════════════════════════════════════════════════
+//  UPDATE
+// ════════════════════════════════════════════════════════
+function update() {
+  const wind     = +document.getElementById('sl-wind').value;
+  const solar    = +document.getElementById('sl-solar').value;
+  const nuclear  = +document.getElementById('sl-nuclear').value;
+  const battery  = +document.getElementById('sl-battery').value;
+  const interconn= +document.getElementById('sl-interconn').value;
+
+  document.getElementById('lbl-wind').textContent     = wind + ' GW';
+  document.getElementById('lbl-solar').textContent    = solar + ' GW';
+  document.getElementById('lbl-nuclear').textContent  = nuclear.toFixed(1) + ' GW';
+  document.getElementById('lbl-battery').textContent  = battery + ' GWh';
+  document.getElementById('lbl-interconn').textContent= interconn + ' GW';
+
+  const r = model(wind, solar, nuclear, battery, interconn);
+
+  // KPIs
+  const setKPI = (id, val, cls) => {
+    const el = document.getElementById(id);
+    el.textContent = val;
+    el.className = 'kpi-value ' + cls;
+  };
+
+  setKPI('kpi-cost',   '€' + r.totalCost, r.totalCost > 105 ? 'warn' : 'good');
+  setKPI('kpi-sec',    r.security + '%',  r.security  < 80  ? 'warn' : 'good');
+  setKPI('kpi-curt',   r.curtailmentPct + '%', r.curtailmentPct > 15 ? 'warn' : 'good');
+  if (nuclear === 0) {
+    setKPI('kpi-ndelta', 'n.v.t.', 'neut');
+  } else {
+    const sign = r.nuclearDelta >= 0 ? '+' : '';
+    setKPI('kpi-ndelta', sign + '€' + r.nuclearDelta, r.nuclearDelta > 6 ? 'warn' : 'good');
+  }
+
+  // Dynamic LCOE box
+  const setLCOE = (effId, deltaId, base, eff, delta, col) => {
+    document.getElementById(effId).textContent = '€' + eff + '/MWh';
+    const del = document.getElementById(deltaId);
+    del.textContent = delta > 0
+      ? `+€${delta}/MWh door kannibalisering`
+      : 'Minimale kannibalisering bij deze mix';
+    del.className = 'lcoe-delta ' + (delta > 10 ? 'up' : 'same');
+  };
+
+  setLCOE('lcoe-wind-eff',   'lcoe-wind-delta',   P.windBase,    r.windEff,    r.windDelta,   '--wind');
+  setLCOE('lcoe-solar-eff',  'lcoe-solar-delta',  P.solarBase,   r.solarEff,   r.solarDelta,  '--solar');
+  setLCOE('lcoe-nuc-eff',    'lcoe-nuc-delta',    P.nuclearBase, r.nuclearEff, r.nuclearDeltaLCOE, '--nuclear');
+
+  renderFrontier(r);
+  renderStack(r.breakdown);
+  document.getElementById('insight').innerHTML = insight(wind, solar, nuclear, battery, interconn, r);
+}
+
+// ════════════════════════════════════════════════════════
+//  SCENARIOS
+// ════════════════════════════════════════════════════════
+const SCEN = {
+  windmax:  { wind:28, solar:42, nuclear:0,   battery:25, interconn:18 },
+  balanced: { wind:22, solar:38, nuclear:3.2, battery:20, interconn:15 },
+  nuclear:  { wind:15, solar:30, nuclear:6.4, battery:10, interconn:10 },
+  island:   { wind:22, solar:38, nuclear:3.2, battery:30, interconn:4  },
+  battery:  { wind:25, solar:42, nuclear:0,   battery:45, interconn:18 },
+};
+
+document.querySelectorAll('.scenario-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const s = SCEN[btn.dataset.s];
+    document.getElementById('sl-wind').value      = s.wind;
+    document.getElementById('sl-solar').value     = s.solar;
+    document.getElementById('sl-nuclear').value   = s.nuclear;
+    document.getElementById('sl-battery').value   = s.battery;
+    document.getElementById('sl-interconn').value = s.interconn;
+    update();
+  });
+});
+
+['sl-wind','sl-solar','sl-nuclear','sl-battery','sl-interconn'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    update();
+  });
+});
+
+update();
+window.addEventListener('resize', update);
+</script>
+</body>
+</html>
