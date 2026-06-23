@@ -18,6 +18,7 @@
     --battery:   #1e8a4a;
     --gas:       #7f8c8d;
     --interconn: #7b3fa0;
+    --gasccs:    #4a6358;
     --accent:    #b52a1c;
   }
 
@@ -140,6 +141,7 @@
   input[type=range].nuclear-s  { accent-color: var(--nuclear); }
   input[type=range].battery-s  { accent-color: var(--battery); }
   input[type=range].interconn-s{ accent-color: var(--interconn); }
+  input[type=range].gasccs-s   { accent-color: var(--gasccs); }
 
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -176,7 +178,7 @@
   /* KPI row */
   .kpi-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1px;
     background: var(--rule);
     border: 1px solid var(--rule);
@@ -326,9 +328,120 @@
     padding-top: 0.9rem;
   }
 
-  @media (max-width: 700px) {
+  /* ── ABOUT PANEL ── */
+  .about-panel {
+    max-width: 960px;
+    margin: 1.8rem auto 0;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .about-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1.3rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+  }
+
+  .about-toggle:hover { background: var(--bg); }
+
+  .about-toggle .arrow {
+    font-size: 0.65rem;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+
+  .about-toggle.open .arrow { transform: rotate(180deg); }
+
+  .about-body {
+    display: none;
+    padding: 0 1.8rem 1.8rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .about-body.open { display: block; }
+
+  .about-body h2 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 1.4rem 0 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.3rem;
+  }
+
+  .about-body h3 {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 1.1rem 0 0.4rem;
+  }
+
+  .about-body p {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 0.7rem;
+  }
+
+  .about-body table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    margin-bottom: 1rem;
+  }
+
+  .about-body th {
+    text-align: left;
+    font-weight: 700;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink);
+  }
+
+  .about-body td {
+    padding: 0.3rem 0.6rem;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+    vertical-align: top;
+  }
+
+  .about-body tr:hover td { background: var(--bg); }
+
+  .about-body .refs {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .about-body .disclaimer {
+    border-left: 3px solid var(--rule);
+    padding: 0.6rem 1rem;
+    background: var(--bg);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 0.8rem;
+  }
+
     .layout { grid-template-columns: 1fr; }
-    .kpi-row { grid-template-columns: repeat(2,1fr); }
+    .kpi-row { grid-template-columns: repeat(3,1fr); }
     .lcoe-box { grid-template-columns: 1fr; }
     .controls { position: static; }
   }
@@ -403,6 +516,33 @@
       </div>
     </div>
 
+    <div class="control-group">
+      <div class="control-label">
+        Gasbackup als CCS
+        <span class="control-val" style="color:var(--gasccs)" id="lbl-gasccs">30%</span>
+      </div>
+      <div class="control-sublabel">Aandeel gasbackup met CO₂-afvang i.p.v. kaal gas</div>
+      <div class="slider-row">
+        <input type="range" class="gasccs-s" id="sl-gasccs" min="0" max="100" value="30" step="10">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="controls-title">Elektriciteitsvraag 2040</div>
+    <div class="control-group">
+      <div class="control-sublabel">TNO/PBL scenario — bepaalt penetratie en curtailment</div>
+      <select id="sel-demand" style="
+        width:100%; padding:0.4rem 0.5rem;
+        font-family:'Helvetica Neue',Arial,sans-serif; font-size:0.75rem;
+        border:1px solid var(--rule); background:var(--paper); color:var(--ink);
+        cursor:pointer; border-radius:2px; margin-top:0.2rem;">
+        <option value="120">120 TWh — huidig niveau</option>
+        <option value="160" selected>160 TWh — PBL middenmidden 2040</option>
+        <option value="200">200 TWh — hoog elektr. scenario 2040</option>
+      </select>
+    </div>
+
     <hr class="divider">
 
     <div class="controls-title">Snelscenario's</div>
@@ -428,7 +568,7 @@
       <div class="kpi">
         <span class="kpi-label">Leveringszekerheid</span>
         <span class="kpi-value neut" id="kpi-sec">—</span>
-        <span class="kpi-sub">% uren gedekt zonder import</span>
+        <span class="kpi-sub">% dark-doldrums-uren gedekt door eigen bronnen (incl. gas)</span>
       </div>
       <div class="kpi">
         <span class="kpi-label">Curtailment</span>
@@ -439,6 +579,16 @@
         <span class="kpi-label">Kernmeerkosten</span>
         <span class="kpi-value neut" id="kpi-ndelta">—</span>
         <span class="kpi-sub">vs. zelfde zekerheid zonder kern</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Interconnectiekosten</span>
+        <span class="kpi-value neut" id="kpi-ic">—</span>
+        <span class="kpi-sub">€/MWh infra + importpremie</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Gas+CCS all-in</span>
+        <span class="kpi-value neut" id="kpi-ccs">—</span>
+        <span class="kpi-sub">€/MWh incl. capaciteitsvergoeding</span>
       </div>
     </div>
 
@@ -472,6 +622,19 @@
       </div>
     </div>
 
+    <!-- TIPPING POINT CURVE -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Het kantelpunt</div>
+      <div class="panel-title">Kerncurve versus systeemwaarde — bij welke wind/zon-penetratie wordt kern een nettoverlies?</div>
+      <svg id="svg-tipping" width="100%" height="300"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-line" style="background:var(--nuclear)"></div>Effectieve LCOE kernenergie (stijgt met penetratie)</div>
+        <div class="legend-item"><div class="leg-line" style="background:var(--ink)"></div>Systeemwaarde van extra capaciteit (daalt met penetratie)</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--accent)"></div>Kantelpunt: kern = nettoverlies</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
+      </div>
+    </div>
+
     <!-- EFFICIENT FRONTIER -->
     <div class="chart-panel">
       <div class="panel-eyebrow">Efficient frontier</div>
@@ -493,6 +656,22 @@
       <div class="legend" id="stack-legend"></div>
     </div>
 
+    <!-- LDC PANEL -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Load duration curve — 3 segmenten</div>
+      <div class="panel-title">Energiebalans per marktsegment (TWh/jaar)</div>
+      <svg id="svg-ldc" width="100%" height="200"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-line" style="background:#1a6fa3"></div>Wind</div>
+        <div class="legend-item"><div class="leg-line" style="background:#d4900a"></div>Zon</div>
+        <div class="legend-item"><div class="leg-line" style="background:#b52a1c"></div>Kern</div>
+        <div class="legend-item"><div class="leg-line" style="background:#4a6358"></div>Gas(+CCS)</div>
+        <div class="legend-item"><div class="leg-line" style="background:#7b3fa0"></div>Import</div>
+        <div class="legend-item"><div class="leg-line" style="background:#1e8a4a"></div>Batterij ↕</div>
+        <div class="legend-item"><div class="leg-line" style="background:#ccc; border:1px dashed #999"></div>Curtailment (weggegooid)</div>
+      </div>
+    </div>
+
     <!-- INSIGHT -->
     <div class="insight-box" id="insight">Pas de sliders aan om de systeemeffecten te zien.</div>
 
@@ -501,186 +680,517 @@
 
 <div class="footnote">
   <strong>Methodiek:</strong>
-  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). Leveringszekerheid: schatting op basis van "dark doldrums"-kans NL (~400–600 uur/jaar wind &lt;10% én zon ~0). Gas backup: €95/MWh incl. capaciteitsvergoeding. Batterijcycluskost: €10/MWh (V2G: €6/MWh). Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
+  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). Interconnectiekosten zijn geen gratis optie: kabelinfrastructuur à €1,75 mld/GW (subsea kabels + converterstations) geannualiseerd over 40 jaar, plus een importpremie tijdens schaarse uren die oploopt naarmate windstilte vaker Europabreed gecorreleerd is. <strong>Leveringszekerheid (herzien):</strong> percentage van de "dark doldrums"-uren (~400–600 uur/jaar, NL wind &lt;10% én zon ~0) dat wordt gedekt door binnenlandse bronnen — batterijen, kernrestproductie, én gasvermogen (kaal of met CCS). Dit meet dus niet "hebben we wel/geen stroom" (Nederland heeft doorgaans voldoende gasvermogen om elk gat te vullen), maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere, vaak hogere Europese schaarsteprijzen. Gas+CCS: €135/MWh LCOE (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%) plus €18/MWh capaciteitsvergoeding voor stand-by beschikbaarheid — zelfde transparante logica als bij kaal gas. Kaal gas: €95/MWh incl. capaciteitsvergoeding. Batterijcycluskost: €10/MWh (V2G: €6/MWh). Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
 </div>
+
+<!-- ABOUT PANEL -->
+<div class="about-panel">
+  <button class="about-toggle" id="about-toggle" onclick="toggleAbout()">
+    Over dit model — methodiek, aannames &amp; referenties
+    <span class="arrow">▼</span>
+  </button>
+  <div class="about-body" id="about-body">
+
+    <h2>Achtergrond</h2>
+    <p>Dit model maakt één fundamenteel argument inzichtelijk: beslissingen over het elektriciteitssysteem zijn geen optelsom van losse technologiekeuzes. Elke toevoeging verandert de waarde van alles wat er al in zit. De methodiek is gebaseerd op het werk van <strong>Lion Hirth</strong> (value factor / marktwaardedepreciatie, 2013–2015), uitgebreid met het kannibaliseringseffect op kapitaalkosten, volledige systeemkosten, een load duration curve in drie segmenten, en realistische Nederlandse parameters voor 2040.</p>
+
+    <h2>Technologiekosten</h2>
+    <table>
+      <tr><th>Technologie</th><th>Standalone LCOE</th><th>Toelichting</th></tr>
+      <tr><td>Wind offshore</td><td>€117/MWh</td><td>NL kabinetsbrief 2025 (strike price SDE++)</td></tr>
+      <tr><td>Zon</td><td>€45/MWh</td><td>Huidige tenderprijzen utility-scale</td></tr>
+      <tr><td>Kernenergie</td><td>€160/MWh</td><td>Hinkley Point C benchmark; excl. extra infrastructuur</td></tr>
+      <tr><td>Gas CCGT</td><td>€95/MWh</td><td>Incl. capaciteitsvergoeding</td></tr>
+      <tr><td>Gas+CCS</td><td>€135 + €18/MWh</td><td>Hogere capex CO₂-afvang/opslag; 90% afvangrate; €18 = capaciteitsvergoeding</td></tr>
+      <tr><td>Batterijen + V2G</td><td>€10/MWh</td><td>Cycluskost incl. bidirectioneel laden EVs</td></tr>
+    </table>
+
+    <h2>Kannibaliseringsopslag</h2>
+    <p>Standalone LCOE's missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. Dit verlengt terugverdientijden en verhoogt via hogere WACC de effectieve kapitaalkosten.</p>
+    <table>
+      <tr><th>Technologie</th><th>Opslag per 10pp penetratie</th><th>Reden</th></tr>
+      <tr><td>Wind</td><td>+5,5%</td><td>Gecorreleerde productie bij hoge windsnelheid</td></tr>
+      <tr><td>Zon</td><td>+6,5%</td><td>Sterke dagcorrelatie, zomermiddag-concentratie</td></tr>
+      <tr><td>Kern</td><td>+9,0%</td><td>25-jarige blootstelling + baseload-inflexibiliteit in flexibel systeem</td></tr>
+    </table>
+
+    <h2>Load duration curve — 3 segmenten</h2>
+    <table>
+      <tr><th>Segment</th><th>Uren/jaar</th><th>Situatie</th><th>Dominante bron</th></tr>
+      <tr><td><strong>Piek (A)</strong></td><td>~500</td><td>Winter, windstil, avond — <em>dark doldrums</em></td><td>Gas(+CCS), kern, import</td></tr>
+      <tr><td><strong>Schouder (B)</strong></td><td>~5.000</td><td>Gemiddeld aanbod en vraag</td><td>Wind, zon, batterijen</td></tr>
+      <tr><td><strong>Dal (C)</strong></td><td>~3.260</td><td>Zomermiddag, veel zon/wind, lage vraag</td><td>Curtailment, batterijlading, export</td></tr>
+    </table>
+
+    <h2>Interconnectiekosten</h2>
+    <p>Interconnectie is geen gratis optie: <strong>€1,75 mld/GW</strong> infrastructuur (gemiddelde €1,5–2 mrd, geannualiseerd over 40 jaar), plus een importpremie die oploopt bij Europabrede windstilte — als Nederland importeert tijdens dark doldrums, zijn Duitsland, België en Denemarken vaak in dezelfde situatie.</p>
+
+    <h2>Leveringszekerheid — definitie</h2>
+    <p>Het model meet het percentage van de dark-doldrums-uren (~400–600 uur/jaar) dat wordt gedekt door <strong>binnenlandse bronnen</strong> — batterijen, kernrestproductie, gas(+CCS). Dit meet niet "hebben we wel of geen stroom" maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere Europese schaarsteprijzen.</p>
+
+    <h2>Elektriciteitsvraag 2040</h2>
+    <table>
+      <tr><th>Scenario</th><th>TWh/jaar</th><th>Toelichting</th></tr>
+      <tr><td>Laag</td><td>120 TWh</td><td>Huidig verbruiksniveau</td></tr>
+      <tr><td>Midden</td><td>160 TWh</td><td>TNO/PBL middenscenario (standaard)</td></tr>
+      <tr><td>Hoog</td><td>200 TWh</td><td>Volledig elektrificiatiescenario industrie + warmte</td></tr>
+    </table>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies. Het model gebruikt drie marktsegmenten in plaats van een volledig uurresolutiemodel. Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL Klimaat- en Energieverkenning.
+    </div>
+
+    <h2>Referenties</h2>
+    <div class="refs">
+      Hirth, L. (2013). <em>The market value of variable renewables.</em> Energy Economics.<br>
+      Hirth, L. (2015). <em>The optimal share of variable renewables.</em> The Energy Journal.<br>
+      PBL/TNO (2023). <em>Klimaat- en Energieverkenning 2023.</em><br>
+      ENTSO-E (2024). <em>Ten-Year Network Development Plan.</em><br>
+      HM Government (2023). <em>Hinkley Point C — revised cost estimates.</em>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleAbout() {
+  const btn  = document.getElementById('about-toggle');
+  const body = document.getElementById('about-body');
+  btn.classList.toggle('open');
+  body.classList.toggle('open');
+}
+</script>
+
 
 <script>
 // ════════════════════════════════════════════════════════
 //  PARAMETERS
-// ════════════════════════════════════════════════════════
 const P = {
-  demand:          120,   // TWh/year
-  peakGW:          21,    // GW
+  // Demand — instelbaar via UI (120/160/200 TWh)
+  demandBase:      160,   // TWh/year — TNO/PBL middenscenario 2040
+
+  // Peak load (GW) schaalt mee met vraag
+  // NL piek ~21 GW bij 120 TWh; bij hogere vraag: elektr. industrie/warmtepomp pieken
+  peakGWperTWh:    0.165, // GW per TWh jaarvraag (empirisch NL)
+
+  // Capacity factors
   windCF:          0.42,
   solarCF:         0.11,
   nuclearCF:       0.85,
-  darkHours:       500,   // hours/year: wind<10% AND solar≈0
+
+  // ── LOAD DURATION CURVE — 3 segmenten ──────────────────
+  // Segment A: Piek (dark doldrums) — weinig VRE, hoge vraag
+  //   Typisch winter, avond/nacht, windstil → gas/kern nodig
+  segA_hours:      500,   // uur/jaar
+  segA_loadFrac:   0.90,  // gemiddelde belasting als fractie van piek
+  segA_vreFrac:    0.12,  // VRE-aanbod als fractie van geïnstalleerd vermogen
+
+  // Segment B: Schouder — gemiddeld vraag/aanbod
+  segB_hours:      5000,
+  segB_loadFrac:   0.65,
+  segB_vreFrac:    0.55,  // wind+zon gemiddeld redelijk beschikbaar
+
+  // Segment C: Dal — lage vraag, hoog VRE-aanbod (zomermiddag, weekend)
+  segC_hours:      3260,  // 8760 - 500 - 5000
+  segC_loadFrac:   0.38,
+  segC_vreFrac:    1.05,  // soms meer aanbod dan geïnstalleerd vermogen (gusts + sun peak)
 
   // Standalone LCOE (€/MWh)
   windBase:        117,
   solarBase:       45,
   nuclearBase:     160,
-  gasCost:         95,
+  gasCost:         95,    // CCGT zonder CCS, incl. capaciteitsvergoeding
   batteryCycle:    10,
 
-  // Cannibalization: LCOE rises with penetration
-  // windKannib: how much LCOE rises per 10% penetration point
-  windKannib:      0.055,   // +5.5% per 10pp penetration
-  solarKannib:     0.065,   // solar more self-cannibalizing (correlated)
-  nuclearKannib:   0.090,   // nuclear worst: 25yr exposure + inflexibility premium
+  // Gas + CCS
+  gasCcsLCOE:          135,
+  gasCcsCapMechCost:   18,
+  gasCcsCaptureRate:   0.90,
 
-  // System cost adders (€/MWh) per 10pp penetration
+  // Cannibalization slopes (LCOE stijgt met penetratie)
+  windKannib:      0.055,
+  solarKannib:     0.065,
+  nuclearKannib:   0.090,
+
+  // System cost adders (€/MWh per 10pp penetratie)
   windSysSlope:    1.6,
   solarSysSlope:   2.0,
-  nuclearSysSlope: 2.8,    // inflexible baseload in flexible system
+  nuclearSysSlope: 2.8,
 
   // Interconnection
   interconnMaxBenefit: 0.55,
   interconnSat:    18,
-
-  // Battery curtailment absorption
-  batteryAbsorbFactor: 0.018,  // per GWh
+  interconnCapexPerGW: 1750,
+  interconnLifetimeYr: 40,
+  interconnUtilTWhPerGW: 4.5,
+  interconnImportPremiumBase: 0.15,
+  interconnCorrelationPenalty: 0.55,
 };
 
 // ════════════════════════════════════════════════════════
 //  DYNAMIC LCOE (kannibalisering-gecorrigeerd)
 // ════════════════════════════════════════════════════════
 function effectiveLCOE(baseLCOE, penetrationFrac, kannibFactor, interconnBenefit) {
-  // penetrationFrac: fraction of demand met by this technology
-  // kannibFactor: how fast LCOE rises
-  // interconn reduces cannibalization (can export surplus)
-  const pen = penetrationFrac * 100; // in percentage points
+  const pen = penetrationFrac * 100;
   const interconnMod = 1 - interconnBenefit * 0.45;
   const multiplier = 1 + (pen / 10) * kannibFactor * interconnMod;
   return Math.round(baseLCOE * multiplier);
 }
 
 // ════════════════════════════════════════════════════════
-//  CORE MODEL
+//  INTERCONNECTION COSTS
 // ════════════════════════════════════════════════════════
-function model(wind, solar, nuclear, battery, interconn) {
+function interconnCost(interconnGW, totalVREPenFrac, importedTWh, demand) {
+  const capexTotal_m   = interconnGW * P.interconnCapexPerGW;
+  const annualCapex_m  = capexTotal_m / P.interconnLifetimeYr;
+  const infraCostPerMWh = (annualCapex_m * 1e6) / (demand * 1e6);
+
+  const relianceRatio = Math.min(1, importedTWh / Math.max(0.5, interconnGW * P.interconnUtilTWhPerGW * 0.3));
+  const correlationFactor = Math.min(1, Math.max(0, (totalVREPenFrac - 0.6) / 1.2));
+  const premiumRate = P.interconnImportPremiumBase +
+    P.interconnCorrelationPenalty * correlationFactor * relianceRatio;
+  const importPremiumPerMWh = (importedTWh / demand) * P.gasCost * premiumRate;
+
+  return {
+    infraCostPerMWh:     Math.round(infraCostPerMWh * 10) / 10,
+    importPremiumPerMWh: Math.round(importPremiumPerMWh * 10) / 10,
+    total: Math.round((infraCostPerMWh + importPremiumPerMWh) * 10) / 10
+  };
+}
+
+// ════════════════════════════════════════════════════════
+//  LOAD DURATION CURVE ENGINE
+//
+//  Per segment berekenen we:
+//  - VRE-aanbod (GWh)
+//  - Residuele vraag (= vraag − VRE − batterijontlading)
+//  - Of er curtailment is (aanbod > vraag na opslag/export)
+//  - Of er gas/import nodig is (residuele vraag > 0 na VRE)
+//
+//  Batterij werkt als price-taker:
+//   Laadt in seg C (dal), ontlaadt in seg A (piek) en deel B
+//  Interconnectie werkt als export buffer in seg C,
+//   en als import suppletie in seg A
+// ════════════════════════════════════════════════════════
+function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
+  const peakGW  = demand * P.peakGWperTWh;
+
+  // VRE-opwekking per segment (GWh)
+  // Wind: CF per segment verschilt (meer 's nachts/winter dan overdag/zomer)
+  const windA  = windGW  * P.segA_vreFrac * 0.55 * P.segA_hours / 1000;  // weinig wind
+  const windB  = windGW  * P.segB_vreFrac * P.windCF / 0.55 * P.segB_hours / 1000;
+  const windC  = windGW  * Math.min(1, P.segC_vreFrac * 0.7) * P.windCF / 0.55 * P.segC_hours / 1000;
+
+  // Zon: alleen in B en C (overdag), vrijwel nul in A (winter/nacht)
+  const solarA = solarGW * 0.02 * P.segA_hours / 1000;
+  const solarB = solarGW * P.solarCF * 1.1 * P.segB_hours / 1000;
+  const solarC = solarGW * P.solarCF * 1.8 * P.segC_hours / 1000;  // zomermiddag piek
+
+  // Kern: baseload, vrijwel constant (kleine onderhoudscorrectie)
+  const nuclearA = nuclearGW * P.nuclearCF * P.segA_hours / 1000;
+  const nuclearB = nuclearGW * P.nuclearCF * P.segB_hours / 1000;
+  const nuclearC = nuclearGW * P.nuclearCF * P.segC_hours / 1000;
+
+  // Vraag per segment (GWh)
+  const demandA = peakGW * P.segA_loadFrac * P.segA_hours / 1000;
+  const demandB = peakGW * P.segB_loadFrac * P.segB_hours / 1000;
+  const demandC = peakGW * P.segC_loadFrac * P.segC_hours / 1000;
+  const totalDemandCheck = demandA + demandB + demandC; // ≈ demand TWh bij correcte params
+
+  // Vraagschaalfactor: zorg dat segmenten optellen tot 'demand'
+  const demandScale = demand / totalDemandCheck;
+  const dA = demandA * demandScale;
+  const dB = demandB * demandScale;
+  const dC = demandC * demandScale;
+
+  // VRE totaal per segment
+  const vreA = windA + solarA + nuclearA;
+  const vreB = windB + solarB + nuclearB;
+  const vreC = windC + solarC + nuclearC;
+
+  // Surplus/tekort per segment (voor schaling)
+  const rawSurplusC = Math.max(0, vreC - dC);
+  const rawDeficitA = Math.max(0, dA - vreA);
+  const rawDeficitB = Math.max(0, dB - vreB);
+
+  // Batterij: laadt in C, ontlaadt in A en B (pro rata naar deficit)
+  const totalDeficit = rawDeficitA + rawDeficitB;
+  const battCharge  = Math.min(rawSurplusC * 0.85, batteryGWh * 365 * 0.8 / 1000); // TWh/jaar
+  const battDischargeA = totalDeficit > 0
+    ? Math.min(battCharge * 0.9, rawDeficitA) * Math.min(1, rawDeficitA / totalDeficit)
+    : 0;
+  const battDischargeB = totalDeficit > 0
+    ? Math.min(battCharge * 0.9 - battDischargeA, rawDeficitB) * Math.min(1, rawDeficitB / totalDeficit)
+    : 0;
+
+  // Interconnectie: exporteert surplus in C (vermindert curtailment),
+  // importeert in A (verkleint gas-gat) — netto effect via interconnBenefit
+  // Maar interconnectie heeft ook kosten → die worden elders berekend
+  const exportCapC = interconnGW * P.segC_hours / 1000 * 0.6; // max export capaciteit
+  const importCapA = interconnGW * P.segA_hours / 1000 * 0.5;
+  const interconnExportC = Math.min(rawSurplusC - battCharge, exportCapC);
+  const interconnImportA = Math.min(rawDeficitA - battDischargeA, importCapA) * 0.5; // 50% beschikbaar
+
+  // Curtailment: wat overblijft na batterij-laden en export
+  const curtailmentTWh = Math.max(0, rawSurplusC - battCharge - Math.max(0, interconnExportC));
+
+  // Gas/import gat in piek (segment A)
+  const gasGapA = Math.max(0, rawDeficitA - battDischargeA - interconnImportA);
+  // Gas/import gat in schouder (segment B)
+  const gasGapB = Math.max(0, rawDeficitB - battDischargeB);
+  const totalGasGap = gasGapA + gasGapB; // TWh/jaar gas of import nodig
+
+  // Curtailment rate als % van totale VRE-productie
+  const totalVRE = vreA + vreB + vreC;
+  const curtailmentRate = totalVRE > 0 ? curtailmentTWh / totalVRE : 0;
+
+  // Leveringszekerheid: % van piekschaarsere-uren (seg A) gedekt zonder import
+  // = hoe groot is het deel dat door binnenlandse bronnen (VRE+batt+gas) wordt gedekt?
+  const domesticCoverA = Math.min(1, (vreA + battDischargeA + gasGapA) / Math.max(0.01, dA));
+  const importFracA = interconnImportA / Math.max(0.01, dA);
+  // Security = hoe groot deel van seg A NIET afhankelijk is van import
+  const security = Math.round(Math.min(99, (1 - importFracA) * 100));
+
+  return {
+    // TWh per categorie
+    totalVRETWh:     Math.round(totalVRE * 10) / 10,
+    curtailmentTWh:  Math.round(curtailmentTWh * 10) / 10,
+    curtailmentRate: Math.round(curtailmentRate * 100),
+    gasGapTWh:       Math.round(totalGasGap * 10) / 10,
+    gasGapA_TWh:     Math.round(gasGapA * 10) / 10,
+    battChargeTWh:   Math.round(battCharge * 10) / 10,
+    importTWh:       Math.round(interconnImportA * 10) / 10,
+    security,
+    // Per-segment breakdown (voor visualisatie)
+    segments: [
+      { name: 'Piek (A)', hours: P.segA_hours * demandScale,
+        demand: Math.round(dA*10)/10, vre: Math.round(vreA*10)/10,
+        gas: Math.round(gasGapA*10)/10, batt: Math.round(battDischargeA*10)/10,
+        import: Math.round(interconnImportA*10)/10 },
+      { name: 'Schouder (B)', hours: P.segB_hours * demandScale,
+        demand: Math.round(dB*10)/10, vre: Math.round(vreB*10)/10,
+        gas: Math.round(gasGapB*10)/10, batt: Math.round(battDischargeB*10)/10,
+        import: 0 },
+      { name: 'Dal (C)', hours: P.segC_hours * demandScale,
+        demand: Math.round(dC*10)/10, vre: Math.round(vreC*10)/10,
+        gas: 0, batt: -Math.round(battCharge*10)/10,
+        curtail: Math.round(curtailmentTWh*10)/10 },
+    ]
+  };
+}
+
+// ════════════════════════════════════════════════════════
+//  CORE MODEL (nu gebouwd bovenop LDC)
+// ════════════════════════════════════════════════════════
+function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   const windTWh    = wind    * P.windCF    * 8.76;
   const solarTWh   = solar   * P.solarCF   * 8.76;
   const nuclearTWh = nuclear * P.nuclearCF * 8.76;
 
-  const windPen    = windTWh    / P.demand;
-  const solarPen   = solarTWh   / P.demand;
-  const nuclearPen = nuclearTWh / P.demand;
+  const windPen    = windTWh    / demand;
+  const solarPen   = solarTWh   / demand;
+  const nuclearPen = nuclearTWh / demand;
   const totalPen   = windPen + solarPen + nuclearPen;
 
-  // Interconnection benefit (log-saturating, erodes at high EU surplus)
+  // Interconnection benefit
   const rawInterconn = P.interconnMaxBenefit *
-    Math.log(1 + interconn / P.interconnSat) /
-    Math.log(1 + 1);
+    Math.log(1 + interconn / P.interconnSat) / Math.log(1 + 1);
   const euSurplusPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
-  const ib = Math.max(0, rawInterconn - euSurplusPenalty); // effective interconn benefit
+  const ib = Math.max(0, rawInterconn - euSurplusPenalty);
 
-  // Effective (kannibalisering-gecorrigeerde) LCOE per tech
+  // Effective LCOE per tech (kannibalisering-gecorrigeerd)
   const windEff    = effectiveLCOE(P.windBase,    windPen,    P.windKannib,    ib);
   const solarEff   = effectiveLCOE(P.solarBase,   solarPen,   P.solarKannib,   ib);
   const nuclearEff = effectiveLCOE(P.nuclearBase, nuclearPen + totalPen * 0.3,
-                                   P.nuclearKannib, ib * 0.5); // interconn helps kern minder
+                                   P.nuclearKannib, ib * 0.5);
 
-  // Curtailment
-  const surplusPen = Math.max(0, totalPen - 0.92);
-  const batteryAbsorb = Math.min(0.4, battery * P.batteryAbsorbFactor);
-  const curtailmentRate = Math.max(0,
-    surplusPen * (1 - ib * 0.65) * (1 - batteryAbsorb)
-  );
+  // ── LOAD DURATION CURVE ──────────────────────────────
+  const ldc = runLDC(wind, solar, nuclear, battery, interconn, demand);
 
-  // System cost adders
+  const curtailmentRate = ldc.curtailmentRate / 100; // als fractie
+
+  // System cost adders (netteverzwaring, redispatch, etc.)
   const windSys    = windPen    * 10 * P.windSysSlope;
   const solarSys   = solarPen   * 10 * P.solarSysSlope;
   const nuclearSys = nuclearPen * 10 * P.nuclearSysSlope;
   const curtailCost = curtailmentRate * 100 * 0.5;
 
-  // Gas backup for dark doldrums
-  const darkTWh = P.darkHours * P.peakGW / 1000;
-  const battCover = Math.min(darkTWh * 0.6, battery / 1000 * P.darkHours * 0.4);
-  const interconnCover = Math.min(darkTWh * 0.45, interconn * P.darkHours / 1000 * 0.45);
-  const nucCover  = nuclearTWh * 0.18;
-  const gasBackupTWh = Math.max(0, darkTWh - battCover - interconnCover - nucCover);
-  const gasShare  = gasBackupTWh / P.demand;
+  // Gas split: kaal vs CCS
+  const gasGapTWh    = ldc.gasGapTWh;
+  const gasCcsTWh    = gasGapTWh * gasCcsShare;
+  const gasPlainTWh  = gasGapTWh * (1 - gasCcsShare);
+  const gCS = gasCcsTWh  / demand;
+  const gPS = gasPlainTWh / demand;
 
-  // Weighted average effective LCOE
+  // Interconnection costs
+  const icCost = interconnCost(interconn, totalPen, ldc.importTWh, demand);
+
+  // Weighted LCOE shares (gecorrigeerd voor curtailment)
   const wS  = Math.min(windPen,    0.95) * (1 - curtailmentRate * 0.55);
   const sS  = Math.min(solarPen,   0.95) * (1 - curtailmentRate * 0.35);
   const nS  = Math.min(nuclearPen, 0.95);
-  const gS  = gasShare;
-  const tot = wS + sS + nS + gS || 1;
+  const tot = wS + sS + nS + gPS + gCS || 1;
 
-  const lcoe = (wS * windEff + sS * solarEff + nS * nuclearEff + gS * P.gasCost) / tot;
-  const sysAdder = windSys + solarSys + nuclearSys + curtailCost;
+  const gasCcsAllIn   = P.gasCcsLCOE + P.gasCcsCapMechCost;
+  const gasPlainAllIn = P.gasCost;
+
+  const lcoe = (wS * windEff + sS * solarEff + nS * nuclearEff +
+                gPS * gasPlainAllIn + gCS * gasCcsAllIn) / tot;
+  const sysAdder  = windSys + solarSys + nuclearSys + curtailCost + icCost.total;
   const totalCost = Math.round(lcoe + sysAdder);
 
-  // Delivery security
-  const base = Math.min(93,
-    58 + windPen * 22 + solarPen * 7 +
-    Math.min(4, battery * 0.25) -
-    Math.max(0, (totalPen - 1.35) * 18)
-  );
-  const nucBonus   = Math.min(4, nuclearPen * 9);
-  const interBonus = Math.min(7, interconn * 0.45);
-  const security   = Math.min(97, Math.round(base + nucBonus + interBonus));
-
-  // Cost WITHOUT nuclear (replace with extra wind + gas)
-  const altWindExtra = Math.min(4, nuclear * 0.55);
-  const altGas = gasShare + nuclearPen * 0.45;
-  const altWindPen = windPen + altWindExtra * P.windCF * 8.76 / P.demand;
+  // Cost WITHOUT nuclear
+  const altWindPen = windPen + Math.min(4, nuclear * 0.55) * P.windCF * 8.76 / demand;
   const altWindEff = effectiveLCOE(P.windBase, altWindPen, P.windKannib, ib);
-  const altLCOE = (wS * altWindEff + sS * solarEff + altGas * P.gasCost) / (wS + sS + altGas || 1);
-  const altSys  = altWindPen * 10 * P.windSysSlope + solarSys + curtailCost * 0.88;
+  const ldcAlt     = runLDC(wind + Math.min(4, nuclear * 0.55), solar, 0, battery, interconn, demand);
+  const altGasPS   = ldcAlt.gasGapTWh * (1 - gasCcsShare) / demand;
+  const altGasCS   = ldcAlt.gasGapTWh * gasCcsShare       / demand;
+  const altTot     = wS + sS + altGasPS + altGasCS || 1;
+  const altLCOE    = (wS * altWindEff + sS * solarEff +
+                      altGasPS * gasPlainAllIn + altGasCS * gasCcsAllIn) / altTot;
+  const altSys     = altWindPen * 10 * P.windSysSlope + solarSys +
+                     ldcAlt.curtailmentRate / 100 * 100 * 0.5 * 0.88 + icCost.total;
   const costNoNuclear = Math.round(altLCOE + altSys);
-  const nuclearDelta = nuclear > 0 ? totalCost - costNoNuclear : 0;
+  const nuclearDelta  = nuclear > 0 ? totalCost - costNoNuclear : 0;
 
   return {
     totalCost,
-    security,
-    curtailmentPct: Math.round(curtailmentRate * 100),
+    security: ldc.security,
+    curtailmentPct: ldc.curtailmentRate,
+    curtailmentTWh: ldc.curtailmentTWh,
+    gasGapTWh:      ldc.gasGapTWh,
+    battChargeTWh:  ldc.battChargeTWh,
+    importTWh:      ldc.importTWh,
+    interconnCostPerMWh: icCost.total,
+    interconnInfraCost:  icCost.infraCostPerMWh,
+    interconnImportPremium: icCost.importPremiumPerMWh,
     nuclearDelta,
     windEff, solarEff, nuclearEff,
-    windDelta:   windEff    - P.windBase,
-    solarDelta:  solarEff   - P.solarBase,
+    windDelta:        windEff    - P.windBase,
+    solarDelta:       solarEff   - P.solarBase,
     nuclearDeltaLCOE: nuclearEff - P.nuclearBase,
+    gasCcsAllIn:      Math.round(gasCcsAllIn),
+    gasCcsCapMechCost: P.gasCcsCapMechCost,
+    ldc,
     breakdown: {
-      'Wind':          Math.round(wS * windEff    / tot),
-      'Zon':           Math.round(sS * solarEff   / tot),
-      'Kern':          Math.round(nS * nuclearEff / tot),
-      'Gas backup':    Math.round(gS * P.gasCost  / tot),
-      'Systeemkosten': Math.round(sysAdder),
+      'Wind':           Math.round(wS  * windEff       / tot),
+      'Zon':            Math.round(sS  * solarEff      / tot),
+      'Kern':           Math.round(nS  * nuclearEff    / tot),
+      'Gas (kaal)':     Math.round(gPS * gasPlainAllIn / tot),
+      'Gas+CCS':        Math.round(gCS * gasCcsAllIn   / tot),
+      'Interconnectie': Math.round(icCost.total),
+      'Systeemkosten':  Math.round(windSys + solarSys + nuclearSys + curtailCost),
     }
   };
+}
+
+
+// ════════════════════════════════════════════════════════
+//  TIPPING POINT CURVE
+//  X-as: wind+zon penetratie (% van jaarvraag)
+//  Lijn 1: effectieve LCOE kern bij die penetratie (stijgt)
+//  Lijn 2: systeemwaarde — wat een MWh extra capaciteit nog
+//          waard is voor het systeem (daalt: cannibalisering
+//          + curtailment + dalende marktprijs)
+// ════════════════════════════════════════════════════════
+function tippingCurve(battery, interconn, demand) {
+  const points = [];
+  // Sweep VRE penetration from 20% to 220% of demand
+  for (let penPct = 20; penPct <= 220; penPct += 4) {
+    const totalPen = penPct / 100;
+
+    // Approximate wind/solar split (NL ratio ~37% wind / 63% solar in TWh terms
+    // at typical builds — derive equivalent GW for interconn/curtailment effects)
+    const windShare = 0.42;
+    const windPenEq  = totalPen * windShare;
+    const solarPenEq = totalPen * (1 - windShare);
+
+    const rawInterconn = P.interconnMaxBenefit *
+      Math.log(1 + interconn / P.interconnSat) / Math.log(1 + 1);
+    const euPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
+    const ib = Math.max(0, rawInterconn - euPenalty);
+
+    // Effective nuclear LCOE at this VRE penetration (nuclear itself assumed marginal/small)
+    const nuclearEff = effectiveLCOE(P.nuclearBase, totalPen * 0.3, P.nuclearKannib, ib * 0.5);
+
+    // System value: what the system is willing to pay for firm, dispatchable capacity
+    // Starts near gas backup cost, falls as curtailment rises and batteries/interconn
+    // absorb the need for firm capacity
+    const surplusPen = Math.max(0, totalPen - 0.92);
+    const batteryAbsorb = Math.min(0.4, battery * P.batteryAbsorbFactor);
+    const curtailmentRate = Math.max(0, surplusPen * (1 - ib * 0.65) * (1 - batteryAbsorb));
+
+    // Marginal system value of firm capacity: gas backup cost minus erosion from
+    // curtailment (signals oversupply) and minus battery/interconnection substitution.
+    // Interconnection's substitution benefit is NET of its own infra + import-premium costs —
+    // it's not a free option, so its contribution shrinks once those costs are subtracted.
+    const baseValue = P.gasCost; // €95/MWh — what firm capacity is worth at low VRE
+    const erosion = curtailmentRate * 130 + Math.max(0, totalPen - 0.6) * 18;
+
+    const peakGW = demand * P.peakGWperTWh;
+    const darkTWh = P.segA_hours * peakGW * P.segA_loadFrac / 1000;
+    const interconnCoverEst = Math.min(darkTWh * 0.45, interconn * P.segA_hours / 1000 * 0.45);
+    const icCostEst = interconnCost(interconn, totalPen, interconnCoverEst, demand);
+    const interconnGrossBenefit = ib * 22;
+    const interconnNetBenefit = Math.max(0, interconnGrossBenefit - icCostEst.total);
+
+    const substitution = (batteryAbsorb * 25) + interconnNetBenefit;
+    const systemValue = Math.max(15, baseValue - erosion - substitution);
+
+    points.push({ pen: penPct, nuclearLCOE: Math.round(nuclearEff), systemValue: Math.round(systemValue) });
+  }
+  return points;
+}
+
+function findCrossing(curve) {
+  for (let i = 1; i < curve.length; i++) {
+    const prev = curve[i-1], cur = curve[i];
+    if (prev.nuclearLCOE <= prev.systemValue && cur.nuclearLCOE > cur.systemValue) {
+      // linear interpolate
+      const t = (prev.systemValue - prev.nuclearLCOE) /
+                ((cur.nuclearLCOE - cur.systemValue) + (prev.systemValue - prev.nuclearLCOE));
+      return {
+        pen: prev.pen + t * (cur.pen - prev.pen),
+        value: prev.systemValue + t * (cur.systemValue - prev.systemValue)
+      };
+    }
+  }
+  // already crossed at start, or never crosses
+  if (curve.length && curve[0].nuclearLCOE > curve[0].systemValue) {
+    return { pen: curve[0].pen, value: curve[0].systemValue, atStart: true };
+  }
+  return null;
 }
 
 // ════════════════════════════════════════════════════════
 //  FRONTIER CLOUD
 // ════════════════════════════════════════════════════════
-function buildFrontier() {
+function buildFrontier(gasCcsShare, demand) {
   const pts = [];
   // Wind family
   for (let w = 8; w <= 32; w += 3) {
-    const r = model(w, 36, 0, 20, 15);
+    const r = model(w, 36, 0, 20, 15, gasCcsShare, demand);
     pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Wind ${w} GW, geen kern` });
   }
   // Nuclear family
   for (let n = 0; n <= 6.4; n += 0.8) {
-    const r = model(18, 34, n, 15, 12);
+    const r = model(18, 34, n, 15, 12, gasCcsShare, demand);
     pts.push({ x: r.security, y: r.totalCost, type: 'nuclear', tip: `Kern ${n.toFixed(1)} GW` });
   }
   // Battery family
   for (let b = 5; b <= 50; b += 5) {
-    const r = model(22, 38, 0, b, 18);
+    const r = model(22, 38, 0, b, 18, gasCcsShare, demand);
     pts.push({ x: r.security, y: r.totalCost, type: 'battery', tip: `Batterij ${b} GWh` });
   }
   // Interconn family
   for (let ic = 3; ic <= 28; ic += 4) {
-    const r = model(22, 36, 0, 20, ic);
+    const r = model(22, 36, 0, 20, ic, gasCcsShare, demand);
     pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Interconn ${ic} GW` });
   }
   // Mixed
   for (let w = 14; w <= 26; w += 4) {
     for (let n = 0; n <= 4.8; n += 1.6) {
-      const r = model(w, 36, n, 20, 15);
+      const r = model(w, 36, n, 20, 15, gasCcsShare, demand);
       pts.push({ x: r.security, y: r.totalCost,
         type: n > 0 ? 'nuclear' : 'wind',
         tip: `Wind ${w} GW + Kern ${n.toFixed(1)} GW` });
@@ -689,14 +1199,16 @@ function buildFrontier() {
   return pts;
 }
 
-const frontierPts = buildFrontier();
+let frontierPts = buildFrontier(0.3, 160);
 const typeCol = { wind: '#1a6fa3', nuclear: '#b52a1c', battery: '#1e8a4a' };
 
 const breakdownColors = {
   'Wind':          '#1a6fa3',
   'Zon':           '#d4900a',
   'Kern':          '#b52a1c',
-  'Gas backup':    '#7f8c8d',
+  'Gas (kaal)':    '#7f8c8d',
+  'Gas+CCS':       '#4a6358',
+  'Interconnectie':'#7b3fa0',
   'Systeemkosten': '#333333',
 };
 
@@ -740,7 +1252,7 @@ function renderFrontier(cur) {
    .attr('x', iW/2).attr('y', iH + 36)
    .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
    .attr('font-family','Helvetica Neue,Arial,sans-serif')
-   .text('Leveringszekerheid (% uren zonder import)');
+   .text('Leveringszekerheid (% dark-doldrums-uren gedekt door eigen bronnen)');
   g.append('text')
    .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-42)
    .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
@@ -779,8 +1291,214 @@ function renderFrontier(cur) {
 }
 
 // ════════════════════════════════════════════════════════
+//  RENDER: TIPPING POINT CURVE
+// ════════════════════════════════════════════════════════
+function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPen, demand) {
+  const el = document.getElementById('svg-tipping');
+  const W = el.clientWidth || 600;
+  const H = 300;
+  const m = { top: 18, right: 24, bottom: 42, left: 54 };
+  const iW = W - m.left - m.right;
+  const iH = H - m.top - m.bottom;
+
+  const curve = tippingCurve(battery, interconn, demand);
+  const crossing = findCrossing(curve);
+
+  const svg = d3.select('#svg-tipping')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  const xd = [20, 220];
+  const allY = curve.flatMap(d => [d.nuclearLCOE, d.systemValue]);
+  const yd = [Math.min(0, d3.min(allY) - 8), d3.max(allY) + 10];
+
+  const xSc = d3.scaleLinear().domain(xd).range([0, iW]);
+  const ySc = d3.scaleLinear().domain(yd).range([iH, 0]);
+
+  g.append('g').attr('class','grid')
+   .call(d3.axisLeft(ySc).tickSize(-iW).tickFormat('').ticks(6));
+  g.append('g').attr('class','grid').attr('transform',`translate(0,${iH})`)
+   .call(d3.axisBottom(xSc).tickSize(-iH).tickFormat('').ticks(6));
+
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
+   .call(d3.axisBottom(xSc).ticks(6).tickFormat(d => d + '%'));
+  g.append('g').attr('class','axis')
+   .call(d3.axisLeft(ySc).ticks(6).tickFormat(d => '€' + d));
+
+  g.append('text')
+   .attr('x', iW/2).attr('y', iH + 36)
+   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Wind + zon penetratie (% van jaarvraag)');
+  g.append('text')
+   .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-42)
+   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('€/MWh');
+
+  // Shaded "verlieszone" past crossing
+  if (crossing) {
+    g.append('rect')
+     .attr('x', xSc(crossing.pen)).attr('y', 0)
+     .attr('width', Math.max(0, iW - xSc(crossing.pen))).attr('height', iH)
+     .attr('fill', '#b52a1c').attr('opacity', 0.06);
+    g.append('text')
+     .attr('x', iW - 6).attr('y', 16)
+     .attr('text-anchor','end').attr('fill','#b52a1c').attr('font-size',9)
+     .attr('font-family','Helvetica Neue,Arial,sans-serif').attr('opacity',0.8)
+     .text('kern = structureel nettoverlies');
+  }
+
+  const lineNuclear = d3.line()
+    .x(d => xSc(d.pen)).y(d => ySc(d.nuclearLCOE)).curve(d3.curveMonotoneX);
+  const lineValue = d3.line()
+    .x(d => xSc(d.pen)).y(d => ySc(d.systemValue)).curve(d3.curveMonotoneX);
+
+  g.append('path').datum(curve)
+   .attr('fill','none').attr('stroke','#b52a1c').attr('stroke-width', 2.5)
+   .attr('d', lineNuclear);
+
+  g.append('path').datum(curve)
+   .attr('fill','none').attr('stroke','#1a1a1a').attr('stroke-width', 2.5)
+   .attr('d', lineValue);
+
+  // Crossing marker
+  if (crossing) {
+    g.append('line')
+     .attr('x1', xSc(crossing.pen)).attr('x2', xSc(crossing.pen))
+     .attr('y1', 0).attr('y2', iH)
+     .attr('stroke', '#b52a1c').attr('stroke-width', 1)
+     .attr('stroke-dasharray', '4,3').attr('opacity', 0.6);
+
+    g.append('circle')
+     .attr('cx', xSc(crossing.pen)).attr('cy', ySc(crossing.value))
+     .attr('r', 6).attr('fill', '#b52a1c').attr('stroke', '#fff').attr('stroke-width', 1.5);
+
+    g.append('text')
+     .attr('x', xSc(crossing.pen))
+     .attr('y', iH - 8)
+     .attr('text-anchor', crossing.pen > 170 ? 'end' : 'middle')
+     .attr('fill', '#b52a1c').attr('font-size', 10).attr('font-weight', 700)
+     .attr('font-family','Helvetica Neue,Arial,sans-serif')
+     .text(`Kantelpunt: ${Math.round(crossing.pen)}% VRE`);
+  }
+
+  // Current position marker
+  const curTotalPen = Math.round((curWindPen + curSolarPen + curNuclearPen * 0.3) * 100);
+  const clampedPen = Math.max(20, Math.min(220, curTotalPen));
+  // find nearest curve point for y-interpolation
+  const nearest = curve.reduce((a,b) => Math.abs(b.pen - clampedPen) < Math.abs(a.pen - clampedPen) ? b : a);
+
+  g.append('circle')
+   .attr('cx', xSc(clampedPen)).attr('cy', ySc(nearest.nuclearLCOE))
+   .attr('r', 7).attr('fill', '#1a1a1a').attr('stroke', '#b52a1c').attr('stroke-width', 2);
+
+  g.append('text')
+   .attr('x', xSc(clampedPen) + 10).attr('y', ySc(nearest.nuclearLCOE) - 8)
+   .attr('fill', '#1a1a1a').attr('font-size', 9).attr('font-weight', 700)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('Huidige mix');
+
+  return crossing;
+}
+
+// ════════════════════════════════════════════════════════
 //  RENDER: COST STACK (horizontal bar)
 // ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  RENDER: LDC SEGMENT BAR CHART
+// ════════════════════════════════════════════════════════
+function renderLDC(ldc) {
+  const el  = document.getElementById('svg-ldc');
+  const W   = el.clientWidth || 600;
+  const H   = 200;
+  const m   = { top: 18, right: 28, bottom: 38, left: 58 };
+  const iW  = W - m.left - m.right;
+  const iH  = H - m.top  - m.bottom;
+
+  const svg = d3.select('#svg-ldc')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+  svg.selectAll('*').remove();
+  const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  const segs = ldc.segments;
+  const names = segs.map(s => s.name);
+  const maxVal = d3.max(segs, s => s.demand) * 1.15;
+
+  const xSc = d3.scaleBand().domain(names).range([0, iW]).padding(0.22);
+  const ySc = d3.scaleLinear().domain([0, maxVal]).range([iH, 0]);
+
+  g.append('g').attr('class','grid')
+   .call(d3.axisLeft(ySc).tickSize(-iW).tickFormat('').ticks(5));
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
+   .call(d3.axisBottom(xSc));
+  g.append('g').attr('class','axis')
+   .call(d3.axisLeft(ySc).ticks(5).tickFormat(d => d + ' TWh'));
+
+  segs.forEach(s => {
+    const x  = xSc(s.name);
+    const bw = xSc.bandwidth();
+    const layers = [
+      { key: 'vre',    val: Math.max(0, s.vre - (s.curtail || 0)), col: '#1a6fa3' },
+      { key: 'gas',    val: s.gas  || 0, col: '#4a6358' },
+      { key: 'batt',   val: s.batt > 0 ? s.batt : 0, col: '#1e8a4a' },
+      { key: 'import', val: s.import || 0, col: '#7b3fa0' },
+    ];
+
+    let cum = 0;
+    layers.forEach(l => {
+      if (l.val <= 0) return;
+      g.append('rect')
+       .attr('x', x).attr('y', ySc(cum + l.val))
+       .attr('width', bw).attr('height', Math.max(0, ySc(cum) - ySc(cum + l.val)))
+       .attr('fill', l.col).attr('opacity', 0.88);
+      cum += l.val;
+    });
+
+    // Demand line
+    g.append('line')
+     .attr('x1', x).attr('x2', x + bw)
+     .attr('y1', ySc(s.demand)).attr('y2', ySc(s.demand))
+     .attr('stroke', '#1a1a1a').attr('stroke-width', 2).attr('stroke-dasharray','4,2');
+
+    // Curtailment (hashed, above demand line if present)
+    if (s.curtail > 0) {
+      g.append('rect')
+       .attr('x', x).attr('y', ySc(s.vre))
+       .attr('width', bw).attr('height', Math.max(0, ySc(s.vre - s.curtail) - ySc(s.vre)))
+       .attr('fill', 'url(#hatch)').attr('stroke','#999').attr('stroke-width',0.5);
+      g.append('text')
+       .attr('x', x + bw/2).attr('y', ySc(s.vre) - 4)
+       .attr('text-anchor','middle').attr('fill','#888').attr('font-size',9)
+       .attr('font-family','Helvetica Neue,Arial,sans-serif')
+       .text(`−${s.curtail} TWh`);
+    }
+
+    // Demand label
+    g.append('text')
+     .attr('x', x + bw/2).attr('y', ySc(s.demand) - 5)
+     .attr('text-anchor','middle').attr('fill','#1a1a1a').attr('font-size',9)
+     .attr('font-weight','700').attr('font-family','Helvetica Neue,Arial,sans-serif')
+     .text(`Vraag: ${s.demand} TWh`);
+  });
+
+  // Hatch pattern for curtailment
+  const defs = svg.append('defs');
+  const pat = defs.append('pattern')
+    .attr('id','hatch').attr('patternUnits','userSpaceOnUse').attr('width',5).attr('height',5);
+  pat.append('path').attr('d','M-1,1 l2,-2 M0,5 l5,-5 M4,6 l2,-2')
+     .attr('stroke','#aaa').attr('stroke-width',1);
+
+  g.append('text')
+   .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-48)
+   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text('TWh per jaar');
+}
+
 function renderStack(breakdown) {
   const el = document.getElementById('svg-stack');
   const W = el.clientWidth || 600;
@@ -840,8 +1558,19 @@ function renderStack(breakdown) {
 // ════════════════════════════════════════════════════════
 //  INSIGHT TEXT
 // ════════════════════════════════════════════════════════
-function insight(wind, solar, nuclear, battery, interconn, r) {
+function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFrac, gasCcsShare) {
   const lines = [];
+
+  // Tipping point framing — lead with this, it's the core argument
+  if (crossing) {
+    const vrePct = Math.round(vrePenFrac * 100);
+    const pastCrossing = vrePct >= crossing.pen;
+    if (pastCrossing) {
+      lines.push(`<strong>Voorbij het kantelpunt:</strong> bij ${vrePct}% wind+zon-penetratie is het systeem al voorbij het kantelpunt van ${Math.round(crossing.pen)}%. Vanaf hier is een extra eenheid kernvermogen per definitie duurder dan wat het systeem ervoor over heeft — kernsubsidie wordt dan een structurele overdracht, geen efficiënte investering.`);
+    } else {
+      lines.push(`Bij de huidige ${vrePct}% wind+zon-penetratie zit het systeem nog onder het kantelpunt van ${Math.round(crossing.pen)}%. Extra kerncapaciteit heeft hier nog reststerk waarde — maar die marge krimpt snel naarmate wind en zon verder groeien richting 2040.`);
+    }
+  }
 
   // Kannibalisering wind
   if (r.windDelta > 15) {
@@ -869,11 +1598,14 @@ function insight(wind, solar, nuclear, battery, interconn, r) {
     lines.push(`Curtailment van ${r.curtailmentPct}% is merkbaar. Meer batterijcapaciteit of interconnectie vermindert dit direct.`);
   }
 
-  // Interconnectie bij hoge VRE
+  // Interconnectie — nu met expliciete kosten (infra + importpremie)
+  if (r.interconnCostPerMWh > 3) {
+    lines.push(`<strong>Interconnectie is geen gratis optie:</strong> €${r.interconnInfraCost}/MWh aan kabelinfrastructuur (kapitaalslasten over 40 jaar) plus €${r.interconnImportPremium}/MWh importpremie tijdens schaarse uren — want als Nederland windstil is, zijn Duitsland, België en Denemarken dat vaak ook. Totaal: €${r.interconnCostPerMWh}/MWh, structureel meegenomen in de systeemkosten.`);
+  }
   if (interconn < 8 && nuclear === 0 && (wind > 20 || solar > 40)) {
-    lines.push(`<strong>Lage interconnectie</strong> bij hoge wind/zon maakt kern relatief aantrekkelijker: er is dan minder escape voor overaanbod, en de waarde van stabiele basislast stijgt.`);
+    lines.push(`<strong>Lage interconnectie</strong> bij hoge wind/zon maakt kern relatief aantrekkelijker: er is dan minder escape voor overaanbod, en de waarde van stabiele basislast stijgt — maar let op: bij hoge interconnectie verschuift het probleem alleen, het verdwijnt niet.`);
   } else if (interconn > 18 && r.curtailmentPct > 10) {
-    lines.push(`Hoge interconnectie helpt, maar bij Europees overaanbod (Duitsland, België, Denemarken in dezelfde situatie) neemt de exportwaarde sterk af — het kannibaliseringseffect telt dan ook op Europese schaal.`);
+    lines.push(`Hoge interconnectie helpt tegen curtailment, maar bij Europees overaanbod (Duitsland, België, Denemarken in dezelfde situatie) neemt zowel de exportwaarde als de importzekerheid af — en de infrastructuur blijft gewoon geld kosten.`);
   }
 
   // Battery vs nuclear
@@ -881,9 +1613,17 @@ function insight(wind, solar, nuclear, battery, interconn, r) {
     lines.push(`<span class="ok">Met ${battery} GWh aan batterijen + V2G</span> is vrijwel alle flexibiliteit al beschikbaar. Kern en batterijen concurreren direct: beide vullen de daluren op, maar batterijen doen dit goedkoper en zonder kannibaliseringsrisico.`);
   }
 
-  // Security warning
+  // Gas+CCS aandeel
+  const gasCcsPctVal = Math.round((typeof gasCcsShare === 'number' ? gasCcsShare : 0) * 100);
+  if (gasCcsPctVal > 0) {
+    lines.push(`Bij ${gasCcsPctVal}% van de gasbackup als gas+CCS kost dat €${r.gasCcsAllIn}/MWh all-in — €${r.gasCcsCapMechCost}/MWh daarvan is de capaciteitsvergoeding, transparant als verzekeringspremie voor beschikbaarheid, vergelijkbaar met hoe je dat al voor kaal gas beschreef.`);
+  }
+
+  // Security — herdefinieerd: dit gaat nu over de binnenlandse mix, niet "wel of geen stroom"
   if (r.security < 78) {
-    lines.push(`⚠️ Leveringszekerheid van ${r.security}% is kwetsbaar — het systeem is regelmatig afhankelijk van import tijdens piekschaarste (dark doldrums).`);
+    lines.push(`⚠️ ${r.security}% van de dark-doldrums-uren wordt gedekt door eigen bronnen (batterij, kern, gas). Het resterende gat moet via import worden gevuld, mét het bijbehorende prijsrisico tijdens Europabrede schaarste — niet per se "geen stroom", maar wel duurder en minder grip.`);
+  } else if (r.security >= 95) {
+    lines.push(`Met ${r.security}% binnenlandse dekking is gas(+CCS) hier vrijwel het volledige sluitstuk — de vraag is niet meer óf het gat gevuld wordt, maar tegen welke prijs en CO₂-voetafdruk.`);
   }
 
   if (lines.length === 0) {
@@ -902,14 +1642,19 @@ function update() {
   const nuclear  = +document.getElementById('sl-nuclear').value;
   const battery  = +document.getElementById('sl-battery').value;
   const interconn= +document.getElementById('sl-interconn').value;
+  const gasCcsPct= +document.getElementById('sl-gasccs').value;
+  const gasCcsShare = gasCcsPct / 100;
+  const demand     = +document.getElementById('sel-demand').value;
 
   document.getElementById('lbl-wind').textContent     = wind + ' GW';
   document.getElementById('lbl-solar').textContent    = solar + ' GW';
   document.getElementById('lbl-nuclear').textContent  = nuclear.toFixed(1) + ' GW';
   document.getElementById('lbl-battery').textContent  = battery + ' GWh';
   document.getElementById('lbl-interconn').textContent= interconn + ' GW';
+  document.getElementById('lbl-gasccs').textContent   = gasCcsPct + '%';
 
-  const r = model(wind, solar, nuclear, battery, interconn);
+  const r = model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand);
+  frontierPts = buildFrontier(gasCcsShare, demand);
 
   // KPIs
   const setKPI = (id, val, cls) => {
@@ -927,6 +1672,8 @@ function update() {
     const sign = r.nuclearDelta >= 0 ? '+' : '';
     setKPI('kpi-ndelta', sign + '€' + r.nuclearDelta, r.nuclearDelta > 6 ? 'warn' : 'good');
   }
+  setKPI('kpi-ic', '€' + r.interconnCostPerMWh, r.interconnCostPerMWh > 8 ? 'warn' : 'good');
+  setKPI('kpi-ccs', '€' + r.gasCcsAllIn, 'neut');
 
   // Dynamic LCOE box
   const setLCOE = (effId, deltaId, base, eff, delta, col) => {
@@ -942,20 +1689,26 @@ function update() {
   setLCOE('lcoe-solar-eff',  'lcoe-solar-delta',  P.solarBase,   r.solarEff,   r.solarDelta,  '--solar');
   setLCOE('lcoe-nuc-eff',    'lcoe-nuc-delta',    P.nuclearBase, r.nuclearEff, r.nuclearDeltaLCOE, '--nuclear');
 
+  const windPenFrac    = (wind    * P.windCF    * 8.76) / P.demand;
+  const solarPenFrac   = (solar   * P.solarCF   * 8.76) / P.demand;
+  const nuclearPenFrac = (nuclear * P.nuclearCF * 8.76) / P.demand;
+
+  const crossing = renderTipping(battery, interconn, windPenFrac, solarPenFrac, nuclearPenFrac, demand);
   renderFrontier(r);
   renderStack(r.breakdown);
-  document.getElementById('insight').innerHTML = insight(wind, solar, nuclear, battery, interconn, r);
+  renderLDC(r.ldc);
+  document.getElementById('insight').innerHTML = insight(wind, solar, nuclear, battery, interconn, r, crossing, windPenFrac + solarPenFrac, gasCcsShare);
 }
 
 // ════════════════════════════════════════════════════════
 //  SCENARIOS
 // ════════════════════════════════════════════════════════
 const SCEN = {
-  windmax:  { wind:28, solar:42, nuclear:0,   battery:25, interconn:18 },
-  balanced: { wind:22, solar:38, nuclear:3.2, battery:20, interconn:15 },
-  nuclear:  { wind:15, solar:30, nuclear:6.4, battery:10, interconn:10 },
-  island:   { wind:22, solar:38, nuclear:3.2, battery:30, interconn:4  },
-  battery:  { wind:25, solar:42, nuclear:0,   battery:45, interconn:18 },
+  windmax:  { wind:28, solar:42, nuclear:0,   battery:25, interconn:18, gasccs:20 },
+  balanced: { wind:22, solar:38, nuclear:3.2, battery:20, interconn:15, gasccs:30 },
+  nuclear:  { wind:15, solar:30, nuclear:6.4, battery:10, interconn:10, gasccs:50 },
+  island:   { wind:22, solar:38, nuclear:3.2, battery:30, interconn:4,  gasccs:60 },
+  battery:  { wind:25, solar:42, nuclear:0,   battery:45, interconn:18, gasccs:20 },
 };
 
 document.querySelectorAll('.scenario-btn').forEach(btn => {
@@ -968,15 +1721,21 @@ document.querySelectorAll('.scenario-btn').forEach(btn => {
     document.getElementById('sl-nuclear').value   = s.nuclear;
     document.getElementById('sl-battery').value   = s.battery;
     document.getElementById('sl-interconn').value = s.interconn;
+    document.getElementById('sl-gasccs').value    = s.gasccs;
     update();
   });
 });
 
-['sl-wind','sl-solar','sl-nuclear','sl-battery','sl-interconn'].forEach(id => {
+['sl-wind','sl-solar','sl-nuclear','sl-battery','sl-interconn','sl-gasccs'].forEach(id => {
   document.getElementById(id).addEventListener('input', () => {
     document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
     update();
   });
+});
+
+document.getElementById('sel-demand').addEventListener('change', () => {
+  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+  update();
 });
 
 update();
