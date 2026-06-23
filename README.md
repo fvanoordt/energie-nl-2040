@@ -3,7 +3,7 @@
 
 > *Welke mix van wind, zon, batterijen, kernenergie, interconnectie en gas(+CCS) levert de laagste totale systeemkosten bij voldoende leveringszekerheid — en wanneer wordt kernenergie een nettoverlies voor de samenleving?*
 
-**→ [Open de tool](https://jouwnaam.github.io/energie-nl-2040)**
+**→ [Open de tool](https://fvanoordt.github.io/energie-nl-2040/)**
 
 ---
 
