@@ -178,7 +178,7 @@
   /* KPI row */
   .kpi-row {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 1px;
     background: var(--rule);
     border: 1px solid var(--rule);
@@ -326,6 +326,56 @@
     line-height: 1.65;
     border-top: 1px solid var(--rule);
     padding-top: 0.9rem;
+  }
+
+  /* ── DOLDRUMS ROW ── */
+  .doldrums-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-top: 0.6rem;
+  }
+
+  .doldrums-cell {
+    background: var(--paper);
+    padding: 0.75rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .doldrums-label {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .doldrums-hours {
+    font-size: 1.6rem;
+    font-weight: normal;
+    line-height: 1;
+    color: var(--ink);
+    font-family: 'Georgia', serif;
+  }
+
+  .doldrums-hours .hrs-unit {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .doldrums-sub {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.62rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  @media (max-width: 700px) {
+    .doldrums-row { grid-template-columns: repeat(2, 1fr); }
   }
 
   /* ── ABOUT PANEL ── */
@@ -566,11 +616,6 @@
         <span class="kpi-sub">€/MWh all-in, incl. kannibalisering</span>
       </div>
       <div class="kpi">
-        <span class="kpi-label">Leveringszekerheid</span>
-        <span class="kpi-value neut" id="kpi-sec">—</span>
-        <span class="kpi-sub">% dark-doldrums-uren gedekt door eigen bronnen (incl. gas)</span>
-      </div>
-      <div class="kpi">
         <span class="kpi-label">Curtailment</span>
         <span class="kpi-value neut" id="kpi-curt">—</span>
         <span class="kpi-sub">% opgewekte stroom weggegooid</span>
@@ -589,6 +634,36 @@
         <span class="kpi-label">Gas+CCS all-in</span>
         <span class="kpi-value neut" id="kpi-ccs">—</span>
         <span class="kpi-sub">€/MWh incl. capaciteitsvergoeding</span>
+      </div>
+    </div>
+
+    <!-- DOLDRUMS HOURS ROW -->
+    <div class="chart-panel" style="padding:1rem 1.3rem 0.9rem">
+      <div class="panel-eyebrow">Dark doldrums — leveringszekerheid in concrete uren</div>
+      <div class="panel-title" style="margin-bottom:0.7rem">
+        Van de <strong>~<span id="kpi-doldrums-total">500</span> uur/jaar</strong> dat wind én zon vrijwel niets leveren, wordt het gat als volgt gedekt — er is <em>altijd</em> stroom, maar de herkomst verschilt:
+      </div>
+      <div class="doldrums-row">
+        <div class="doldrums-cell" style="border-left:3px solid var(--battery)">
+          <span class="doldrums-label">🔋 Batterij / V2G</span>
+          <span class="doldrums-hours" id="kpi-hrs-batt">—</span>
+          <span class="doldrums-sub">uur gedekt door opgeslagen wind/zon</span>
+        </div>
+        <div class="doldrums-cell" style="border-left:3px solid var(--nuclear)">
+          <span class="doldrums-label">⚛️ Kernenergie</span>
+          <span class="doldrums-hours" id="kpi-hrs-vre">—</span>
+          <span class="doldrums-sub">uur gedekt door doorlopende kernproductie</span>
+        </div>
+        <div class="doldrums-cell" style="border-left:3px solid var(--gasccs)">
+          <span class="doldrums-label">🏭 Gas (kaal / +CCS)</span>
+          <span class="doldrums-hours" id="kpi-hrs-gas">—</span>
+          <span class="doldrums-sub">uur capaciteitsmechanisme actief — binnenlands, dispatchable</span>
+        </div>
+        <div class="doldrums-cell" style="border-left:3px solid var(--interconn)">
+          <span class="doldrums-label">🌍 Import</span>
+          <span class="doldrums-hours" id="kpi-hrs-import">—</span>
+          <span class="doldrums-sub">uur afhankelijk van Europese markt — prijs onzeker</span>
+        </div>
       </div>
     </div>
 
@@ -946,9 +1021,20 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
 
   // Leveringszekerheid: % van piekschaarsere-uren (seg A) gedekt zonder import
   // = hoe groot is het deel dat door binnenlandse bronnen (VRE+batt+gas) wordt gedekt?
-  const domesticCoverA = Math.min(1, (vreA + battDischargeA + gasGapA) / Math.max(0.01, dA));
-  const importFracA = interconnImportA / Math.max(0.01, dA);
+  // ── Uren-breakdown van de ~segA_hours dark-doldrums ──────────────────
+  // Omzetten van TWh naar uren: deel door gemiddeld vermogen in seg A
+  const avgPowerA = peakGW * P.segA_loadFrac; // GW gemiddeld in seg A
+  // Uren gedekt per categorie (optelling = P.segA_hours)
+  const hrsVRE_A     = Math.min(P.segA_hours, (vreA * 1000) / avgPowerA);
+  const hrsBatt_A    = Math.min(P.segA_hours - hrsVRE_A,
+                        (battDischargeA * 1000) / avgPowerA);
+  const hrsImport_A  = Math.min(P.segA_hours - hrsVRE_A - hrsBatt_A,
+                        (interconnImportA * 1000) / avgPowerA);
+  const hrsGas_A     = Math.max(0,
+                        P.segA_hours - hrsVRE_A - hrsBatt_A - hrsImport_A);
+
   // Security = hoe groot deel van seg A NIET afhankelijk is van import
+  const importFracA = interconnImportA / Math.max(0.01, dA);
   const security = Math.round(Math.min(99, (1 - importFracA) * 100));
 
   return {
@@ -961,6 +1047,12 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
     battChargeTWh:   Math.round(battCharge * 10) / 10,
     importTWh:       Math.round(interconnImportA * 10) / 10,
     security,
+    // Concrete uren tijdens dark doldrums (~segA_hours totaal)
+    doldrumsHours:   P.segA_hours,
+    hrsBatt:         Math.round(hrsBatt_A),
+    hrsGas:          Math.round(hrsGas_A),
+    hrsImport:       Math.round(hrsImport_A),
+    hrsVRE:          Math.round(hrsVRE_A),
     // Per-segment breakdown (voor visualisatie)
     segments: [
       { name: 'Piek (A)', hours: P.segA_hours * demandScale,
@@ -1055,12 +1147,17 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
 
   return {
     totalCost,
-    security: ldc.security,
-    curtailmentPct: ldc.curtailmentRate,
-    curtailmentTWh: ldc.curtailmentTWh,
-    gasGapTWh:      ldc.gasGapTWh,
-    battChargeTWh:  ldc.battChargeTWh,
-    importTWh:      ldc.importTWh,
+    security:        ldc.security,
+    curtailmentPct:  ldc.curtailmentRate,
+    curtailmentTWh:  ldc.curtailmentTWh,
+    gasGapTWh:       ldc.gasGapTWh,
+    battChargeTWh:   ldc.battChargeTWh,
+    importTWh:       ldc.importTWh,
+    doldrumsHours:   ldc.doldrumsHours,
+    hrsBatt:         ldc.hrsBatt,
+    hrsGas:          ldc.hrsGas,
+    hrsImport:       ldc.hrsImport,
+    hrsVRE:          ldc.hrsVRE,
     interconnCostPerMWh: icCost.total,
     interconnInfraCost:  icCost.infraCostPerMWh,
     interconnImportPremium: icCost.importPremiumPerMWh,
@@ -1170,28 +1267,28 @@ function buildFrontier(gasCcsShare, demand) {
   // Wind family
   for (let w = 8; w <= 32; w += 3) {
     const r = model(w, 36, 0, 20, 15, gasCcsShare, demand);
-    pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Wind ${w} GW, geen kern` });
+    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'wind', tip: `Wind ${w} GW, geen kern` });
   }
   // Nuclear family
   for (let n = 0; n <= 6.4; n += 0.8) {
     const r = model(18, 34, n, 15, 12, gasCcsShare, demand);
-    pts.push({ x: r.security, y: r.totalCost, type: 'nuclear', tip: `Kern ${n.toFixed(1)} GW` });
+    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'nuclear', tip: `Kern ${n.toFixed(1)} GW` });
   }
   // Battery family
   for (let b = 5; b <= 50; b += 5) {
     const r = model(22, 38, 0, b, 18, gasCcsShare, demand);
-    pts.push({ x: r.security, y: r.totalCost, type: 'battery', tip: `Batterij ${b} GWh` });
+    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'battery', tip: `Batterij ${b} GWh` });
   }
   // Interconn family
   for (let ic = 3; ic <= 28; ic += 4) {
     const r = model(22, 36, 0, 20, ic, gasCcsShare, demand);
-    pts.push({ x: r.security, y: r.totalCost, type: 'wind', tip: `Interconn ${ic} GW` });
+    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'wind', tip: `Interconn ${ic} GW` });
   }
   // Mixed
   for (let w = 14; w <= 26; w += 4) {
     for (let n = 0; n <= 4.8; n += 1.6) {
       const r = model(w, 36, n, 20, 15, gasCcsShare, demand);
-      pts.push({ x: r.security, y: r.totalCost,
+      pts.push({ x: r.hrsImport, y: r.totalCost,
         type: n > 0 ? 'nuclear' : 'wind',
         tip: `Wind ${w} GW + Kern ${n.toFixed(1)} GW` });
     }
@@ -1229,7 +1326,7 @@ function renderFrontier(cur) {
   svg.selectAll('*').remove();
   const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
-  const allX = frontierPts.map(d => d.x).concat([cur.security]);
+  const allX = frontierPts.map(d => d.x).concat([cur.hrsImport]);
   const allY = frontierPts.map(d => d.y).concat([cur.totalCost]);
   const xd = [d3.min(allX) - 1.5, d3.max(allX) + 1.5];
   const yd = [d3.min(allY) - 4,   d3.max(allY) + 4];
@@ -1243,7 +1340,7 @@ function renderFrontier(cur) {
    .call(d3.axisBottom(xSc).tickSize(-iH).tickFormat('').ticks(5));
 
   g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
-   .call(d3.axisBottom(xSc).ticks(5).tickFormat(d => d + '%'));
+   .call(d3.axisBottom(xSc).ticks(5).tickFormat(d => d + ' u'));
   g.append('g').attr('class','axis')
    .call(d3.axisLeft(ySc).ticks(5).tickFormat(d => '€' + d));
 
@@ -1252,7 +1349,7 @@ function renderFrontier(cur) {
    .attr('x', iW/2).attr('y', iH + 36)
    .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
    .attr('font-family','Helvetica Neue,Arial,sans-serif')
-   .text('Leveringszekerheid (% dark-doldrums-uren gedekt door eigen bronnen)');
+   .text('Importafhankelijkheid (uur/jaar tijdens dark doldrums — lager is beter)');
   g.append('text')
    .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-42)
    .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
@@ -1264,7 +1361,7 @@ function renderFrontier(cur) {
    .attr('x', iW - 4).attr('y', iH - 6)
    .attr('text-anchor','end').attr('fill','#1e8a4a').attr('font-size',9)
    .attr('font-family','Helvetica Neue,Arial,sans-serif').attr('opacity',0.75)
-   .text('goedkoper & veiliger →');
+   .text('← minder import & goedkoper →');
 
   // Cloud
   g.selectAll('.fp')
@@ -1278,13 +1375,13 @@ function renderFrontier(cur) {
 
   // Current point
   g.append('circle')
-   .attr('cx', xSc(cur.security)).attr('cy', ySc(cur.totalCost))
+   .attr('cx', xSc(cur.hrsImport)).attr('cy', ySc(cur.totalCost))
    .attr('r', 9)
    .attr('fill','#1a1a1a')
    .attr('stroke','#b52a1c').attr('stroke-width', 2.5);
 
   g.append('text')
-   .attr('x', xSc(cur.security) + 13).attr('y', ySc(cur.totalCost) + 4)
+   .attr('x', xSc(cur.hrsImport) + 13).attr('y', ySc(cur.totalCost) + 4)
    .attr('fill','#1a1a1a').attr('font-size',9).attr('font-weight','700')
    .attr('font-family','Helvetica Neue,Arial,sans-serif')
    .text('Huidige mix');
@@ -1323,7 +1420,7 @@ function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPe
    .call(d3.axisBottom(xSc).tickSize(-iH).tickFormat('').ticks(6));
 
   g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
-   .call(d3.axisBottom(xSc).ticks(6).tickFormat(d => d + '%'));
+   .call(d3.axisBottom(xSc).ticks(6).tickFormat(d => d + ' u'));
   g.append('g').attr('class','axis')
    .call(d3.axisLeft(ySc).ticks(6).tickFormat(d => '€' + d));
 
@@ -1613,17 +1710,14 @@ function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFr
     lines.push(`<span class="ok">Met ${battery} GWh aan batterijen + V2G</span> is vrijwel alle flexibiliteit al beschikbaar. Kern en batterijen concurreren direct: beide vullen de daluren op, maar batterijen doen dit goedkoper en zonder kannibaliseringsrisico.`);
   }
 
-  // Gas+CCS aandeel
-  const gasCcsPctVal = Math.round((typeof gasCcsShare === 'number' ? gasCcsShare : 0) * 100);
-  if (gasCcsPctVal > 0) {
-    lines.push(`Bij ${gasCcsPctVal}% van de gasbackup als gas+CCS kost dat €${r.gasCcsAllIn}/MWh all-in — €${r.gasCcsCapMechCost}/MWh daarvan is de capaciteitsvergoeding, transparant als verzekeringspremie voor beschikbaarheid, vergelijkbaar met hoe je dat al voor kaal gas beschreef.`);
-  }
-
-  // Security — herdefinieerd: dit gaat nu over de binnenlandse mix, niet "wel of geen stroom"
-  if (r.security < 78) {
-    lines.push(`⚠️ ${r.security}% van de dark-doldrums-uren wordt gedekt door eigen bronnen (batterij, kern, gas). Het resterende gat moet via import worden gevuld, mét het bijbehorende prijsrisico tijdens Europabrede schaarste — niet per se "geen stroom", maar wel duurder en minder grip.`);
-  } else if (r.security >= 95) {
-    lines.push(`Met ${r.security}% binnenlandse dekking is gas(+CCS) hier vrijwel het volledige sluitstuk — de vraag is niet meer óf het gat gevuld wordt, maar tegen welke prijs en CO₂-voetafdruk.`);
+  // Doldrums uren — het eerlijke verhaal
+  const totalDoldrums = r.doldrumsHours;
+  if (r.hrsImport > 80) {
+    lines.push(`<strong>Hoge importafhankelijkheid: ${r.hrsImport} uur/jaar</strong> is het systeem afhankelijk van Europese import tijdens dark doldrums. Dat is geen stroomstoring — gas vult het altijd aan — maar wel ${r.hrsImport} uur per jaar waarop de prijs en beschikbaarheid door buurlanden worden bepaald.`);
+  } else if (r.hrsImport > 20) {
+    lines.push(`Import is nodig in ${r.hrsImport} van de ${totalDoldrums} donkerste uren per jaar. Gas(+CCS) dekt de overige ${r.hrsGas} uur via het capaciteitsmechanisme — binnenlands, dispatchable, prijszeker.`);
+  } else {
+    lines.push(`<span class="ok">Slechts ${r.hrsImport} uur/jaar</span> import nodig tijdens dark doldrums. Gas(+CCS) via capaciteitsmechanisme dekt ${r.hrsGas} uur — het systeem is grotendeels zelfvoorzienend, ook in de moeilijkste uren.`);
   }
 
   if (lines.length === 0) {
@@ -1664,7 +1758,6 @@ function update() {
   };
 
   setKPI('kpi-cost',   '€' + r.totalCost, r.totalCost > 105 ? 'warn' : 'good');
-  setKPI('kpi-sec',    r.security + '%',  r.security  < 80  ? 'warn' : 'good');
   setKPI('kpi-curt',   r.curtailmentPct + '%', r.curtailmentPct > 15 ? 'warn' : 'good');
   if (nuclear === 0) {
     setKPI('kpi-ndelta', 'n.v.t.', 'neut');
@@ -1674,6 +1767,18 @@ function update() {
   }
   setKPI('kpi-ic', '€' + r.interconnCostPerMWh, r.interconnCostPerMWh > 8 ? 'warn' : 'good');
   setKPI('kpi-ccs', '€' + r.gasCcsAllIn, 'neut');
+
+  // Doldrums uren
+  const setHrs = (id, val, cls) => {
+    document.getElementById(id).innerHTML =
+      `${val} <span class="hrs-unit">uur/jaar</span>`;
+    document.getElementById(id).className = 'doldrums-hours' + (cls ? ' ' + cls : '');
+  };
+  document.getElementById('kpi-doldrums-total').textContent = r.doldrumsHours;
+  setHrs('kpi-hrs-batt',   r.hrsBatt,   r.hrsBatt > 50  ? 'good' : '');
+  setHrs('kpi-hrs-vre',    r.hrsVRE,    r.hrsVRE  > 30  ? 'good' : '');
+  setHrs('kpi-hrs-gas',    r.hrsGas,    r.hrsGas  > 200 ? 'warn' : '');
+  setHrs('kpi-hrs-import', r.hrsImport, r.hrsImport > 50 ? 'warn' : 'good');
 
   // Dynamic LCOE box
   const setLCOE = (effId, deltaId, base, eff, delta, col) => {
