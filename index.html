@@ -887,12 +887,13 @@ const P = {
   gasCcsCapMechCost:   18,
   gasCcsCaptureRate:   0.90,
 
-  // Kannibalisatie-ijkpunten (schaling van LDC-surplus naar LCOE-opslag)
-  // Niet langer autonome slopes maar afgeleid uit LDC-surplus in runLDC()
-  kannibWindScale:   2.2,   // €/MWh LCOE-opslag per 10% surplus-uren in seg C
-  kannibSolarScale:  2.8,   // zon meer gecorreleerd → hogere opslag
-  kannibNuclearBase: 1.8,   // kern: ook seg B prijsdruk + 25jr blootstelling
-  kannibNuclearLong: 3.5,   // extra langetermijn-risicopremie voor kern
+  // Kannibalisatie-ijkpunten — geijkt op Hirth (2013/2015) value factor curves
+  // Bij surplusFrac=0.5 (50% overaanbod in dal-uren) moet opslag ~30-40% zijn
+  // Bij surplusFrac=1.0 moet opslag ~55-65% zijn (kern: 70-80% door 25jr exposure)
+  kannibWindScale:   45,    // basis-opslag bij surplusFrac=1.0 (~45%)
+  kannibSolarScale:  55,    // zon meer gecorreleerd → hogere opslag
+  kannibNuclearBase: 55,    // kern: ook seg B prijsdruk + inflexibiliteit
+  kannibNuclearLong: 25,    // extra langetermijn-risicopremie (25jr exposure)
 
   // System cost adders (€/MWh per 10pp penetratie)
   windSysSlope:    1.6,
@@ -907,6 +908,9 @@ const P = {
   interconnUtilTWhPerGW: 4.5,
   interconnImportPremiumBase: 0.15,
   interconnCorrelationPenalty: 0.55,
+
+  // Battery
+  batteryAbsorbFactor: 0.018,  // curtailment-absorptie per GWh batterij
 };
 
 // ════════════════════════════════════════════════════════
@@ -920,19 +924,26 @@ const P = {
 //  interconnBenefit = dempt kannibalisatie (export mogelijkheid)
 // ════════════════════════════════════════════════════════
 function effectiveLCOE(baseLCOE, surplusFrac, segBpressure, isNuclear, interconnBenefit) {
-  const interconnMod = Math.max(0.3, 1 - interconnBenefit * 0.55);
+  // interconnectie dempt kannibalisatie maar beperkt:
+  // bij hoge Europese VRE-penetratie exporteer je niet weg, je concurreert
+  // Max demping: 25% (niet 55% zoals eerder)
+  const interconnMod = Math.max(0.75, 1 - interconnBenefit * 0.25);
 
-  // Korte-termijn marktwaardedepreciatie (à la Hirth): prijsdruk in productie-uren
-  const shortTermKannib = surplusFrac * (isNuclear ? P.kannibNuclearBase : P.kannibWindScale)
-    + segBpressure * (isNuclear ? P.kannibNuclearBase * 0.6 : P.kannibWindScale * 0.4);
+  // Korte-termijn marktwaardedepreciatie (geijkt op Hirth 2013/2015):
+  // surplusFrac=0 → 0% opslag, surplusFrac=1 → kannibScale% opslag
+  // segBpressure voegt prijsdruk toe ook buiten de dal-uren
+  const scale = isNuclear ? P.kannibNuclearBase : P.kannibWindScale;
+  const shortTerm = surplusFrac * scale
+    + segBpressure * scale * 0.35;
 
-  // Langetermijn financieringsrisico: banken prijzen verwachte toekomstige prijsdruk in
-  // Kern heeft 25 jaar exposure, wind/zon 15-20 jaar → kern zwaarder gewogen
-  const longTermRisk = isNuclear
-    ? surplusFrac * P.kannibNuclearLong * interconnMod
-    : surplusFrac * P.kannibWindScale * 0.5 * interconnMod;
+  // Langetermijn financieringsrisico:
+  // Kern: 25jr exposure → banken vragen hogere risicopremie
+  // Wind/zon: 15-20jr → lagere maar nog steeds significante premie
+  const longTerm = isNuclear
+    ? surplusFrac * P.kannibNuclearLong
+    : surplusFrac * scale * 0.4;
 
-  const totalOpslag = (shortTermKannib + longTermRisk) * interconnMod;
+  const totalOpslag = (shortTerm + longTerm) * interconnMod;
   return Math.round(baseLCOE * (1 + totalOpslag / 100));
 }
 
@@ -974,11 +985,24 @@ function interconnCost(interconnGW, totalVREPenFrac, importedTWh, demand) {
 function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const peakGW  = demand * P.peakGWperTWh;
 
+  // Lokale hulpvariabelen voor surplus/kannibalisatieberekening
+  const batteryAbsorb = Math.min(0.4, batteryGWh * P.batteryAbsorbFactor);
+  const rawIb = P.interconnMaxBenefit *
+    Math.log(1 + interconnGW / P.interconnSat) / Math.log(1 + 1);
+  const ib = Math.max(0, rawIb); // vereenvoudigd: geen euSurplusPenalty hier
+
   // VRE-opwekking per segment (GWh)
-  // Wind: CF per segment verschilt (meer 's nachts/winter dan overdag/zomer)
-  const windA  = windGW  * P.segA_vreFrac * 0.55 * P.segA_hours / 1000;  // weinig wind
-  const windB  = windGW  * P.segB_vreFrac * P.windOffCF / 0.55 * P.segB_hours / 1000;
-  const windC  = windGW  * Math.min(1, P.segC_vreFrac * 0.7) * P.windOffCF / 0.55 * P.segC_hours / 1000;
+  // Wind offshore (instelbaar) + onshore (vaste 7 GW basis)
+  const totalWindGW = windGW + P.windOnGW;
+  const windOffFrac = windGW / Math.max(0.01, totalWindGW);
+  const windOnFrac  = P.windOnGW / Math.max(0.01, totalWindGW);
+  // Gewogen CF per segment (offshore hogere CF dan onshore)
+  const cfA = windOffFrac * 0.55 * P.windOffCF + windOnFrac * 0.55 * P.windOnCF;
+  const cfB = windOffFrac * P.windOffCF + windOnFrac * P.windOnCF;
+  const cfC = windOffFrac * P.windOffCF * 0.7 + windOnFrac * P.windOnCF * 0.6;
+  const windA = totalWindGW * P.segA_vreFrac * cfA / P.windOffCF * P.segA_hours / 1000;
+  const windB = totalWindGW * P.segB_vreFrac * cfB / P.windOffCF * P.segB_hours / 1000;
+  const windC = totalWindGW * Math.min(1, P.segC_vreFrac * 0.7) * cfC / P.windOffCF * P.segC_hours / 1000;
 
   // Zon: alleen in B en C (overdag), vrijwel nul in A (winter/nacht)
   const solarA = solarGW * 0.02 * P.segA_hours / 1000;
@@ -1845,8 +1869,8 @@ function update() {
   setLCOE('lcoe-nuc-eff',    'lcoe-nuc-delta',    P.nuclearBase, r.nuclearEff, r.nuclearDeltaLCOE, '--nuclear');
 
   const windPenFrac    = ((wind * P.windOffCF + P.windOnGW * P.windOnCF) * 8.76) / demand;
-  const solarPenFrac   = (solar   * P.solarCF   * 8.76) / P.demand;
-  const nuclearPenFrac = (nuclear * P.nuclearCF * 8.76) / P.demand;
+  const solarPenFrac   = (solar   * P.solarCF   * 8.76) / demand;
+  const nuclearPenFrac = (nuclear * P.nuclearCF * 8.76) / demand;
 
   const crossing = renderTipping(battery, interconn, windPenFrac, solarPenFrac, nuclearPenFrac, demand);
   renderFrontier(r);
