@@ -977,8 +977,8 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   // VRE-opwekking per segment (GWh)
   // Wind: CF per segment verschilt (meer 's nachts/winter dan overdag/zomer)
   const windA  = windGW  * P.segA_vreFrac * 0.55 * P.segA_hours / 1000;  // weinig wind
-  const windB  = windGW  * P.segB_vreFrac * P.windCF / 0.55 * P.segB_hours / 1000;
-  const windC  = windGW  * Math.min(1, P.segC_vreFrac * 0.7) * P.windCF / 0.55 * P.segC_hours / 1000;
+  const windB  = windGW  * P.segB_vreFrac * P.windOffCF / 0.55 * P.segB_hours / 1000;
+  const windC  = windGW  * Math.min(1, P.segC_vreFrac * 0.7) * P.windOffCF / 0.55 * P.segC_hours / 1000;
 
   // Zon: alleen in B en C (overdag), vrijwel nul in A (winter/nacht)
   const solarA = solarGW * 0.02 * P.segA_hours / 1000;
@@ -1130,18 +1130,17 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   const euSurplusPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
   const ib = Math.max(0, rawInterconn - euSurplusPenalty);
 
-  // Effective LCOE per tech — LDC-gebaseerde kannibalisatie (na runLDC)
-  // surplusFrac en segBpressure komen uit de LDC, consistent met curtailment
-  const windEff    = effectiveLCOE(P.windBase,    ldc.surplusFrac, ldc.segBpressure, false, ib);
-  // Onshore heeft lagere kannibalisatie (deels al afgeschreven, lagere CF)
-  const windOnEff  = effectiveLCOE(P.windOnBase,  ldc.surplusFrac * 0.5, ldc.segBpressure * 0.4, false, ib);
-  const solarEff   = effectiveLCOE(P.solarBase,   ldc.surplusFrac * 1.2, ldc.segBpressure * 1.1, false, ib);
-  const nuclearEff = effectiveLCOE(P.nuclearBase, ldc.surplusFrac, ldc.segBpressure, true,  ib * 0.5);
-
   // ── LOAD DURATION CURVE — eerst draaien, dan kannibalisatie afleiden ──
   const ldc = runLDC(wind, solar, nuclear, battery, interconn, demand);
 
-  const curtailmentRate = ldc.curtailmentRate / 100; // als fractie
+  // Effective LCOE per tech — LDC-gebaseerde kannibalisatie
+  // surplusFrac en segBpressure komen uit de LDC, consistent met curtailment
+  const windEff    = effectiveLCOE(P.windBase,   ldc.surplusFrac,       ldc.segBpressure,       false, ib);
+  const windOnEff  = effectiveLCOE(P.windOnBase, ldc.surplusFrac * 0.5, ldc.segBpressure * 0.4, false, ib);
+  const solarEff   = effectiveLCOE(P.solarBase,  ldc.surplusFrac * 1.2, ldc.segBpressure * 1.1, false, ib);
+  const nuclearEff = effectiveLCOE(P.nuclearBase,ldc.surplusFrac,       ldc.segBpressure,       true,  ib * 0.5);
+
+  const curtailmentRate = ldc.curtailmentRate / 100;
 
   // System cost adders (netteverzwaring, redispatch, etc.)
   const windSys    = windPen    * 10 * P.windSysSlope;
@@ -1254,8 +1253,11 @@ function tippingCurve(battery, interconn, demand) {
     const euPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
     const ib = Math.max(0, rawInterconn - euPenalty);
 
-    // Effective nuclear LCOE at this VRE penetration (nuclear itself assumed marginal/small)
-    const nuclearEff = effectiveLCOE(P.nuclearBase, totalPen * 0.3, P.nuclearKannib, ib * 0.5);
+    // Effective nuclear LCOE: in tippingCurve gebruiken we surplusPen als proxy
+    // voor surplusFrac (geen echte LDC hier), en segBpressure als totalPen-fractie
+    const surplusFracProxy = Math.max(0, totalPen - 0.7);
+    const segBProxy = Math.min(1, totalPen * 0.6);
+    const nuclearEff = effectiveLCOE(P.nuclearBase, surplusFracProxy, segBProxy, true, ib * 0.5);
 
     // System value: what the system is willing to pay for firm, dispatchable capacity
     // Starts near gas backup cost, falls as curtailment rises and batteries/interconn
