@@ -3,48 +3,62 @@
 
 > *Welke mix van wind, zon, batterijen, kernenergie, interconnectie en gas(+CCS) levert de laagste totale systeemkosten bij voldoende leveringszekerheid — en wanneer wordt kernenergie een nettoverlies voor de samenleving?*
 
-**→ [Open de tool](https://fvanoordt.github.io/energie-nl-2040)**
+**→ [Open de tool](https://jouwnaam.github.io/energie-nl-2040)**
 
 ---
 
 ## Achtergrond
 
-Dit model is gebouwd om één fundamenteel argument inzichtelijk te maken: beslissingen over het elektriciteitsysteem zijn geen optelsom van losse technologiekeuzes. Elke toevoeging verandert de waarde van alles wat er al in zit.
+Dit model maakt één fundamenteel argument inzichtelijk: beslissingen over het elektriciteitssysteem zijn geen optelsom van losse technologiekeuzes. Elke toevoeging verandert de waarde van alles wat er al in zit.
 
 De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwaardedepreciatie, 2013–2015), uitgebreid met:
 
 - **Kannibaliseringseffect op kapitaalkosten** — niet alleen de marktwaarde van stroom daalt bij hoge penetratie, ook de financieringskosten stijgen doordat banken het terugverdienrisico inprijzen via een hogere WACC
-- **Volledige systeemkosten** — inclusief netcongestie, curtailment, flexibiliteitspremie, interconnectie-infrastructuur en importpremie
-- **Load duration curve** in drie segmenten die de realiteit van wind- en zoncorrelatie weerspiegelen
-- **Nederlandse parameters** voor 2040 — geen fictief land, maar reële getallen
+- **Load duration curve in 4 segmenten** — verdeelt het jaar in piek, schouder-hoog, schouder-laag en dal, waardoor curtailment realistisch wordt berekend per marktsegment
+- **Volledige systeemkosten** — inclusief netcongestie, curtailment/export, flexibiliteitspremie, interconnectie-infrastructuur en importpremie
+- **Nederlandse parameters voor 2040** — geen fictief land, maar reële getallen
 
 ---
 
 ## Wat het model berekent
 
-### Drie kernvragen per portfoliomix
+### Vijf KPI's per portfoliomix
 
-| Vraag | Metric |
+| KPI | Wat het meet |
 |---|---|
-| Wat kost het systeem werkelijk? | Totale systeemkosten in €/MWh, all-in |
-| Hoe zeker is de levering? | % van dark-doldrums-uren gedekt door binnenlandse bronnen |
-| Is kernenergie een netto-investering of nettoverlies? | Kernmeerkosten vs. alternatief zonder kern bij gelijke zekerheid |
+| Systeemkosten | €/MWh all-in, inclusief kannibalisering |
+| Curtailment / export | % weggegooid of geëxporteerd (in praktijk grotendeels curtailment — buurlanden hebben op dezelfde uren ook surplus) |
+| Kernmeerkosten | €/MWh extra t.o.v. zelfde zekerheid zonder kern — toont ook hoeveel TWh kern levert tijdens overaanbod-uren (feitelijke productiestatistiek, geen curtailment-toewijzing) |
+| Interconnectiekosten | €/MWh infrastructuur + importpremie |
+| Gas+CCS all-in | €/MWh inclusief capaciteitsvergoeding |
 
-### Load duration curve — 3 segmenten
+### Dark doldrums — leveringszekerheid in concrete uren
 
-Het model rekent geen jaargemiddelden maar simuleert drie marktsegmenten:
+Van de ~500 uur/jaar dat wind én zon vrijwel niets leveren, toont het model per dekkingsbron hoeveel uur wordt gedekt — er is *altijd* stroom, maar de herkomst verschilt:
 
-| Segment | Uren/jaar | Typische situatie | Dominante bron |
+| Bron | Rol |
+|---|---|
+| 🔋 Batterij / V2G | Opgeslagen wind/zon uit dal-uren |
+| ⚛️ Kernenergie | Doorlopende baseload-productie |
+| 🏭 Gas (kaal / +CCS) | Capaciteitsmechanisme actief — binnenlands, dispatchable |
+| 🌍 Import | Laatste redmiddel — Europese marktprijs, onzeker |
+
+### Load duration curve — 4 marktsegmenten
+
+De segmenten zijn benoemd naar marktconditie (schaarste of overschot), niet naar tijdstip — namen als "dal zomermiddag" suggereren een kort, zeldzaam venster terwijl het in werkelijkheid om duizenden uren per jaar gaat.
+
+| Segment | Uren/jaar | Marktconditie | Dominante bron |
 |---|---|---|---|
-| **Piek (A)** | ~500 | Winter, windstil, avond — *dark doldrums* | Gas(+CCS), kern, import |
-| **Schouder (B)** | ~5.000 | Gemiddeld aanbod en vraag | Wind, zon, batterijen |
-| **Dal (C)** | ~3.260 | Zomermiddag, veel zon/wind, lage vraag | Curtailment, batterijlading, export |
+| **Schaarste-uren** | ~500 | Weinig wind/zon, hoge vraag — *dark doldrums* | Gas(+CCS), kern, import |
+| **Overschot-uren (matig)** | ~2.000 | Redelijk wind/zon, gemiddelde vraag — surplus mogelijk | Wind+zon, export, batterijlading |
+| **Krapte-uren (regulier)** | ~3.000 | Weinig zon, wisselend wind — structureel tekort | Wind, gas, batterij ontlading |
+| **Overschot-uren (hoog)** | ~3.260 | Veel wind/zon, lage vraag | Curtailment/export, batterijlading |
 
-Curtailment is daardoor geen ruwe penetratieproxy maar een directe berekening van wat in segment C overblijft ná batterijlading en export via interconnectie.
+Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nachten binnen de krapte-uren. Export is beperkt omdat buurlanden op dezelfde uren hetzelfde surplus hebben (Europese correlatie).
 
 ### Het kantelpunt
 
-De centrale grafiek toont waar de **effectieve LCOE van kernenergie** de **systeemwaarde van firm capaciteit** overstijgt. Voorbij dat punt is kernsubsidie per definitie een structurele overdracht aan de samenleving, geen efficiënte investering.
+De centrale grafiek toont waar de **effectieve LCOE van kernenergie** de **systeemwaarde van firm capaciteit** overstijgt. Voorbij dat punt is kernsubsidie per definitie een structurele overdracht, geen efficiënte investering.
 
 ---
 
@@ -54,31 +68,30 @@ De centrale grafiek toont waar de **effectieve LCOE van kernenergie** de **syste
 
 | Technologie | Standalone LCOE | Bron/toelichting |
 |---|---|---|
-| Wind offshore | €117/MWh | NL kabinetsbrief 2025 (strike price SDE++) |
+| Wind offshore (nieuwbouw) | €117/MWh | NL kabinetsbrief 2025 (strike price SDE++) |
+| Wind onshore (basis) | €85/MWh | Vaste 7 GW bestaand, grotendeels afgeschreven |
 | Zon | €45/MWh | Huidige tenderprijzen utility-scale |
-| Kernenergie | €160/MWh | Hinkley Point C benchmark; exclusief extra infra |
-| Gas CCGT | €95/MWh | Incl. capaciteitsvergoeding |
-| Gas+CCS | €135/MWh + €18/MWh capaciteitsvergoeding | Hogere capex CO₂-afvang/opslag/transport; 90% afvangrate |
-| Batterijen (V2G) | €10/MWh cycluskost | Inclusief bidirectioneel laden EVs |
+| Kernenergie | €160/MWh | Hinkley Point C benchmark; excl. extra infrastructuur |
+| Gas CCGT (kaal) | €95/MWh | Incl. capaciteitsvergoeding |
+| Gas+CCS | €135 + €18/MWh | Hogere capex CO₂-afvang/opslag; 90% afvangrate; €18 = capaciteitsvergoeding |
+| Batterijen + V2G | €10/MWh cycluskost | ~200 cycli/jaar; send-out 4-6 uur; incl. bidirectioneel laden EVs |
 
 ### Kannibaliseringsopslag (effectieve LCOE)
 
-Standalone LCOE's missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. Dit verlengt terugverdientijden en verhoogt via hogere WACC de effectieve kapitaalkosten.
+Standalone LCOE's missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. De effectieve LCOE wordt afgeleid uit de LDC-uitkomsten (surplusFrac en segBpressure), consistent met de curtailment-berekening.
 
-| Technologie | Opslag per 10pp penetratie |
-|---|---|
-| Wind | +5,5% op LCOE |
-| Zon | +6,5% |
-| Kern | +9,0% — zwaarder gewogen vanwege 25-jarige blootstelling en inflexibiliteit |
-
-Interconnectie vermindert het kannibaliseringseffect (surplus kan worden geëxporteerd), maar dit voordeel erodeert wanneer buurlanden in dezelfde situatie zitten.
+| Technologie | Maximale opslag bij hoge penetratie | Reden |
+|---|---|---|
+| Wind offshore | ~45% | Gecorreleerde productie; hogere WACC bij lage verwachte marktprijzen |
+| Zon | ~55% | Sterke dagcorrelatie; zomermiddag-concentratie |
+| Kern | ~80% | 25-jarige blootstelling + baseload-inflexibiliteit; interconnectie helpt minder |
 
 ### Interconnectiekosten
 
 Interconnectie is geen gratis optie:
-
-- **Infrastructuur**: €1,75 mld/GW (gemiddelde van €1,5–2 mrd, geannualiseerd over 40 jaar)
+- **Infrastructuur**: €1,75 mld/GW (subsea kabels + converterstations), geannualiseerd over 40 jaar
 - **Importpremie**: oploopt bij Europabrede windstilte — als Nederland importeert tijdens dark doldrums, zijn Duitsland, België en Denemarken vaak in dezelfde situatie
+- **Exportbeperking**: bij hoge VRE-penetratie is de exportwaarde laag — buurlanden hebben op zomermiddagen zelf ook surplus; max ~25-35% van surplus kan worden geëxporteerd
 
 ### Elektriciteitsvraag 2040
 
@@ -88,15 +101,11 @@ Interconnectie is geen gratis optie:
 | Midden | 160 TWh | TNO/PBL middenscenario (standaard) |
 | Hoog | 200 TWh | Volledig elektrificiatiescenario industrie + warmte |
 
-### Leveringszekerheid — definitie
-
-Het model meet het percentage van de *dark-doldrums-uren* (~400–600 uur/jaar: wind <10% én zon ~0) dat wordt gedekt door **binnenlandse bronnen** — batterijen, kernrestproductie, gas(+CCS). Dit meet niet "hebben we wel of geen stroom" (Nederland heeft doorgaans voldoende gasvermogen om elk gat te vullen), maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere Europese schaarsteprijzen.
-
 ---
 
-## Scenario's
+## Snelscenario's
 
-| Scenario | Wind | Zon | Kern | Batterijen | Interconnectie | Gas+CCS |
+| Scenario | Wind offshore | Zon | Kern | Batterijen | Interconnectie | Gas+CCS |
 |---|---|---|---|---|---|---|
 | Max wind, geen kern | 28 GW | 42 GW | 0 GW | 25 GWh | 18 GW | 20% |
 | Gebalanceerd (basis) | 22 GW | 38 GW | 3,2 GW | 20 GWh | 15 GW | 30% |
@@ -104,17 +113,19 @@ Het model meet het percentage van de *dark-doldrums-uren* (~400–600 uur/jaar: 
 | NL als eiland | 22 GW | 38 GW | 3,2 GW | 30 GWh | 4 GW | 60% |
 | Batterij-optimum | 25 GW | 42 GW | 0 GW | 45 GWh | 18 GW | 20% |
 
+*Wind offshore is nieuwbouw bovenop 6,4 GW bestaand. Onshore: vaste 7 GW basis.*
+
 ---
 
 ## Beperkingen en disclaimer
 
 Dit is een **beleidsvisualisatie-instrument**, geen vervanging voor volledige systeemstudies. Beperkingen:
 
-- Het model gebruikt drie marktsegmenten in plaats van een volledig uurresolutiemodel
-- Prijscorrelaties tussen landen zijn gesimplificeerd (logaritmisch saturerend)
+- Het model gebruikt 4 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor onderschat (werkelijk 12-18% bij 85%+ penetratie vs. ~8-10% in dit model)
+- Prijscorrelaties tussen landen zijn gesimplificeerd
 - Netcongestiekosten zijn als proxy meegenomen, niet als volledig netwerkmodel
-- Kernenergie-aannames zijn gebaseerd op Hinkley Point C; Nederlandse EPR-kosten zijn onzeker
-- V2G-adoptie richting 2040 is inherent onzeker
+- Kernenergie-aannames gebaseerd op Hinkley Point C; Nederlandse EPR-kosten zijn onzeker
+- V2G-adoptie richting 2040 inherent onzeker
 
 Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL Klimaat- en Energieverkenning.
 
@@ -127,16 +138,17 @@ Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL
 - PBL/TNO (2023). *Klimaat- en Energieverkenning 2023.*
 - ENTSO-E (2024). *Ten-Year Network Development Plan.*
 - HM Government (2023). *Hinkley Point C — revised cost estimates.*
+- NL Kabinetsbrief (2025). *SDE++ tenderprijzen windenergie op zee.*
 
 ---
 
 ## Technische details
 
-Het model is een zelfstandig HTML-bestand zonder externe afhankelijkheden behalve D3.js (geladen via CDN). Geen installatie nodig — open in elke moderne browser.
+Zelfstandig HTML-bestand (~81KB). Vereist internetverbinding voor D3.js (geladen via CDN). Werkt in elke moderne browser — geen installatie nodig.
 
 ```
-energie-portfolio-nl-2040.html   ← hernoem naar index.html voor GitHub Pages
-README.md
+index.html    ← het model (hernoem energie-portfolio-nl-2040.html naar index.html)
+README.md     ← deze toelichting
 ```
 
-*Ontwikkeld als communicatie-instrument voor het Nederlandse energiebeleidsdebat, 2025.*
+*Ontwikkeld als communicatie-instrument voor het Nederlandse energiebeleidsdebat, 2025–2026.*

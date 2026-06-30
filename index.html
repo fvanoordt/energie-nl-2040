@@ -623,7 +623,7 @@
       <div class="kpi">
         <span class="kpi-label">Kernmeerkosten</span>
         <span class="kpi-value neut" id="kpi-ndelta">—</span>
-        <span class="kpi-sub">vs. zelfde zekerheid zonder kern</span>
+        <span class="kpi-sub" id="kpi-ndelta-sub">vs. zelfde zekerheid zonder kern</span>
       </div>
       <div class="kpi">
         <span class="kpi-label">Interconnectiekosten</span>
@@ -735,7 +735,7 @@
     <div class="chart-panel">
       <div class="panel-eyebrow">Load duration curve — 3 segmenten</div>
       <div class="panel-title">Energiebalans per marktsegment (TWh/jaar)</div>
-      <svg id="svg-ldc" width="100%" height="200"></svg>
+      <svg id="svg-ldc" width="100%" height="235"></svg>
       <div class="legend">
         <div class="legend-item"><div class="leg-line" style="background:#1a6fa3"></div>Wind</div>
         <div class="legend-item"><div class="leg-line" style="background:#d4900a"></div>Zon</div>
@@ -790,13 +790,14 @@
       <tr><td>Kern</td><td>+9,0%</td><td>25-jarige blootstelling + baseload-inflexibiliteit in flexibel systeem</td></tr>
     </table>
 
-    <h2>Load duration curve — 3 segmenten</h2>
+    <h2>Load duration curve — 4 marktsegmenten</h2>
+    <p>De segmenten zijn benoemd naar marktconditie (schaarste of overschot), niet naar tijdstip — de oude namen ("dal zomermiddag" voor 3.260 uur/jaar) suggereerden een kort, zeldzaam venster terwijl het in werkelijkheid om duizenden uren per jaar gaat.</p>
     <table>
-      <tr><th>Segment</th><th>Uren/jaar</th><th>Situatie</th><th>Dominante bron</th></tr>
-      <tr><td><strong>Piek (A)</strong></td><td>~500</td><td>Winter, windstil, avond — <em>dark doldrums</em></td><td>Gas(+CCS), kern, import</td></tr>
-      <tr><td><strong>Schouder wind/zon (B1)</strong></td><td>~2.000</td><td>Winderige/zonnige daguren — surplus mogelijk</td><td>Wind+zon, export, batterijlading</td></tr>
-      <tr><td><strong>Schouder avond (B2)</strong></td><td>~3.000</td><td>Avond, nacht, bewolkt — structureel tekort</td><td>Wind, gas, batterij ontlading</td></tr>
-      <tr><td><strong>Dal (C)</strong></td><td>~3.260</td><td>Zomermiddag, veel zon/wind, lage vraag</td><td>Curtailment, batterijlading, export</td></tr>
+      <tr><th>Segment</th><th>Uren/jaar</th><th>Marktconditie</th><th>Dominante bron</th></tr>
+      <tr><td><strong>Schaarste-uren</strong></td><td>~500</td><td>Weinig wind/zon, hoge vraag — <em>dark doldrums</em></td><td>Gas(+CCS), kern, import</td></tr>
+      <tr><td><strong>Overschot-uren (matig)</strong></td><td>~2.000</td><td>Redelijk wind/zon, gemiddelde vraag — surplus mogelijk</td><td>Wind+zon, export, batterijlading</td></tr>
+      <tr><td><strong>Krapte-uren (regulier)</strong></td><td>~3.000</td><td>Weinig zon, wisselend wind — structureel tekort</td><td>Wind, gas, batterij ontlading</td></tr>
+      <tr><td><strong>Overschot-uren (hoog)</strong></td><td>~3.260</td><td>Veel wind/zon, lage vraag</td><td>Curtailment/export, batterijlading</td></tr>
     </table>
 
     <h2>Interconnectiekosten</h2>
@@ -1145,28 +1146,31 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
     security,
     surplusFrac,
     segBpressure,
+    // Kern productie tijdens surplus-uren (B1 + C): feitelijke bijdrage aan overaanbod
+    nuclearInSurplusTWh: Math.round((nucB1 + nucC) * 10) / 10,
+    nuclearTotalTWh:     Math.round((nucA + nucB1 + nucB2 + nucC) * 10) / 10,
     doldrumsHours:   P.segA_hours,
     hrsBatt:         Math.round(hrsBatt_A),
     hrsGas:          Math.round(hrsGas_A),
     hrsImport:       Math.round(hrsImport_A),
     hrsVRE:          Math.round(hrsVRE_A),
     segments: [
-      { name: 'Piek (A)', hours: P.segA_hours,
+      { name: 'Schaarste-uren', sublabel: 'weinig wind/zon, hoge vraag', hours: P.segA_hours,
         demand: Math.round(dA*10)/10,  vre: Math.round(vreA*10)/10,
         gas: Math.round(gasGapA*10)/10, batt: Math.round(battDischargeA*10)/10,
         import: Math.round(interconnImportA*10)/10 },
-      { name: 'Schouder wind/zon (B1)', hours: P.segB1_hours,
+      { name: 'Overschot-uren (matig)', sublabel: 'redelijk wind/zon, gemiddelde vraag', hours: P.segB1_hours,
         demand: Math.round(dB1*10)/10, vre: Math.round(vreB1*10)/10,
         gas: 0, batt: -Math.round(battCharge*0.3*10)/10,
         export: Math.round(exportB1*10)/10,
         curtail: Math.round(curtailB1*10)/10 },
-      { name: 'Schouder avond (B2)', hours: P.segB2_hours,
+      { name: 'Krapte-uren (regulier)', sublabel: 'weinig zon, wisselend wind', hours: P.segB2_hours,
         demand: Math.round(dB2*10)/10, vre: Math.round(vreB2*10)/10,
         gas: Math.round(gasGapB2*10)/10, batt: Math.round(battDischargeB2*10)/10,
         export: Math.round(exportB2*10)/10,
         curtail: Math.round(curtailB2*10)/10,
         import: 0 },
-      { name: 'Dal zomermiddag (C)', hours: P.segC_hours,
+      { name: 'Overschot-uren (hoog)', sublabel: 'veel wind/zon, lage vraag', hours: P.segC_hours,
         demand: Math.round(dC*10)/10,  vre: Math.round(vreC*10)/10,
         gas: 0, batt: -Math.round(battCharge*0.7*10)/10,
         export: Math.round(exportC*10)/10,
@@ -1267,6 +1271,8 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
     gasGapTWh:       ldc.gasGapTWh,
     battChargeTWh:   ldc.battChargeTWh,
     importTWh:       ldc.importTWh,
+    nuclearInSurplusTWh: ldc.nuclearInSurplusTWh,
+    nuclearTotalTWh:     ldc.nuclearTotalTWh,
     doldrumsHours:   ldc.doldrumsHours,
     hrsBatt:         ldc.hrsBatt,
     hrsGas:          ldc.hrsGas,
@@ -1605,8 +1611,8 @@ function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPe
 function renderLDC(ldc) {
   const el  = document.getElementById('svg-ldc');
   const W   = el.clientWidth || 600;
-  const H   = 200;
-  const m   = { top: 18, right: 28, bottom: 38, left: 58 };
+  const H   = 235;
+  const m   = { top: 18, right: 28, bottom: 70, left: 58 };
   const iW  = W - m.left - m.right;
   const iH  = H - m.top  - m.bottom;
 
@@ -1625,10 +1631,31 @@ function renderLDC(ldc) {
 
   g.append('g').attr('class','grid')
    .call(d3.axisLeft(ySc).tickSize(-iW).tickFormat('').ticks(5));
-  g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
-   .call(d3.axisBottom(xSc));
   g.append('g').attr('class','axis')
    .call(d3.axisLeft(ySc).ticks(5).tickFormat(d => d + ' TWh'));
+
+  // Custom 3-regel X-as labels: naam / uren·jaar / voorbeeld
+  segs.forEach(s => {
+    const x = xSc(s.name) + xSc.bandwidth() / 2;
+    const labelG = g.append('g').attr('transform', `translate(${x},${iH + 16})`);
+    labelG.append('text')
+      .attr('text-anchor','middle').attr('fill','#1a1a1a')
+      .attr('font-size', 10).attr('font-weight', 700)
+      .attr('font-family','Helvetica Neue,Arial,sans-serif')
+      .text(s.name);
+    labelG.append('text')
+      .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('y', 13)
+      .attr('font-size', 9)
+      .attr('font-family','Helvetica Neue,Arial,sans-serif')
+      .text(`${Math.round(s.hours)} u/jaar`);
+    if (s.sublabel) {
+      labelG.append('text')
+        .attr('text-anchor','middle').attr('fill','#999').attr('y', 25)
+        .attr('font-size', 8.5).attr('font-style', 'italic')
+        .attr('font-family','Helvetica Neue,Arial,sans-serif')
+        .text(s.sublabel);
+    }
+  });
 
   segs.forEach(s => {
     const x  = xSc(s.name);
@@ -1787,6 +1814,10 @@ function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFr
     } else {
       lines.push(`Bij de huidige wind/zon-instelling is kern-kannibalisering beperkt (+€${r.nuclearDeltaLCOE}/MWh). Voeg meer wind of zon toe om het effect te zien.`);
     }
+    if (r.nuclearInSurplusTWh > 0.5) {
+      const surplusSharePct = Math.round((r.nuclearInSurplusTWh / Math.max(0.1, r.nuclearTotalTWh)) * 100);
+      lines.push(`<strong>Kern draait door tijdens overaanbod:</strong> ${r.nuclearInSurplusTWh} TWh van de totale kernproductie (${surplusSharePct}%) wordt geleverd in de uren dat wind en zon al meer leveren dan de vraag aankan. Dat is geen curtailment-toewijzing — het is de feitelijke productie van kern op precies die uren.`);
+    }
     if (r.nuclearDelta > 8) {
       lines.push(`<strong>Kernmeerkosten: +€${r.nuclearDelta}/MWh</strong> ten opzichte van een portfolio dat dezelfde leveringszekerheid haalt zonder kern (via extra wind + gas + batterijen).`);
     } else if (r.nuclearDelta > 0) {
@@ -1867,9 +1898,13 @@ function update() {
   setKPI('kpi-curt',   r.curtailmentPct + '%', r.curtailmentPct > 15 ? 'warn' : 'good');
   if (nuclear === 0) {
     setKPI('kpi-ndelta', 'n.v.t.', 'neut');
+    document.getElementById('kpi-ndelta-sub').textContent = 'vs. zelfde zekerheid zonder kern';
   } else {
     const sign = r.nuclearDelta >= 0 ? '+' : '';
     setKPI('kpi-ndelta', sign + '€' + r.nuclearDelta, r.nuclearDelta > 6 ? 'warn' : 'good');
+    const surplusPct = Math.round((r.nuclearInSurplusTWh / Math.max(0.1, r.nuclearTotalTWh)) * 100);
+    document.getElementById('kpi-ndelta-sub').textContent =
+      `${r.nuclearInSurplusTWh} TWh (${surplusPct}%) geleverd tijdens overaanbod`;
   }
   setKPI('kpi-ic', '€' + r.interconnCostPerMWh, r.interconnCostPerMWh > 8 ? 'warn' : 'good');
   setKPI('kpi-ccs', '€' + r.gasCcsAllIn, 'neut');
