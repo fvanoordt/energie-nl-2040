@@ -503,6 +503,11 @@
   <div class="eyebrow">Systeemanalyse · Nederland 2040 · Lion Hirth-methodiek uitgebreid</div>
   <h1>Portfoliokeuze: wat kost kernenergie <em>echt</em> in een wind/zon-rijk systeem?</h1>
   <p class="lead">Standalone LCOE's missen het kannibaliseringseffect: naarmate penetratie stijgt, dalen marktprijzen precies op productie-uren, waardoor terugverdientijden langer worden en de effectieve kapitaalkosten stijgen. Dit instrument maakt dat zichtbaar.</p>
+<p class="lead" style="margin-top:0.4rem;font-style:italic">
+  Dit model richt zich op aanbodzijde-systeemkosten. Vraagzijde-netwerkkosten
+  (warmtepompen, EV, industrie) zijn buiten scope —
+  <a href="#footnote" style="color:var(--muted);text-decoration:underline dotted">zie toelichting in de voetnoot ↓</a>
+</p>
 </header>
 
 <div class="layout">
@@ -618,7 +623,7 @@
       <div class="kpi">
         <span class="kpi-label">Curtailment / export</span>
         <span class="kpi-value neut" id="kpi-curt">—</span>
-        <span class="kpi-sub">% weggegooid of geëxporteerd (buurlanden hebben zelf ook surplus)</span>
+        <span class="kpi-sub">% weggegooid of geëxporteerd (buurlanden hebben zelf ook surplus) — werkelijk hoger door vereenvoudigde methodiek*</span>
       </div>
       <div class="kpi">
         <span class="kpi-label">Kernmeerkosten</span>
@@ -754,9 +759,11 @@
   </div>
 </div>
 
-<div class="footnote">
+<div class="footnote" id="footnote">
+  <strong>Systeemkosten — reikwijdte:</strong> dit model omvat aanbodzijde-effecten: curtailment, redispatch, flexibiliteitspremie en interconnectie-infrastructuur. Vraagzijde-netwerkkosten — verzwaring van regionale netten voor warmtepompen, EV-laadinfrastructuur en industriële elektrificiatie — zijn niet meegenomen. Deze kosten zijn grotendeels technologieneutraal: ze komen sowieso, ongeacht de gekozen opwekmix, en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern daardoor nauwelijks.
+  <br><br>
   <strong>Methodiek:</strong>
-  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). Interconnectiekosten zijn geen gratis optie: kabelinfrastructuur à €1,75 mld/GW (subsea kabels + converterstations) geannualiseerd over 40 jaar, plus een importpremie tijdens schaarse uren die oploopt naarmate windstilte vaker Europabreed gecorreleerd is. <strong>Leveringszekerheid (herzien):</strong> percentage van de "dark doldrums"-uren (~400–600 uur/jaar, NL wind &lt;10% én zon ~0) dat wordt gedekt door binnenlandse bronnen — batterijen, kernrestproductie, én gasvermogen (kaal of met CCS). Dit meet dus niet "hebben we wel/geen stroom" (Nederland heeft doorgaans voldoende gasvermogen om elk gat te vullen), maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere, vaak hogere Europese schaarsteprijzen. Gas+CCS: €135/MWh LCOE (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%) plus €18/MWh capaciteitsvergoeding voor stand-by beschikbaarheid — zelfde transparante logica als bij kaal gas. Kaal gas: €95/MWh incl. capaciteitsvergoeding. Batterijcycluskost: €10/MWh (V2G: €6/MWh). Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040. Curtailment/export: in perioden met hoog VRE-aanbod hebben buurlanden (DE, BE, DK) hetzelfde surplus, waardoor exportwaarde minimaal is en curtailment de dominante uitkomst is. Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
+  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). Interconnectiekosten zijn geen gratis optie: kabelinfrastructuur à €1,75 mld/GW (subsea kabels + converterstations) geannualiseerd over 40 jaar, plus een importpremie tijdens schaarse uren die oploopt naarmate windstilte vaker Europabreed gecorreleerd is. <strong>Leveringszekerheid (herzien):</strong> percentage van de "dark doldrums"-uren (~400–600 uur/jaar, NL wind &lt;10% én zon ~0) dat wordt gedekt door binnenlandse bronnen — batterijen, kernrestproductie, én gasvermogen (kaal of met CCS). Dit meet dus niet "hebben we wel/geen stroom" (Nederland heeft doorgaans voldoende gasvermogen om elk gat te vullen), maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere, vaak hogere Europese schaarsteprijzen. Gas+CCS: €135/MWh LCOE (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%) plus €18/MWh capaciteitsvergoeding voor stand-by beschikbaarheid — zelfde transparante logica als bij kaal gas. Kaal gas: €95/MWh incl. capaciteitsvergoeding. Batterijcycluskost: €10/MWh (V2G: €6/MWh). Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040. Curtailment/export: in perioden met hoog VRE-aanbod hebben buurlanden (DE, BE, DK) hetzelfde surplus, waardoor exportwaarde minimaal is en curtailment de dominante uitkomst is. <strong>Onderschatting curtailment:</strong> dit model gebruikt 4 gemiddelde marktsegmenten in plaats van uurresolutiedata. Daardoor worden piekuren binnen elk segment uitgemiddeld en wordt curtailment structureel onderschat — werkelijke waarden liggen naar verwachting 30-50% hoger. De systeemkosten zijn daarmee ook aan de conservatieve kant. Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
 </div>
 
 <!-- ABOUT PANEL -->
@@ -1804,7 +1811,7 @@ function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFr
 
   // Kannibalisering wind
   if (r.windDelta > 15) {
-    lines.push(`<strong>Wind offshore kannibalisering:</strong> effectieve LCOE stijgt van €117 naar €${r.windEff}/MWh (+€${r.windDelta}). Hoe meer surplus-uren in het systeem (nu ${Math.round(r.surplusFrac*100)}% van segment C), hoe hoger het financieringsrisico dat banken inprijzen.`);
+    lines.push(`<strong>Wind offshore kannibalisering:</strong> effectieve LCOE stijgt van €117 naar €${r.windEff}/MWh (+€${r.windDelta}). Hoe meer overschot-uren in het systeem (nu ${Math.round(r.surplusFrac*100)}% van de overschot-uren), hoe hoger het financieringsrisico dat banken inprijzen.`);
   }
 
   // Kern kannibalisering

@@ -24,6 +24,8 @@ De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwa
 
 ### Vijf KPI's per portfoliomix
 
+> **Reikwijdte systeemkosten:** dit model omvat aanbodzijde-effecten (curtailment, redispatch, flexibiliteitspremie, interconnectie-infrastructuur). Vraagzijde-netwerkkosten voor warmtepompen, EV en industriële elektrificiatie zijn buiten scope — deze zijn grotendeels technologieneutraal en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern nauwelijks.
+
 | KPI | Wat het meet |
 |---|---|
 | Systeemkosten | €/MWh all-in, inclusief kannibalisering |
@@ -121,7 +123,7 @@ Interconnectie is geen gratis optie:
 
 Dit is een **beleidsvisualisatie-instrument**, geen vervanging voor volledige systeemstudies. Beperkingen:
 
-- Het model gebruikt 4 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor onderschat (werkelijk 12-18% bij 85%+ penetratie vs. ~8-10% in dit model)
+- Het model gebruikt 4 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor **structureel onderschat** (werkelijk 30-50% hoger dan de modeluitkomst, vergelijkbaar met ~12-18% bij 85%+ penetratie vs. ~8-10% in dit model). Dit betekent ook dat de systeemkosten aan de **conservatieve kant** zijn — het werkelijke nadeel van hoge VRE-penetratie zonder adequate opslag/export is groter dan dit model toont.
 - Prijscorrelaties tussen landen zijn gesimplificeerd
 - Netcongestiekosten zijn als proxy meegenomen, niet als volledig netwerkmodel
 - Kernenergie-aannames gebaseerd op Hinkley Point C; Nederlandse EPR-kosten zijn onzeker
