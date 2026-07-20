@@ -141,6 +141,10 @@ De segmenten zijn benoemd naar marktconditie (schaarste of overschot), niet naar
 
 Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nachten binnen de krapte-uren. Export is beperkt omdat buurlanden op dezelfde uren hetzelfde surplus hebben (Europese correlatie).
 
+### Niet-fossiel aandeel van de jaarvraag
+
+Onder de LDC-grafiek in de tool staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd), en Gas(+CCS) evenmin. Rekensom: `(totalVRETWh − curtailment − export) / vraag`. Getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in `tests.js`.
+
 ### Interconnectiekosten (systeemkosten, los van adequacy-krediet)
 
 Interconnectie is geen gratis optie:

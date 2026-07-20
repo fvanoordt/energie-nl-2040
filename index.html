@@ -820,6 +820,11 @@
         <div class="legend-item"><div class="leg-line" style="background:#a0c4e8"></div>Export naar buurlanden</div>
         <div class="legend-item"><div class="leg-line" style="background:#ccc; border:1px dashed #999"></div>Curtailment/export — in praktijk grotendeels curtailment (buurlanden zelfde surplus)</div>
       </div>
+      <div class="kpi-sub" style="margin-top:0.8rem; padding-top:0.7rem; border-top:1px solid var(--rule);">
+        <strong style="font-size:1.05rem; color:var(--ink)">Niet-fossiel aandeel van de jaarvraag: <span id="ldc-nonfossil-pct">—</span>%</strong>
+        <br>
+        <span style="color:#6b6b6b; font-size:0.72rem;">wind + zon + kern + batterij (die zelf alleen niet-fossiele elektronen opslaat en teruglevert) — exclusief import (herkomst onbekend/gemengd) en Gas(+CCS)</span>
+      </div>
     </div>
 
   </div>
@@ -917,6 +922,9 @@
       <tr><td><strong>Krapte-uren (regulier)</strong></td><td>~3.000</td><td>Weinig zon, wisselend wind — structureel tekort</td><td>Wind, gas, batterij ontlading</td></tr>
       <tr><td><strong>Overschot-uren (hoog)</strong></td><td>~3.260</td><td>Veel wind/zon, lage vraag</td><td>Curtailment/export, batterijlading</td></tr>
     </table>
+
+    <h2>Niet-fossiel aandeel van de jaarvraag</h2>
+    <p>Direct onder de grafiek hierboven staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie (<code>totalVRETWh</code>) wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd — mogelijk deels fossiel bij de buren), en Gas(+CCS) evenmin. Rekensom: <code>(totalVRETWh − curtailment − export) / vraag</code>. Dit is getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in <code>tests.js</code>.</p>
 
     <h2>Interconnectiekosten</h2>
     <p>Interconnectie is geen gratis optie: <strong>€1,75 mld/GW</strong> infrastructuur (gemiddelde €1,5–2 mrd, geannualiseerd over 40 jaar), plus een importpremie die oploopt bij Europabrede windstilte — als Nederland importeert tijdens dark doldrums, zijn Duitsland, België en Denemarken vaak in dezelfde situatie.</p>
@@ -1351,6 +1359,7 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
 
   const totalVRE = totalVREraw;
   const curtailmentRate = totalVRE > 0 ? curtailmentTWh / totalVRE : 0;
+  const exportTWh = exportB1 + exportB2 + exportC;
 
   // Uren-breakdown dark doldrums (seg A)
   const avgPowerA = peakGW * segALoadFrac;
@@ -1375,6 +1384,7 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
     totalVRETWh:     Math.round(totalVRE * 10) / 10,
     curtailmentTWh:  Math.round(curtailmentTWh * 10) / 10,
     curtailmentRate: Math.round(curtailmentRate * 100),
+    exportTWh:       Math.round(exportTWh * 10) / 10,
     gasGapTWh:       Math.round(totalGasGap * 10) / 10,
     gasGapA_TWh:     Math.round(gasGapA * 10) / 10,
     battChargeTWh:   Math.round(battCharge * 10) / 10,
@@ -1499,6 +1509,13 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   // ── LOAD DURATION CURVE — eerst draaien, dan kannibalisatie afleiden ──
   const ldc = runLDC(wind, solar, nuclear, battery, interconn, demand);
 
+  // Niet-fossiel aandeel van de jaarvraag: wind + zon + kern + batterij (die zelf alleen
+  // wind/zon/kern-elektronen opslaat en teruglevert — geen dubbeltelling, want curtailment
+  // en export worden afgetrokken van de brutoproductie vóórdat het de vraag bereikt; de
+  // batterij verschuift alleen ín tijd wat er al bij zat, en telt dus vanzelf goed mee).
+  const nonFossilTWh = Math.max(0, ldc.totalVRETWh - ldc.curtailmentTWh - ldc.exportTWh);
+  const nonFossilPct = Math.round((nonFossilTWh / demand) * 1000) / 10;
+
   // Effective LCOE per tech — LDC-gebaseerde kannibalisatie
   // surplusFrac en segBpressure komen uit de LDC, consistent met curtailment
   const windEff    = effectiveLCOE(P.windBase,   ldc.surplusFrac,       ldc.segBpressure,       false, ib);
@@ -1578,6 +1595,9 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
     security:        ldc.security,
     curtailmentPct:  ldc.curtailmentRate,
     curtailmentTWh:  ldc.curtailmentTWh,
+    exportTWh:       ldc.exportTWh,
+    nonFossilTWh:    Math.round(nonFossilTWh * 10) / 10,
+    nonFossilPct,
     gasGapTWh:       ldc.gasGapTWh,
     battChargeTWh:   ldc.battChargeTWh,
     importTWh:       ldc.importTWh,
@@ -2383,6 +2403,7 @@ function update() {
   renderFrontier(r);
   renderStack(r.breakdown);
   renderLDC(r.ldc);
+  document.getElementById('ldc-nonfossil-pct').textContent = r.nonFossilPct;
   renderAdequacy(r.adequacy);
   document.getElementById('adq-peak').textContent = r.adequacy.peakGW;
   document.getElementById('adq-demand').textContent = demand;
