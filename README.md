@@ -29,7 +29,7 @@ De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwa
 
 ### Zes KPI's per portfoliomix
 
-> **Reikwijdte systeemkosten:** dit model omvat aanbodzijde-effecten (curtailment, redispatch, flexibiliteitspremie, interconnectie-infrastructuur, capaciteitsmechanisme). Vraagzijde-netwerkkosten voor warmtepompen, EV en industriële elektrificatie zijn buiten scope qua netwerkkosten — de vráág die warmtepompen genereren zit wél in het model (zie "Elektriciteitsvraag 2040" hieronder).
+> **Reikwijdte systeemkosten:** dit model omvat aanbodzijde-effecten (curtailment, flexibiliteitspremie, interconnectie-infrastructuur, capaciteitsmechanisme). Vraagzijde-netwerkkosten voor warmtepompen, EV en industriële elektrificatie zijn buiten scope qua netwerkkosten — de vráág die warmtepompen genereren zit wél in het model (zie "Elektriciteitsvraag 2040" hieronder). Nederland wordt behandeld als één knooppunt zonder interne transportbeperkingen ("koperen plaat") — redispatch-kosten voor lokale netcongestie zitten er dus niet in (zie Beperkingen).
 
 | KPI | Wat het meet |
 |---|---|
@@ -184,7 +184,9 @@ Dit is een **beleidsvisualisatie-instrument**, geen vervanging voor volledige sy
 
 - Het model gebruikt 4 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor **structureel onderschat** (werkelijk 30-50% hoger dan de modeluitkomst). Dit betekent ook dat de systeemkosten aan de **conservatieve kant** zijn.
 - Prijscorrelaties tussen landen zijn gesimplificeerd tot een 2-groepen-model, niet een volledige correlatiematrix
-- Netcongestiekosten zijn als proxy meegenomen, niet als volledig netwerkmodel
+- **Nederland wordt behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen** — redispatch-kosten voor lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) en de bijbehorende regionale distributienet-investeringen zitten er niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten
+- **Geen expliciete verdringingsvolgorde bij overaanbod:** kern draait met een vaste capaciteitsfactor door alle marktsegmenten (ook overaanbod-uren) — de must-run-eigenschap van kern zit dus in de kannibaliseringsopslag en de totale curtailment, maar het model wijst niet toe wélke technologie (kern of wind/zon) in een gegeven uur zou moeten terugschakelen als er een merit-order- of dispatchprioriteit zou gelden
+- **WACC is geen aparte variabele:** marktwaardedepreciatie en de hogere financieringskosten (WACC) bij lage verwachte marktprijzen zijn samen verwerkt in één kannibaliseringsopslag per technologie, niet als twee los gemodelleerde effecten
 - De benodigde gasvloot heeft een ondergrens van 4 GW (strategische reserve) die niet verder onderbouwd is dan een werkaanname
 - Het capaciteitsmechanisme-prijsniveau (€45.000/MW/jaar) is een oriënterende werkaanname, geen NL-specifieke schatting
 - Kernenergie wordt met twee expliciete bouwrealiteiten gemodelleerd (zie hierboven), niet met een fijnmazige kostencurve
