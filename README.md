@@ -145,6 +145,8 @@ Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nach
 
 Onder de LDC-grafiek in de tool staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd), en Gas(+CCS) evenmin. Rekensom: `(totalVRETWh − curtailment − export) / vraag`. Getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in `tests.js`.
 
+**Een tweede getal ernaast: klimaatneutraal aandeel.** "Niet-fossiel" is met opzet streng gedefinieerd, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.500 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), geen modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040": het Klimaatakkoord noemt 70% *hernieuwbaar* (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate): `niet-fossiel + gasCcsTWh × 0,90`, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.
+
 ### Interconnectiekosten (systeemkosten, los van adequacy-krediet)
 
 Interconnectie is geen gratis optie:
@@ -222,6 +224,8 @@ Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL
 - Malvaldi, A. et al. (2017). *A spatial and temporal correlation analysis of aggregate wind power in an ideally interconnected European power system.* Wind Energy.
 - TenneT. *Interconnectoren: stroom zonder grenzen.* tennet.eu.
 - CBS. *Zonnestroom; vermogen en vermogensklasse, bedrijven en woningen, regio.* Geraadpleegd 2026.
+- Klimaatakkoord. *Elektriciteit.* klimaatakkoord.nl (70% hernieuwbaar-doel 2030).
+- PBL. *Klimaat- en Energieverkenning (KEV).* Meest recente raming.
 - NL Kabinetsbrief (2025). *SDE++ tenderprijzen windenergie op zee.*
 
 ---

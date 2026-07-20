@@ -824,6 +824,10 @@
         <strong style="font-size:1.05rem; color:var(--ink)">Niet-fossiel aandeel van de jaarvraag: <span id="ldc-nonfossil-pct">—</span>%</strong>
         <br>
         <span style="color:#6b6b6b; font-size:0.72rem;">wind + zon + kern + batterij (die zelf alleen niet-fossiele elektronen opslaat en teruglevert) — exclusief import (herkomst onbekend/gemengd) en Gas(+CCS)</span>
+        <br><br>
+        <strong style="font-size:1.05rem; color:var(--ink)">Klimaatneutraal aandeel: <span id="ldc-climateneutral-pct">—</span>%</strong>
+        <br>
+        <span style="color:#6b6b6b; font-size:0.72rem;">idem, plus het afgevangen deel van Gas+CCS (90% capture rate) — sluit aan bij het officiële "klimaatneutraal energiesysteem 2040/2050"-doel, dat kern én afgevangen CO₂ toestaat. Ter referentie: het Klimaatakkoord-doel is 70% <em>hernieuwbaar</em> (excl. kern) in 2030, niet 90-100% niet-fossiel in 2040 — en zelfs dat 70%-doel is in de laatste KEV-raming al bijgesteld naar 60%.</span>
       </div>
     </div>
 
@@ -925,6 +929,7 @@
 
     <h2>Niet-fossiel aandeel van de jaarvraag</h2>
     <p>Direct onder de grafiek hierboven staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie (<code>totalVRETWh</code>) wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd — mogelijk deels fossiel bij de buren), en Gas(+CCS) evenmin. Rekensom: <code>(totalVRETWh − curtailment − export) / vraag</code>. Dit is getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in <code>tests.js</code>.</p>
+    <p><strong>Waarom een tweede getal ernaast staat:</strong> "niet-fossiel" (strikt gedefinieerd, wind+zon+kern+batterij) is met opzet een strenge maatstaf, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.500 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), niet een modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040" — het Klimaatakkoord noemt 70% <em>hernieuwbaar</em> (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate, zie Technologiekosten): <code>niet-fossiel + gasCcsTWh × 0,90</code>, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.</p>
 
     <h2>Interconnectiekosten</h2>
     <p>Interconnectie is geen gratis optie: <strong>€1,75 mld/GW</strong> infrastructuur (gemiddelde €1,5–2 mrd, geannualiseerd over 40 jaar), plus een importpremie die oploopt bij Europabrede windstilte — als Nederland importeert tijdens dark doldrums, zijn Duitsland, België en Denemarken vaak in dezelfde situatie.</p>
@@ -965,7 +970,9 @@
       Stiewe, C., Xu, A.L., Eicke, A., Hirth, L. (2025). <em>Cross-border cannibalization: Spillover effects of wind and solar energy on interconnected European electricity markets.</em> Energy Economics 143, 108251.<br>
       Malvaldi, A. et al. (2017). <em>A spatial and temporal correlation analysis of aggregate wind power in an ideally interconnected European power system.</em> Wind Energy.<br>
       TenneT. <em>Interconnectoren: stroom zonder grenzen.</em> tennet.eu.<br>
-      CBS. <em>Zonnestroom; vermogen en vermogensklasse, bedrijven en woningen, regio.</em> Geraadpleegd 2026.
+      CBS. <em>Zonnestroom; vermogen en vermogensklasse, bedrijven en woningen, regio.</em> Geraadpleegd 2026.<br>
+      Klimaatakkoord. <em>Elektriciteit.</em> klimaatakkoord.nl (70% hernieuwbaar-doel 2030).<br>
+      PBL. <em>Klimaat- en Energieverkenning (KEV).</em> Meest recente raming.
     </div>
 
   </div>
@@ -1538,6 +1545,13 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   const gCS = gasCcsTWh  / demand;
   const gPS = gasPlainTWh / demand;
 
+  // Klimaatneutraal aandeel: niet-fossiel + het afgevangen deel van Gas+CCS (90% capture rate).
+  // Dit is een bredere, beleidsmatig relevantere maatstaf dan "niet-fossiel" — sluit aan bij het
+  // Nederlandse "klimaatneutraal energiesysteem 2040/2050"-doel, dat CO2-vrije bronnen (incl. kern
+  // én afgevangen CO2 bij gas+CCS) toestaat, in tegenstelling tot een striktere "0% fossiel"-lezing.
+  const climateNeutralTWh = nonFossilTWh + gasCcsTWh * P.gasCcsCaptureRate;
+  const climateNeutralPct = Math.round((climateNeutralTWh / demand) * 1000) / 10;
+
   // Interconnection costs
   const icCost = interconnCost(interconn, totalPen, ldc.importTWh, demand);
 
@@ -1598,6 +1612,8 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
     exportTWh:       ldc.exportTWh,
     nonFossilTWh:    Math.round(nonFossilTWh * 10) / 10,
     nonFossilPct,
+    climateNeutralTWh: Math.round(climateNeutralTWh * 10) / 10,
+    climateNeutralPct,
     gasGapTWh:       ldc.gasGapTWh,
     battChargeTWh:   ldc.battChargeTWh,
     importTWh:       ldc.importTWh,
@@ -2404,6 +2420,7 @@ function update() {
   renderStack(r.breakdown);
   renderLDC(r.ldc);
   document.getElementById('ldc-nonfossil-pct').textContent = r.nonFossilPct;
+  document.getElementById('ldc-climateneutral-pct').textContent = r.climateNeutralPct;
   renderAdequacy(r.adequacy);
   document.getElementById('adq-peak').textContent = r.adequacy.peakGW;
   document.getElementById('adq-demand').textContent = demand;
