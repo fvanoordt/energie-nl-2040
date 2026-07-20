@@ -89,7 +89,7 @@ Bij hoge VRE-penetratie draait de gasvloot te weinig uren om zichzelf via de ene
 
 ### Het kantelpunt
 
-Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit kantelpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 71-72% wind+zon-penetratie.
+Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit kantelpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 70-71% wind+zon-penetratie.
 
 ---
 
@@ -116,11 +116,13 @@ Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één sch
 
 Standalone kosten missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. Dit geldt voor élke technologie die hierboven staat, niet voor één in het bijzonder.
 
-| Technologie | Maximale opslag bij hoge penetratie | Reden |
+| Technologie | Opslag: Gebalanceerd-scenario / max. binnen sliderbereik | Reden |
 |---|---|---|
-| Wind offshore | ~45% | Gecorreleerde productie; hogere WACC bij lage verwachte marktprijzen |
-| Zon | ~55% | Sterke dagcorrelatie; zomermiddag-concentratie |
-| Kern | ~80% | Lange investeringshorizon + baseload-inflexibiliteit; interconnectie helpt minder |
+| Wind offshore | +15% / +27% | Gecorreleerde productie; hogere WACC bij lage verwachte marktprijzen |
+| Zon | +20% / +33% | Sterke dagcorrelatie; zomermiddag-concentratie |
+| Kern | +20% / +53% | Lange investeringshorizon + baseload-inflexibiliteit; interconnectie helpt minder |
+
+*Geteste waarden binnen het bereik van de sliders, niet de theoretische asymptoot van de onderliggende schaalparameters — die ligt hoger maar wordt in de praktijk (door batterij-, gas- en interconnectie-absorptie) nooit bereikt.*
 
 **Interconnectie dempt dit niet gelijk voor wind en zon.** Stiewe, Xu, Eicke & Hirth (2025, *Energy Economics*) schatten in een panelanalyse van 30 Europese biedzones (2015-2023) dat interconnectie de eigen kannibalisering van wind sterker dempt dan het de prijsdruk van gecorreleerde buurlanden-opwek verergert — een reëel netto-voordeel ("moderate gains... only for wind generators"). Voor zon vallen die twee effecten vrijwel exact tegen elkaar weg ("these two effects almost exactly cancel each other out"). Het model past interconnectie-demping daarom voor wind vrijwel volledig toe, voor zon slechts voor een klein residu (10%).
 
@@ -152,6 +154,14 @@ Dit is losstaand van het interconnectie-adequacykrediet hierboven — die twee d
 
 De interconnectieslider stelt niet het totale 2040-vermogen in, maar de **realistische extra bouw** bovenop de vaste basislijn van 15 GW (bestaande kabels, TenneT — zie hierboven). Bestaande verbindingen worden niet afgebroken, en hoogspanningsverbindingen in Nederland komen traag en moeizaam tot stand (netcongestie, ruimtelijke inpassing, vergunningen) — een realistische extra bouw tot 2040 ligt daarom in de orde van 0-10 GW, niet 0-15 GW zoals een eerdere versie van dit model liet zien. Het "Gebalanceerd"-scenario gaat uit van +5 GW extra (20 GW totaal). Scenario's die eerder een totaal ónder de 15 GW van vandaag aannamen ("Kern-zwaar", "NL als eiland") vlakken hierdoor af op de basislijn (15 GW, geen extra bouw) — die twee scenario's verschillen dus niet meer in interconnectie-aanname, wat inhoudelijk correct is: geen van beide vereist nieuwe verbindingen, en geen van beide kan de bestaande capaciteit laten verdwijnen.
 
+### Windslider — extra bouw, niet totaal
+
+Zelfde logica als bij zon en interconnectie: de slider stelt de **extra bouw** van wind offshore tot 2040 in, bovenop de vaste basislijn van 6,4 GW (huidig geïnstalleerd). Bestaande turbines worden niet afgebroken. "Gebalanceerd" gaat uit van +15,6 GW extra (22 GW totaal). Onshore wind is apart en vast op 7 GW (nauwelijks uitbreidbaar door ruimtegebrek) — die telt niet mee in deze slider maar wel in de systeemberekening.
+
+### Zonslider — extra bouw, niet totaal
+
+Zelfde logica als bij interconnectie: de slider stelt de **extra bouw** van zon-PV tot 2040 in, bovenop de vaste basislijn van ~30 GW (CBS: 29,4 GWp geïnstalleerd eind 2025). Bestaande panelen worden niet afgebroken. "Gebalanceerd" gaat uit van +8 GW extra (38 GW totaal). Anders dan bij interconnectie is zonnebouw in Nederland relatief snel gegaan (SolarPower Europe verwacht ~40 GW in 2028) — de bovengrens van de slider (+40 GW, dus 70 GW totaal) is daarom ruimer dan bij interconnectie, maar blijft een aanname, geen voorspelling.
+
 ### Elektriciteitsvraag 2040 — en waarom hogere vraag het systeem piekeriger maakt
 
 Extra vraag boven het huidige niveau komt vooral van elektrificatie van warmte (hybride/volledige warmtepompen). Warmtepompvraag piekt bij koud én windstil weer — precies tijdens de schaarste-uren. Het model laat de piek/jaarvraag-verhouding en de intensiteit van de schaarste-uren daarom meeschalen met het gekozen vraagscenario, via lineaire interpolatie — bewust geen apart bedienbaar element, om het model toegankelijk te houden.
@@ -166,15 +176,15 @@ Extra vraag boven het huidige niveau komt vooral van elektrificatie van warmte (
 
 ## Snelscenario's
 
-| Scenario | Wind offshore | Zon | Kern | Batterijen | Interconnectie (totaal) | Gas+CCS |
+| Scenario | Wind offshore (totaal) | Zon (totaal) | Kern | Batterijen | Interconnectie (totaal) | Gas+CCS |
 |---|---|---|---|---|---|---|
-| Max wind, geen kern | 28 GW | 42 GW | 0 GW | 25 GWh | 18 GW (+3) | 20% |
-| Gebalanceerd (basis) | 22 GW | 38 GW | 3,2 GW | 20 GWh | 20 GW (+5) | 30% |
-| Kern-zwaar (4 EPR's) | 15 GW | 30 GW | 6,4 GW | 10 GWh | 15 GW (+0) | 50% |
-| NL als eiland | 22 GW | 38 GW | 3,2 GW | 30 GWh | 15 GW (+0) | 60% |
-| Batterij-optimum | 25 GW | 42 GW | 0 GW | 45 GWh | 18 GW (+3) | 20% |
+| Max wind, geen kern | 28 GW (+21,6) | 42 GW (+12) | 0 GW | 25 GWh | 18 GW (+3) | 20% |
+| Gebalanceerd (basis) | 22 GW (+15,6) | 38 GW (+8) | 3,2 GW | 20 GWh | 20 GW (+5) | 30% |
+| Kern-zwaar (4 EPR's) | 15 GW (+8,6) | 30 GW (+0) | 6,4 GW | 10 GWh | 15 GW (+0) | 50% |
+| NL als eiland | 22 GW (+15,6) | 38 GW (+8) | 3,2 GW | 30 GWh | 15 GW (+0) | 60% |
+| Batterij-optimum | 25 GW (+18,6) | 42 GW (+12) | 0 GW | 45 GWh | 18 GW (+3) | 20% |
 
-*Wind offshore is nieuwbouw bovenop 6,4 GW bestaand. Onshore: vaste 7 GW basis. Kern: 3,2 GW = 2 EPR's (huidig kabinetsplan — locatie nog niet definitief; 1 EPR ≈ 1,6 GW), 6,4 GW = 4 EPR's (verdubbeling). Interconnectie: vaste basislijn van 15 GW (bestaande kabels, TenneT) + realistische extra bouw tot 2040 (0-10 GW instelbaar) — bestaande capaciteit wordt niet afgebroken, dus "Kern-zwaar" en "NL als eiland" vlakken beide af op de basislijn.*
+*Wind offshore: vaste basislijn van 6,4 GW (huidig geïnstalleerd) + extra bouw tot 2040. Onshore: vaste 7 GW basis. Kern: 3,2 GW = 2 EPR's (huidig kabinetsplan — locatie nog niet definitief; 1 EPR ≈ 1,6 GW), 6,4 GW = 4 EPR's (verdubbeling). Interconnectie: vaste basislijn van 15 GW (bestaande kabels, TenneT) + realistische extra bouw tot 2040 (0-10 GW instelbaar) — bestaande capaciteit wordt niet afgebroken, dus "Kern-zwaar" en "NL als eiland" vlakken beide af op de basislijn. Zon: zelfde logica, vaste basislijn van ~30 GW (CBS, eind 2025) + extra bouw tot 2040 (0-40 GW instelbaar).*
 
 ---
 
@@ -207,6 +217,7 @@ Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL
 - Stiewe, C., Xu, A.L., Eicke, A., Hirth, L. (2025). *Cross-border cannibalization: Spillover effects of wind and solar energy on interconnected European electricity markets.* Energy Economics 143, 108251.
 - Malvaldi, A. et al. (2017). *A spatial and temporal correlation analysis of aggregate wind power in an ideally interconnected European power system.* Wind Energy.
 - TenneT. *Interconnectoren: stroom zonder grenzen.* tennet.eu.
+- CBS. *Zonnestroom; vermogen en vermogensklasse, bedrijven en woningen, regio.* Geraadpleegd 2026.
 - NL Kabinetsbrief (2025). *SDE++ tenderprijzen windenergie op zee.*
 
 ---
