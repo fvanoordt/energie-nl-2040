@@ -83,13 +83,15 @@ Een vlakke de-ratingaanname voor interconnectie doet geen recht aan twee dingen.
 
 Blended krediet: ~17% bij lage regionale VRE-uitbouw tot ~11% bij volle uitbouw, ~11-15% over het bereik van de wind/zon-sliders in de praktijk — dynamisch, meebewegend met de wind/zon-sliders, in plaats van één vast getal. Lager dan een eerdere versie van dit model aannam, omdat Noorwegen — de enige echt windonafhankelijke koppeling — maar een klein deel van de totale NL-interconnectiecapaciteit vormt.
 
+**Eén gedeelde functie, twee toepassingen.** Ditzelfde correlatiekrediet (`interconnCorrelationCredit()`) bepaalt ook hoeveel import wordt meegeteld in de dark-doldrums-uren-verdeling. Eerder waren dat twee losstaande aannames — een platte 50%-korting (effectief 25% na een dubbele toepassing) in de energiebalans, dit correlatiemodel (~11-15%) in de adequacy check — wat betekende dat de twee panelen impliciet een verschillend beeld gaven van hoeveel import je tijdens schaarste kunt vertrouwen. Nu gebruiken beide dezelfde onderliggende functie, getest op consistentie in `tests.js`.
+
 ### Capaciteitsmechanisme
 
 Bij hoge VRE-penetratie draait de gasvloot te weinig uren om zichzelf via de energiemarkt terug te verdienen — het "missing money"-probleem. De (endogeen bepaalde, de-rated) vloot uit de adequacy check wordt daarom apart geprijsd via €45.000/MW/jaar (werkaanname; ter oriëntatie clearde de GB-capaciteitsmarkt T-4 recent op orde van grootte £27-65/kW/jaar voor bestaand/gerefurbished vermogen), omgeslagen over alle geleverde TWh. Omdat de vlootomvang endogeen is, verandert deze kostenpost mee met de sliders: meer kern/batterij/interconnectie → kleinere, goedkopere gasvloot.
 
-### Het kantelpunt
+### Het omslagpunt
 
-Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit kantelpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 70-71% wind+zon-penetratie.
+Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit omslagpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 70-71% wind+zon-penetratie.
 
 ---
 
@@ -106,11 +108,11 @@ Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **ges
 | Kernenergie — seriebouw | €70/MWh | OECD (2020) ~$66/MWh voor niet-westerse series (7% discontovoet); Zuid-Korea/VAE-achtig |
 | Gas CCGT (variabel) | €77/MWh | Brandstof, CO₂, opex — capaciteit apart via capaciteitsmechanisme |
 | Gas+CCS (variabel) | €135/MWh | Hogere capex CO₂-afvang/opslag/transport; afvangrate 90%; capaciteit apart |
-| Batterijen + V2G | €10/MWh cycluskost | ~200 cycli/jaar; send-out 4-6 uur; incl. bidirectioneel laden EVs |
+| Batterijen + V2G | €10/MWh cycluskost | ~200 cycli/jaar; send-out 4-6 uur; incl. bidirectioneel laden EVs. Toegepast op de daadwerkelijk geladen energie, zichtbaar als aparte regel "Batterij (cycluskost)" in de kostenopbouw |
 
 ### Twee kern-bouwrealiteiten, geen bandbreedte
 
-Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen qua uitkomst. Het zijn twee aantoonbaar verschillende bouwrealiteiten: westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen (Barakah: eenheid 4 kostte ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma *zou kunnen* opleveren, niet wat 1-2 centrales op zichzelf bereiken. De toggle in de tool bepaalt welke aanname overal wordt gebruikt (kostenopbouw, KPI's, kantelpuntgrafiek).
+Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen qua uitkomst. Het zijn twee aantoonbaar verschillende bouwrealiteiten: westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen (Barakah: eenheid 4 kostte ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma *zou kunnen* opleveren, niet wat 1-2 centrales op zichzelf bereiken. De toggle in de tool bepaalt welke aanname overal wordt gebruikt (kostenopbouw, KPI's, omslagpuntgrafiek).
 
 ### Kannibaliseringsopslag (effectieve LCOE)
 

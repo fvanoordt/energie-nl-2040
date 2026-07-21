@@ -693,6 +693,46 @@
     <!-- INSIGHT -->
     <div class="insight-box" id="insight">Pas de sliders aan om de systeemeffecten te zien.</div>
 
+    <!-- COST STACK -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Kostenopbouw</div>
+      <div class="panel-title">Uitgesplitst naar component (€/MWh geleverd)</div>
+      <svg id="svg-stack" width="100%" height="210"></svg>
+      <div class="legend" id="stack-legend"></div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Kannibalisering-correctie</div>
+      <div class="panel-title">Waarom dezelfde technologie duurder wordt naarmate je er meer van bouwt <span style="font-weight:400; color:#6b6b6b;">(effectieve LCOE na marktwaardedepreciatie)</span></div>
+      <div class="lcoe-box">
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--wind)">Wind offshore</div>
+          <div class="lcoe-base">€117/MWh offshore standalone</div>
+          <div class="lcoe-effective" style="color:var(--wind)" id="lcoe-wind-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-wind-delta">—</div>
+        </div>
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--solar)">Zon</div>
+          <div class="lcoe-base">€45/MWh standalone</div>
+          <div class="lcoe-effective" style="color:var(--solar)" id="lcoe-solar-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-solar-delta">—</div>
+        </div>
+        <div class="lcoe-cell">
+          <div class="lcoe-tech" style="color:var(--nuclear)">Kernenergie</div>
+          <div class="lcoe-base" id="lcoe-nuc-base">€160/MWh standalone</div>
+          <div class="lcoe-effective" style="color:var(--nuclear)" id="lcoe-nuc-eff">—</div>
+          <div class="lcoe-delta" id="lcoe-nuc-delta">—</div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-dot" style="background:var(--muted)"></div>Standalone LCOE = technologiekosten zonder systeeminteractie</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--accent)"></div>Effectieve LCOE = gecorrigeerd voor kannibaliseringsrisico in financiering</div>
+      </div>
+      <div class="kpi-sub" style="margin-top:0.7rem; line-height:1.6;">
+        <strong>0% curtailment en toch een duidelijke opslag hierboven — geen tegenstrijdigheid.</strong> Curtailment meet wat er ná batterijlading en export nog fysiek wordt weggegooid. Kannibalisering meet hoe vaak en hoe hard de marktprijs instort door overaanbod, ongeacht wat er met die energie gebeurt. Een batterij die al het overschot volledig absorbeert, verplaatst de energie naar een later, duurder moment — maar de lage (soms nul-)prijs tijdens het surplus-uur heeft wel degelijk gegolden, en drukt zo de gemiddelde opbrengst van alles wat in dat uur draaide, inclusief de energie die de batterij net inkocht. Curtailment op 0% betekent dus "niets weggegooid", niet "geen prijsdruk gehad".
+      </div>
+    </div>
+
     <!-- DOLDRUMS + ADEQUACY (merged: energie-blik en vermogens-blik op dezelfde ~500 uur) -->
     <div class="chart-panel" style="padding:1rem 1.3rem 0.9rem">
       <div class="panel-eyebrow">Dark doldrums — leveringszekerheid tijdens schaarste-uren</div>
@@ -732,79 +772,13 @@
         <br><br>
         <strong>De KPI hierboven ("Benodigd back-upvermogen") en de "Gas-vloot" in de balk hieronder tonen bewust twee verschillende getallen van dezélfde vloot.</strong> De KPI toont de <em>nameplate-capaciteit</em> die gebouwd moet worden (bijv. 19,9 GW). De balk toont het <em>kredietvermogen</em> dat daarvan meetelt voor de adequacy-toets — 90% van de nameplate, dezelfde de-rating als bij kern (bijv. 17,9 GW). Geen tegenstrijdigheid: "hoeveel moet je bouwen" en "hoeveel daarvan telt mee" zijn twee vragen met een net iets ander antwoord.
         <br><br>
-        <strong>Die benodigde gasvloot kost ook echt iets:</strong> in de kostenopbouw hieronder staat dit expliciet geprijsd als <span style="color:#8b5e34">"Capaciteitsmechanisme"</span> — €<span id="adq-capmech">—</span>/MWh. Kies je meer kern, batterij of interconnectie, dan krimpt de benodigde gasvloot — en daarmee deze kostenpost — mee. Dat is precies waarom deze twee weergaven met elkaar samenhangen.
+        <strong>Die benodigde gasvloot kost ook echt iets:</strong> in de kostenopbouw hierboven staat dit expliciet geprijsd als <span style="color:#8b5e34">"Capaciteitsmechanisme"</span> — €<span id="adq-capmech">—</span>/MWh. Kies je meer kern, batterij of interconnectie, dan krimpt de benodigde gasvloot — en daarmee deze kostenpost — mee. Dat is precies waarom deze twee weergaven met elkaar samenhangen.
         <br><br>
         <strong>Batterij-GWh omhoog draaien beweegt dit minder dan je zou verwachten — dat is geen bug.</strong> Voor deze toets telt niet de energie-inhoud van de batterij (GWh), maar het vermogen dat hij gedurende de aangenomen ontlaadduur van 5 uur kan leveren (× 85% korting voor meerdaagse schaarste). 15 GWh extra batterij levert dus maar (15/5) × 0,85 ≈ 2,6 GW extra kredietvermogen op — een sprong van 75% in GWh wordt maar een paar GW in vermogen. De vereiste-vermogen-lijn zelf verandert hierdoor nooit (gas vult per definitie exact aan wat ontbreekt) — wat wél beweegt is de omvang van de gasvloot en de bijbehorende kost.
       </div>
     </div>
 
     <!-- DYNAMIC LCOE BOX -->
-    <div class="chart-panel">
-      <div class="panel-eyebrow">Kannibalisering-correctie</div>
-      <div class="panel-title">Waarom dezelfde technologie duurder wordt naarmate je er meer van bouwt <span style="font-weight:400; color:#6b6b6b;">(effectieve LCOE na marktwaardedepreciatie)</span></div>
-      <div class="lcoe-box">
-        <div class="lcoe-cell">
-          <div class="lcoe-tech" style="color:var(--wind)">Wind offshore</div>
-          <div class="lcoe-base">€117/MWh offshore standalone</div>
-          <div class="lcoe-effective" style="color:var(--wind)" id="lcoe-wind-eff">—</div>
-          <div class="lcoe-delta" id="lcoe-wind-delta">—</div>
-        </div>
-        <div class="lcoe-cell">
-          <div class="lcoe-tech" style="color:var(--solar)">Zon</div>
-          <div class="lcoe-base">€45/MWh standalone</div>
-          <div class="lcoe-effective" style="color:var(--solar)" id="lcoe-solar-eff">—</div>
-          <div class="lcoe-delta" id="lcoe-solar-delta">—</div>
-        </div>
-        <div class="lcoe-cell">
-          <div class="lcoe-tech" style="color:var(--nuclear)">Kernenergie</div>
-          <div class="lcoe-base" id="lcoe-nuc-base">€160/MWh standalone</div>
-          <div class="lcoe-effective" style="color:var(--nuclear)" id="lcoe-nuc-eff">—</div>
-          <div class="lcoe-delta" id="lcoe-nuc-delta">—</div>
-        </div>
-      </div>
-      <div class="legend">
-        <div class="legend-item"><div class="leg-dot" style="background:var(--muted)"></div>Standalone LCOE = technologiekosten zonder systeeminteractie</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--accent)"></div>Effectieve LCOE = gecorrigeerd voor kannibaliseringsrisico in financiering</div>
-      </div>
-      <div class="kpi-sub" style="margin-top:0.7rem; line-height:1.6;">
-        <strong>0% curtailment en toch een duidelijke opslag hierboven — geen tegenstrijdigheid.</strong> Curtailment meet wat er ná batterijlading en export nog fysiek wordt weggegooid. Kannibalisering meet hoe vaak en hoe hard de marktprijs instort door overaanbod, ongeacht wat er met die energie gebeurt. Een batterij die al het overschot volledig absorbeert, verplaatst de energie naar een later, duurder moment — maar de lage (soms nul-)prijs tijdens het surplus-uur heeft wel degelijk gegolden, en drukt zo de gemiddelde opbrengst van alles wat in dat uur draaide, inclusief de energie die de batterij net inkocht. Curtailment op 0% betekent dus "niets weggegooid", niet "geen prijsdruk gehad".
-      </div>
-    </div>
-
-    <!-- TIPPING POINT CURVE -->
-    <div class="chart-panel">
-      <div class="panel-eyebrow">Het kantelpunt</div>
-      <div class="panel-title">Kerncurve versus systeemwaarde — bij welke wind/zon-penetratie ligt de effectieve kostprijs van kern boven de geschatte systeemwaarde? <span id="tip-base-label" style="font-weight:400; color:#6b6b6b;"></span></div>
-      <svg id="svg-tipping" width="100%" height="300"></svg>
-      <div class="legend">
-        <div class="legend-item"><div class="leg-line" style="background:var(--nuclear)"></div>Effectieve LCOE kernenergie (stijgt met penetratie)</div>
-        <div class="legend-item"><div class="leg-line" style="background:var(--ink)"></div>Systeemwaarde van extra capaciteit (daalt met penetratie)</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--accent)"></div>Kantelpunt: kostprijs kern > systeemwaarde</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
-      </div>
-    </div>
-
-    <!-- EFFICIENT FRONTIER -->
-    <div class="chart-panel">
-      <div class="panel-eyebrow">Kosten versus leveringszekerheid</div>
-      <div class="panel-title">De afweging in één oogopslag — elk punt is een portfoliomix <span style="font-weight:400; color:#6b6b6b;">("efficient frontier")</span></div>
-      <svg id="svg-frontier" width="100%" height="290"></svg>
-      <div class="legend">
-        <div class="legend-item"><div class="leg-dot" style="background:var(--wind)"></div>Wind-dominant</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--nuclear)"></div>Kern-zwaar</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--battery)"></div>Batterij-optimum</div>
-        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
-      </div>
-    </div>
-
-    <!-- COST STACK -->
-    <div class="chart-panel">
-      <div class="panel-eyebrow">Kostenopbouw</div>
-      <div class="panel-title">Uitgesplitst naar component (€/MWh geleverd)</div>
-      <svg id="svg-stack" width="100%" height="210"></svg>
-      <div class="legend" id="stack-legend"></div>
-    </div>
-
     <!-- LDC PANEL -->
     <div class="chart-panel">
       <div class="panel-eyebrow">Wanneer is er te veel, wanneer te weinig</div>
@@ -828,6 +802,28 @@
         <strong style="font-size:1.05rem; color:var(--ink)">Klimaatneutraal aandeel: <span id="ldc-climateneutral-pct">—</span>%</strong>
         <br>
         <span style="color:#6b6b6b; font-size:0.72rem;">idem, plus het afgevangen deel van Gas+CCS (90% capture rate) — sluit aan bij het officiële "klimaatneutraal energiesysteem 2040/2050"-doel, dat kern én afgevangen CO₂ toestaat. Ter referentie: het Klimaatakkoord-doel is 70% <em>hernieuwbaar</em> (excl. kern) in 2030, niet 90-100% niet-fossiel in 2040 — en zelfs dat 70%-doel is in de laatste KEV-raming al bijgesteld naar 60%.</span>
+    <!-- TIPPING POINT CURVE -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Het omslagpunt</div>
+      <div class="panel-title">Bij welke wind/zon-penetratie ligt de effectieve kostprijs van kern boven de geschatte systeemwaarde? <span id="tip-base-label" style="font-weight:400; color:#6b6b6b;"></span></div>
+      <svg id="svg-tipping" width="100%" height="118"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-line" style="background:#8b5e34"></div>Omslagpunt: kostprijs kern > geschatte systeemwaarde</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid #fff; box-shadow:0 0 0 1px var(--rule);"></div>Huidige mix (wind + zon)</div>
+      </div>
+    </div>
+
+    <!-- EFFICIENT FRONTIER -->
+    <div class="chart-panel">
+      <div class="panel-eyebrow">Kosten versus leveringszekerheid</div>
+      <div class="panel-title">De vijf snelscenario's naast elkaar — elk punt is direct gelabeld <span style="font-weight:400; color:#6b6b6b;">("efficient frontier")</span></div>
+      <svg id="svg-frontier" width="100%" height="290"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="leg-dot" style="background:#5b7a99"></div>Snelscenario (naam bij het punt)</div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
+      </div>
+    </div>
+
       </div>
     </div>
 
@@ -838,7 +834,7 @@
   <strong>Systeemkosten — reikwijdte:</strong> dit model omvat aanbodzijde-effecten: curtailment, flexibiliteitspremie, capaciteitsmechanisme en interconnectie-infrastructuur. Vraagzijde-netwerkkosten — verzwaring van regionale netten voor warmtepompen, EV-laadinfrastructuur en industriële elektrificiatie — zijn niet meegenomen. Deze kosten zijn grotendeels technologieneutraal: ze komen sowieso, ongeacht de gekozen opwekmix, en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern daardoor nauwelijks. <strong>Nederland wordt in dit model behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen</strong> — redispatch-kosten om lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) op te lossen zitten er dus niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten (zie disclaimer, about-pagina).
   <br><br>
   <strong>Methodiek:</strong>
-  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). <strong>Interconnectie dempt kannibalisering van wind en zon niet gelijk</strong> (Stiewe, Xu, Eicke & Hirth 2025, Energy Economics — panelanalyse van 30 Europese biedzones, 2015-2023): voor wind overtreft de dempende werking op eigen kannibalisering de verergering via gecorreleerde buurlanden-opwek, per saldo een reëel voordeel. Voor zon vallen die twee effecten empirisch vrijwel exact tegen elkaar weg — netto nauwelijks voordeel. Het model past interconnectie-demping daarom vrijwel volledig toe op wind, maar slechts voor een klein residu (10%) op zon. Interconnectiekosten zijn geen gratis optie: kabelinfrastructuur à €1,75 mld/GW (subsea kabels + converterstations) geannualiseerd over 40 jaar, plus een importpremie tijdens schaarse uren die oploopt naarmate windstilte vaker Europabreed gecorreleerd is. <strong>Leveringszekerheid (herzien):</strong> percentage van de "dark doldrums"-uren (~400–600 uur/jaar, NL wind &lt;10% én zon ~0) dat wordt gedekt door binnenlandse bronnen — batterijen, kernrestproductie, én gasvermogen (kaal of met CCS). Dit meet dus niet "hebben we wel/geen stroom" (Nederland heeft doorgaans voldoende gasvermogen om elk gat te vullen), maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere, vaak hogere Europese schaarsteprijzen. Gas+CCS: €135/MWh variabele kosten (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%). Kaal gas: €77/MWh variabel. <strong>Capaciteitsmechanisme:</strong> in 2040 draait de gasvloot bij hoge VRE-penetratie te weinig uren om zichzelf via de energiemarkt terug te verdienen — het bekende "missing money"-probleem. De vlootomvang ligt niet vast: hij volgt endogeen uit de adequacy check (kern, batterij, interconnectie en wind/zon-restcapaciteit dekken samen een deel van het vereiste piekvermogen; gas vult de rest aan, met een ondergrens van 4 GW strategische reserve). Die vloot wordt geprijsd via €45.000/MW/jaar (werkaanname, ter oriëntatie: de GB-capaciteitsmarkt T-4 clearde recent op orde van grootte £27-65/kW/jaar voor bestaand/gerefurbished vermogen), omgeslagen over alle geleverde TWh. Omdat de vlootomvang meebeweegt met de sliders, verandert deze kostenpost ook echt: meer kern/batterij/interconnectie → kleinere, goedkopere gasvloot. <strong>Interconnectie-adequacykrediet (~11-15%, dynamisch):</strong> vereenvoudigd 2-groepen correlatiemodel — TenneT: de land- en zeeverbindingen met Duitsland, België, het VK en Denemarken vormen samen ~95% van de totale ~14,4 GW NL-interconnectiecapaciteit en delen hetzelfde weersysteem als Nederland; dat basiskrediet (15%) daalt verder naarmate de eigen wind+zon-uitbouw toeneemt (proxy voor het regionale decarbonisatietempo). De Noorse waterkrachtkoppeling (NorNed, ~5% van het totaal) is windonafhankelijk maar geen exclusief NL-bezit — Duitsland, het VK en Denemarken trekken tijdens eenzelfde Europabrede schaarste op dezelfde Noorse capaciteit, die maar één keer geleverd kan worden; het "solo"-krediet van waterkracht (~70%) is daarom gekort naar 45%. Zie about-pagina voor de onderbouwing (Malvaldi et al. 2017). <strong>Piekvraag en warmtepompen:</strong> hogere vraagscenario's komen vooral van elektrificatie van warmte, die juist piekt tijdens windstille kou — het model laat daarom de piek/jaarvraag-verhouding en de intensiteit van de schaarste-uren meeschalen met het gekozen vraagscenario (0,150 GW/TWh bij Laag tot 0,185 GW/TWh bij Hoog). <strong>Kern-bouwaanname (toggle):</strong> €160/MWh (Westerse FOAK, Hinkley Point C-achtig) versus €70/MWh (seriebouw-ervaring, OECD 2020 ~$66/MWh voor niet-westerse series) zijn geen bandbreedte om één schatting maar twee losstaande bouwrealiteiten — de toggle in de besturing bepaalt welke overal in de tool wordt gebruikt, inclusief het kantelpunt in de kernenergiegrafiek. Gas+CCS: €135/MWh variabele kosten (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%). Kaal gas: €77/MWh variabel. Batterijcycluskost: €10/MWh (geen apart V2G-tarief — batterij en V2G worden in dit model identiek geprijsd). Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040. Curtailment/export: in perioden met hoog VRE-aanbod hebben buurlanden (DE, BE, DK) hetzelfde surplus, waardoor exportwaarde minimaal is en curtailment de dominante uitkomst is. <strong>Onderschatting curtailment:</strong> dit model gebruikt 4 gemiddelde marktsegmenten in plaats van uurresolutiedata. Daardoor worden piekuren binnen elk segment uitgemiddeld en wordt curtailment structureel onderschat — werkelijke waarden liggen naar verwachting 30-50% hoger dan wat het model intern berekent. De Curtailment/export-KPI toont daarom al de gecorrigeerde bandbreedte, niet het rauwe modelgetal (dat staat er wel nog bij, tussen haakjes) — de systeemkosten elders in de tool zijn niettemin nog gebaseerd op het rauwe, lagere getal en dus aan de conservatieve kant. Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
+  Effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last). Curtailment-reductie door interconnectie: logaritmisch saturerend, met correctie voor Europees overaanbod bij hoge VRE-penetratie (Duitsland/België/DK in vergelijkbare positie). <strong>Interconnectie dempt kannibalisering van wind en zon niet gelijk</strong> (Stiewe, Xu, Eicke & Hirth 2025, Energy Economics — panelanalyse van 30 Europese biedzones, 2015-2023): voor wind overtreft de dempende werking op eigen kannibalisering de verergering via gecorreleerde buurlanden-opwek, per saldo een reëel voordeel. Voor zon vallen die twee effecten empirisch vrijwel exact tegen elkaar weg — netto nauwelijks voordeel. Het model past interconnectie-demping daarom vrijwel volledig toe op wind, maar slechts voor een klein residu (10%) op zon. Interconnectiekosten zijn geen gratis optie: kabelinfrastructuur à €1,75 mld/GW (subsea kabels + converterstations) geannualiseerd over 40 jaar, plus een importpremie tijdens schaarse uren die oploopt naarmate windstilte vaker Europabreed gecorreleerd is. <strong>Leveringszekerheid</strong> wordt in dit model getoetst via de Vermogensadequaatheid-check (zie het paneel hierboven) en de dark-doldrums-urenverdeling — niet via een los percentage, om dubbele/verouderde metrieken te vermijden. Gas+CCS: €135/MWh variabele kosten (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%). Kaal gas: €77/MWh variabel. <strong>Capaciteitsmechanisme:</strong> in 2040 draait de gasvloot bij hoge VRE-penetratie te weinig uren om zichzelf via de energiemarkt terug te verdienen — het bekende "missing money"-probleem. De vlootomvang ligt niet vast: hij volgt endogeen uit de adequacy check (kern, batterij, interconnectie en wind/zon-restcapaciteit dekken samen een deel van het vereiste piekvermogen; gas vult de rest aan, met een ondergrens van 4 GW strategische reserve). Die vloot wordt geprijsd via €45.000/MW/jaar (werkaanname, ter oriëntatie: de GB-capaciteitsmarkt T-4 clearde recent op orde van grootte £27-65/kW/jaar voor bestaand/gerefurbished vermogen), omgeslagen over alle geleverde TWh. Omdat de vlootomvang meebeweegt met de sliders, verandert deze kostenpost ook echt: meer kern/batterij/interconnectie → kleinere, goedkopere gasvloot. <strong>Interconnectie-adequacykrediet (~11-15%, dynamisch):</strong> vereenvoudigd 2-groepen correlatiemodel — TenneT: de land- en zeeverbindingen met Duitsland, België, het VK en Denemarken vormen samen ~95% van de totale ~14,4 GW NL-interconnectiecapaciteit en delen hetzelfde weersysteem als Nederland; dat basiskrediet (15%) daalt verder naarmate de eigen wind+zon-uitbouw toeneemt (proxy voor het regionale decarbonisatietempo). De Noorse waterkrachtkoppeling (NorNed, ~5% van het totaal) is windonafhankelijk maar geen exclusief NL-bezit — Duitsland, het VK en Denemarken trekken tijdens eenzelfde Europabrede schaarste op dezelfde Noorse capaciteit, die maar één keer geleverd kan worden; het "solo"-krediet van waterkracht (~70%) is daarom gekort naar 45%. Zie about-pagina voor de onderbouwing (Malvaldi et al. 2017). <strong>Piekvraag en warmtepompen:</strong> hogere vraagscenario's komen vooral van elektrificatie van warmte, die juist piekt tijdens windstille kou — het model laat daarom de piek/jaarvraag-verhouding en de intensiteit van de schaarste-uren meeschalen met het gekozen vraagscenario (0,150 GW/TWh bij Laag tot 0,185 GW/TWh bij Hoog). <strong>Kern-bouwaanname (toggle):</strong> €160/MWh (Westerse FOAK, Hinkley Point C-achtig) versus €70/MWh (seriebouw-ervaring, OECD 2020 ~$66/MWh voor niet-westerse series) zijn geen bandbreedte om één schatting maar twee losstaande bouwrealiteiten — de toggle in de besturing bepaalt welke overal in de tool wordt gebruikt, inclusief het omslagpunt in de kernenergiegrafiek. Gas+CCS: €135/MWh variabele kosten (hogere capex door CO₂-afvang/opslag/transport, afvangrate 90%). Kaal gas: €77/MWh variabel. Batterijcycluskost: €10/MWh (geen apart V2G-tarief — batterij en V2G worden in dit model identiek geprijsd). Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040. Curtailment/export: in perioden met hoog VRE-aanbod hebben buurlanden (DE, BE, DK) hetzelfde surplus, waardoor exportwaarde minimaal is en curtailment de dominante uitkomst is. <strong>Onderschatting curtailment:</strong> dit model gebruikt 4 gemiddelde marktsegmenten in plaats van uurresolutiedata. Daardoor worden piekuren binnen elk segment uitgemiddeld en wordt curtailment structureel onderschat — werkelijke waarden liggen naar verwachting 30-50% hoger dan wat het model intern berekent. De Curtailment/export-KPI toont daarom al de gecorrigeerde bandbreedte, niet het rauwe modelgetal (dat staat er wel nog bij, in de subtekst als "model zelf: X%") — de systeemkosten elders in de tool zijn niettemin nog gebaseerd op het rauwe, lagere getal en dus aan de conservatieve kant. Dit is een beleidsvisualisatie-instrument, geen vervanging voor volledige systeemstudies (ENTSO-E TYNDP, ECN/TNO).
 </div>
 
 <!-- ABOUT PANEL -->
@@ -864,7 +860,7 @@
       <tr><td>🔬 Kernenergie — seriebouw</td><td>€70/MWh</td><td>OECD (2020) ~$66/MWh voor niet-westerse series (7% discontovoet); Zuid-Korea/VAE-achtig, ingespeelde toeleveringsketen. Zie toggle in de besturing — bepaalt de kern-LCOE overal in de tool</td></tr>
       <tr><td>⚙️ Gas CCGT (variabel)</td><td>€77/MWh</td><td>Brandstof, CO₂, opex — capaciteit nu apart (zie hieronder)</td></tr>
       <tr><td>⚙️ Gas+CCS (variabel)</td><td>€135/MWh</td><td>Hogere capex CO₂-afvang/opslag/transport; afvangrate 90%; capaciteit apart</td></tr>
-      <tr><td>⚙️ Batterijen + V2G</td><td>€10/MWh</td><td>Cycluskost incl. bidirectioneel laden EVs</td></tr>
+      <tr><td>⚙️ Batterijen + V2G</td><td>€10/MWh</td><td>Cycluskost incl. bidirectioneel laden EVs — toegepast op de daadwerkelijk geladen energie (niet op de GWh-capaciteit zelf), zichtbaar als aparte regel "Batterij (cycluskost)" in het Kostenopbouw-paneel</td></tr>
     </table>
 
     <h2>Systeemkosten in € miljard/jaar — vergelijking, geen norm</h2>
@@ -891,7 +887,7 @@
     <p><strong>Verfijning 1 — het krediet van de gecorreleerde buren is geen vast getal.</strong> Fysieke windcorrelatie (Malvaldi et al.) verandert weinig, maar hoeveel een Dunkelflaute uitmaakt hangt af van hoeveel van het regionale systeem al op wind/zon draait. Een Duitse windstilte raakte een systeem met 20% wind/zon in 2015 nauwelijks; diezelfde windstilte raakt een 2040-systeem met 60%+ wind/zon direct in de leveringszekerheid. Omdat een aparte "regionale uitbouw"-schuif het model minder toegankelijk zou maken, gebruikt het model de eigen wind+zon-sliders als proxy voor het regionale tempo: het basiskrediet (15%) daalt tot maximaal 40% naarmate NL's eigen gecombineerde wind+zon-vermogen richting 100 GW loopt.</p>
     <p><strong>Verfijning 2 — Noorse waterkracht is geen exclusief Nederlands bezit.</strong> Duitsland (NordLink), het VK (North Sea Link) en Denemarken (Skagerrak) trekken tijdens eenzelfde Europabrede dark doldrum evengoed op dezelfde Noorse waterkrachtcapaciteit. Die kan maar één keer geleverd worden — het volle "solo"-krediet van waterkracht (~70%) aan Nederland alleen toerekenen zou hetzelfde vermogen impliciet meerdere keren meetellen. Het model korte dit daarom naar 45%; hoe groot de korting precies moet zijn, hangt af van hoe simultaan een reële Europese schaarste-gebeurtenis zou zijn — een aanname die met een ENTSO-E ERAA-achtige gelijktijdige simulatie preciezer te onderbouwen is dan met dit vereenvoudigde model.</p>
     <p>Bij lage regionale uitbouw komt dit uit op circa 0,95×15% + 0,05×45% ≈ <strong>17%</strong>; bij volle uitbouw op 0,95×9% + 0,05×45% ≈ <strong>11%</strong>. Over het volledige bereik van de wind/zon-sliders (van hun minimum tot maximum) komt dit in de praktijk uit op <strong>~11-15%</strong> — laag, omdat Noorwegen (de enige echt windonafhankelijke koppeling) maar een klein deel van de totale NL-interconnectiecapaciteit vormt.</p>
-
+    <p><strong>Eén gedeelde functie, twee toepassingen.</strong> Ditzelfde correlatiekrediet bepaalt ook hoeveel import wordt meegeteld in de dark-doldrums-uren-verdeling hierboven — eerder waren dat twee losstaande aannames (een platte 50%-korting daar, dit correlatiemodel hier), wat betekende dat de energiebalans en de vermogens-adequacy check impliciet een verschillend beeld gaven van "hoeveel import kun je vertrouwen tijdens schaarste". Nu gebruiken beide dezelfde onderliggende functie.</p>
 
     <h2>Capaciteitsmechanisme</h2>
     <p>Bij hoge VRE-penetratie draait de gasvloot te weinig uren om zichzelf via de energiemarkt terug te verdienen — het "missing money"-probleem. De (endogeen bepaalde, de-rated) vloot uit de adequacy check hierboven wordt daarom apart geprijsd via een vaste jaarlijkse capaciteitsvergoeding, omgeslagen over alle geleverde TWh — ongeacht hoeveel gas een scenario daadwerkelijk laat draaien. Omdat de vlootomvang endogeen is, verandert deze kostenpost wél mee met de sliders.</p>
@@ -902,7 +898,7 @@
     </table>
 
     <h2>Twee kern-bouwrealiteiten, geen bandbreedte</h2>
-    <p>Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen. Het zijn twee aantoonbaar verschillende bouwrealiteiten: Westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen en herhaalde constructie op één ontwerp (Barakah: kosten van eenheid 4 lagen ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma <em>zou kunnen</em> opleveren, niet wat een eerste 1-2 centrales op zichzelf bereiken. De toggle in de besturing verandert de kern-LCOE overal in de tool (kostenopbouw, KPI's, kantelpuntgrafiek) — inclusief het kantelpunt zelf, dat bij €160 al bij de laagste geteste penetratie ligt en pas bij €70 rond 70-71% wind+zon-penetratie uitkomt.</p>
+    <p>Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen. Het zijn twee aantoonbaar verschillende bouwrealiteiten: Westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen en herhaalde constructie op één ontwerp (Barakah: kosten van eenheid 4 lagen ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma <em>zou kunnen</em> opleveren, niet wat een eerste 1-2 centrales op zichzelf bereiken. De toggle in de besturing verandert de kern-LCOE overal in de tool (kostenopbouw, KPI's, omslagpuntgrafiek) — inclusief het omslagpunt zelf, dat bij €160 al bij de laagste geteste penetratie ligt en pas bij €70 rond 70-71% wind+zon-penetratie uitkomt.</p>
 
     <h2>Kannibaliseringsopslag</h2>
     <p>Standalone LCOE's missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. Dit verlengt terugverdientijden en verhoogt via hogere WACC de effectieve kapitaalkosten.</p>
@@ -942,9 +938,6 @@
 
     <h2>Zonslider — extra bouw, niet totaal</h2>
     <p>Zelfde logica als bij interconnectie: de slider stelt de <strong>extra bouw</strong> van zon-PV tot 2040 in, bovenop de vaste basislijn van ~30 GW (CBS: 29,4 GWp geïnstalleerd eind 2025). Bestaande panelen worden niet afgebroken. "Gebalanceerd" gaat uit van +8 GW (38 GW totaal). Anders dan bij interconnectie is zonnebouw in Nederland juist relatief snel gegaan (SolarPower Europe verwacht ~40 GW in 2028) — de bovengrens van de slider (+40 GW, dus 70 GW totaal) is daarom ruimer dan bij interconnectie, maar blijft een aanname, geen voorspelling.</p>
-
-    <h2>Leveringszekerheid — definitie</h2>
-    <p>Het model meet het percentage van de dark-doldrums-uren (~400–600 uur/jaar) dat wordt gedekt door <strong>binnenlandse bronnen</strong> — batterijen, kernrestproductie, gas(+CCS). Dit meet niet "hebben we wel of geen stroom" maar hoeveel van het systeem op binnenlandse, prijszekere bronnen draait versus afhankelijk is van import tegen onzekere Europese schaarsteprijzen.</p>
 
     <h2>Elektriciteitsvraag 2040 — en waarom hogere vraag het systeem piekeriger maakt</h2>
     <p>Extra vraag boven het huidige niveau komt vooral van elektrificatie van warmte (hybride/volledige warmtepompen). Warmtepompvraag piekt bij koud én windstil weer — precies tijdens de schaarste-uren. Het model schaalt piekvraag en de intensiteit van de schaarste-uren daarom mee met het gekozen vraagscenario, via een eenvoudige lineaire interpolatie tussen Laag en Hoog — bewust geen apart bedienbaar element, om het model toegankelijk te houden.</p>
@@ -992,9 +985,6 @@ function toggleAbout() {
 // ════════════════════════════════════════════════════════
 //  PARAMETERS
 const P = {
-  // Demand — instelbaar via UI (120/160/200 TWh)
-  demandBase:      160,   // TWh/year — TNO/PBL middenscenario 2040
-
   // Piekvraag/TWh-verhouding en Segment A-intensiteit zijn nu functies van de vraag
   // zelf (zie demandPeakGWperTWh() / demandSegALoadFrac() bij de LDC-engine) — hogere
   // vraag komt vooral van warmtepompen, en die pieken juist tijdens windstille kou.
@@ -1019,24 +1009,20 @@ const P = {
   // Segment A: Piek (dark doldrums) — windstil, hoge vraag
   segA_hours:      500,
   // segA_loadFrac is nu demandSegALoadFrac(demand) — zie hierboven
-  segA_vreFrac:    0.12,
 
   // Segment B1: Schouder-hoog — winderige/zonnige daguren (lente/herfst)
   //   Wind+zon samen hoog → surplus mogelijk binnen dit segment
   segB1_hours:     2000,
   segB1_loadFrac:  0.78,
-  segB1_vreFrac:   0.92,  // wind+zon samen ~92% van geïnstalleerd
 
   // Segment B2: Schouder-laag — avond/nacht/bewolkt
   //   Wind gemiddeld, geen zon → structureel tekort
   segB2_hours:     3000,
   segB2_loadFrac:  0.75,
-  segB2_vreFrac:   0.32,  // voornamelijk wind, geen zon
 
   // Segment C: Dal — zomermiddag, lage vraag, piek zon+wind
   segC_hours:      3260,  // 8760 - 500 - 2000 - 3000
   segC_loadFrac:   0.46,
-  segC_vreFrac:    1.05,
 
   // Standalone LCOE (€/MWh)
   windBase:        117,
@@ -1241,6 +1227,17 @@ function demandSegALoadFrac(demand) {
   return 0.88 + (demand - 120) * (0.94 - 0.88) / (200 - 120);
 }
 
+// Interconnectiekrediet uit het 2-groepen correlatiemodel (zie P-parameters) — gedeeld tussen
+// de energiebalans hieronder (runLDC, TWh-gemiddelde over de schaarste-uren) en de adequacy
+// check verderop (GW op het piekmoment), zodat "hoeveel import kun je vertrouwen tijdens
+// schaarste" overal dezelfde onderliggende aanname gebruikt, ongeacht welke vraag je stelt.
+function interconnCorrelationCredit(windGW, solarGW) {
+  const totalWindGW = windGW + P.windOnGW;
+  const vreBuildoutFrac = Math.min(1, (totalWindGW + solarGW) / P.vreBuildoutRefGW);
+  const correlatedCredit = P.interconnCorrelatedCreditBase * (1 - P.interconnCorrelatedVreSensitivity * vreBuildoutFrac);
+  return P.interconnCorrelatedShare * correlatedCredit + P.interconnDiverseShare * P.interconnDiverseCredit;
+}
+
 function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const peakGW = demand * demandPeakGWperTWh(demand);
   const segALoadFrac = demandSegALoadFrac(demand);
@@ -1350,8 +1347,9 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const exportC  = Math.min(Math.max(0, rawSurplusC  - battCharge*0.60), exportCapC);
 
   // Import in piek (A)
-  const importCapA = interconnGW * P.segA_hours / 1000 * 0.5;
-  const interconnImportA = Math.min(rawDeficitA - battDischargeA, importCapA) * 0.5;
+  const importCredit = interconnCorrelationCredit(windGW, solarGW);
+  const importCapA = interconnGW * importCredit * P.segA_hours / 1000;
+  const interconnImportA = Math.min(rawDeficitA - battDischargeA, importCapA);
 
   // Curtailment: wat overblijft na batterij + export
   const curtailB1 = Math.max(0, rawSurplusB1 - battCharge*0.25 - exportB1);
@@ -1578,9 +1576,13 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   const gasFleetFirmGW    = adequacy.gasFleetNeededGW * P.gasFleetDerate;
   const capMechCostPerMWh = (gasFleetFirmGW * 1000 * P.capMechPricePerMWyear) / (demand * 1e6);
 
+  // Batterijcycluskost: €10/MWh op de daadwerkelijk geladen energie (ldc.battChargeTWh) —
+  // dit ontbrak eerder volledig in totalCost, waardoor batterijcapaciteit gratis leek.
+  const batteryCostPerMWh = (ldc.battChargeTWh * P.batteryCycle) / demand;
+
   const lcoe = (wS * windEff + wOnS * windOnEff + sS * solarEff + nS * nuclearEff +
                 gPS * gasPlainAllIn + gCS * gasCcsAllIn) / (tot + wOnS);
-  const sysAdder  = windSys + solarSys + nuclearSys + curtailCost + icCost.total + capMechCostPerMWh;
+  const sysAdder  = windSys + solarSys + nuclearSys + curtailCost + icCost.total + capMechCostPerMWh + batteryCostPerMWh;
   const totalCost = Math.round(lcoe + sysAdder);
 
   // Cost WITHOUT nuclear
@@ -1598,15 +1600,15 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   // firm capacity (kern) beter zichtbaar maakt dan een vaste kostenpost zou doen.
   const adequacyAlt = adequacyCheck(wind + Math.min(4, nuclear * 0.55), solar, 0, battery, interconn, demand);
   const capMechCostAltPerMWh = (adequacyAlt.gasFleetNeededGW * P.gasFleetDerate * 1000 * P.capMechPricePerMWyear) / (demand * 1e6);
+  const batteryCostAltPerMWh = (ldcAlt.battChargeTWh * P.batteryCycle) / demand;
   const altSys     = altWindPen * 10 * P.windSysSlope + solarSys +
-                     ldcAlt.curtailmentRate / 100 * 100 * 0.5 * 0.88 + icCost.total + capMechCostAltPerMWh;
+                     ldcAlt.curtailmentRate / 100 * 100 * 0.5 * 0.88 + icCost.total + capMechCostAltPerMWh + batteryCostAltPerMWh;
   const costNoNuclear = Math.round(altLCOE + altSys);
   const nuclearDelta  = nuclear > 0 ? totalCost - costNoNuclear : 0;
 
   return {
     totalCost,
     adequacy,
-    security:        ldc.security,
     curtailmentPct:  ldc.curtailmentRate,
     curtailmentTWh:  ldc.curtailmentTWh,
     exportTWh:       ldc.exportTWh,
@@ -1635,17 +1637,17 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
     surplusFrac:      ldc.surplusFrac,
     gasCcsAllIn:      Math.round(gasCcsAllIn),
     capMechCostPerMWh: Math.round(capMechCostPerMWh * 10) / 10,
-    gasFleetFirmGW:    Math.round(gasFleetFirmGW * 10) / 10,
     ldc,
     breakdown: {
-      'Wind offshore':  Math.round(wS  * windEff       / tot),
-      'Wind onshore':   Math.round(wOnS * windOnEff    / tot),
-      'Zon':            Math.round(sS  * solarEff      / tot),
-      'Kern':           Math.round(nS  * nuclearEff    / tot),
-      'Gas (kaal)':     Math.round(gPS * gasPlainAllIn / tot),
-      'Gas+CCS':        Math.round(gCS * gasCcsAllIn   / tot),
+      'Wind offshore':  Math.round(wS  * windEff       / (tot + wOnS)),
+      'Wind onshore':   Math.round(wOnS * windOnEff    / (tot + wOnS)),
+      'Zon':            Math.round(sS  * solarEff      / (tot + wOnS)),
+      'Kern':           Math.round(nS  * nuclearEff    / (tot + wOnS)),
+      'Gas (kaal)':     Math.round(gPS * gasPlainAllIn / (tot + wOnS)),
+      'Gas+CCS':        Math.round(gCS * gasCcsAllIn   / (tot + wOnS)),
       'Interconnectie': Math.round(icCost.total),
       'Capaciteitsmechanisme': Math.round(capMechCostPerMWh * 10) / 10,
+      'Batterij (cycluskost)': Math.round(batteryCostPerMWh * 10) / 10,
       'Systeemkosten':  Math.round(windSys + solarSys + nuclearSys + curtailCost),
     }
   };
@@ -1686,7 +1688,7 @@ function tippingCurve(battery, interconn, demand) {
     // (zie adequacyCheck()). Dit is een ANDER, complementair waardecomponent dan de energiewaarde
     // hierboven: energiewaarde = vermeden brandstofkosten, capaciteitswaarde = vermeden vaste
     // backup-capaciteit. Dezelfde logica geldt in principe voor elke firm-capacity-techniek
-    // (batterij, interconnectie) — kern staat hier omdat dít de kernenergie-kantelpuntgrafiek is,
+    // (batterij, interconnectie) — kern staat hier omdat dít de kernenergie-omslagpuntgrafiek is,
     // niet omdat kern hier uniek of gunstiger behandeld wordt.
     const adequacy0  = adequacyCheck(windOff, solarEq, 0, battery, interconn, demand);
     const floorBinds = adequacy0.gasFleetNeededGW <= P.gasFleetFloorGW + 0.01;
@@ -1726,42 +1728,28 @@ function findCrossing(curve) {
 // ════════════════════════════════════════════════════════
 //  FRONTIER CLOUD
 // ════════════════════════════════════════════════════════
+const SCEN_LABELS = {
+  windmax:  'Max wind',
+  balanced: 'Gebalanceerd',
+  nuclear:  'Kern-zwaar',
+  island:   'Eiland',
+  battery:  'Batterij-optimum',
+};
+
 function buildFrontier(gasCcsShare, demand) {
+  // Toont uitsluitend de vijf herkenbare snelscenario's, elk direct gelabeld —
+  // geen ongelabelde puntenwolk die suggereert dat er meer varieert dan je kunt zien.
   const pts = [];
-  // Wind family
-  for (let w = 8; w <= 32; w += 3) {
-    const r = model(w, 36, 0, 20, 15, gasCcsShare, demand);
-    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'wind', tip: `Wind ${w} GW, geen kern` });
-  }
-  // Nuclear family
-  for (let n = 0; n <= 6.4; n += 0.8) {
-    const r = model(18, 34, n, 15, 12, gasCcsShare, demand);
-    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'nuclear', tip: `Kern ${n.toFixed(1)} GW` });
-  }
-  // Battery family
-  for (let b = 5; b <= 50; b += 5) {
-    const r = model(22, 38, 0, b, 18, gasCcsShare, demand);
-    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'battery', tip: `Batterij ${b} GWh` });
-  }
-  // Interconn family
-  for (let ic = 3; ic <= 28; ic += 4) {
-    const r = model(22, 36, 0, 20, ic, gasCcsShare, demand);
-    pts.push({ x: r.hrsImport, y: r.totalCost, type: 'wind', tip: `Interconn ${ic} GW` });
-  }
-  // Mixed
-  for (let w = 14; w <= 26; w += 4) {
-    for (let n = 0; n <= 4.8; n += 1.6) {
-      const r = model(w, 36, n, 20, 15, gasCcsShare, demand);
-      pts.push({ x: r.hrsImport, y: r.totalCost,
-        type: n > 0 ? 'nuclear' : 'wind',
-        tip: `Wind ${w} GW + Kern ${n.toFixed(1)} GW` });
-    }
+  for (const [key, s] of Object.entries(SCEN)) {
+    const solarTotal = P.solarBaselineGW + s.solar;
+    const interconnTotal = P.interconnBaselineGW + s.interconn;
+    const r = model(s.wind, solarTotal, s.nuclear, s.battery, interconnTotal, gasCcsShare, demand);
+    pts.push({ x: r.hrsImport, y: r.totalCost, label: SCEN_LABELS[key], key });
   }
   return pts;
 }
 
-let frontierPts = buildFrontier(0.3, 160);
-const typeCol = { wind: '#1a6fa3', nuclear: '#b52a1c', battery: '#1e8a4a' };
+let frontierPts = []; // wordt gevuld door update() zodra SCEN hieronder is gedefinieerd
 
 const breakdownColors = {
   'Wind offshore':  '#1a6fa3',
@@ -1772,6 +1760,7 @@ const breakdownColors = {
   'Gas+CCS':       '#4a6358',
   'Interconnectie':'#7b3fa0',
   'Capaciteitsmechanisme': '#8b5e34',
+  'Batterij (cycluskost)': '#1e8a4a',
   'Systeemkosten': '#333333',
 };
 
@@ -1794,8 +1783,8 @@ function renderFrontier(cur) {
 
   const allX = frontierPts.map(d => d.x).concat([cur.hrsImport]);
   const allY = frontierPts.map(d => d.y).concat([cur.totalCost]);
-  const xd = [d3.min(allX) - 1.5, d3.max(allX) + 1.5];
-  const yd = [d3.min(allY) - 4,   d3.max(allY) + 4];
+  const xd = [Math.max(0, d3.min(allX) - 6), d3.max(allX) + 6];
+  const yd = [d3.min(allY) - 6,   d3.max(allY) + 6];
 
   const xSc = d3.scaleLinear().domain(xd).range([0, iW]);
   const ySc = d3.scaleLinear().domain(yd).range([iH, 0]);
@@ -1829,15 +1818,27 @@ function renderFrontier(cur) {
    .attr('font-family','Helvetica Neue,Arial,sans-serif').attr('opacity',0.75)
    .text('← minder import & goedkoper →');
 
-  // Cloud
+  // De vijf snelscenario's — elk direct gelabeld, geen legenda nodig om ze te decoderen.
+  // Label boven of onder het punt, afwisselend op basis van y-positie, om overlap te beperken.
+  const sorted = [...frontierPts].sort((a, b) => ySc(a.y) - ySc(b.y));
   g.selectAll('.fp')
    .data(frontierPts).enter().append('circle')
    .attr('class','fp')
    .attr('cx', d => xSc(d.x)).attr('cy', d => ySc(d.y))
-   .attr('r', 4.5)
-   .attr('fill', d => typeCol[d.type])
-   .attr('opacity', 0.45)
-   .attr('stroke','none');
+   .attr('r', 5.5)
+   .attr('fill', '#5b7a99')
+   .attr('opacity', 0.85)
+   .attr('stroke','#fff').attr('stroke-width', 1);
+
+  g.selectAll('.fp-label')
+   .data(frontierPts).enter().append('text')
+   .attr('class','fp-label')
+   .attr('x', d => xSc(d.x))
+   .attr('y', (d, i) => ySc(d.y) + (sorted.indexOf(d) % 2 === 0 ? -11 : 20))
+   .attr('text-anchor','middle')
+   .attr('fill','#3a5670').attr('font-size',9.5).attr('font-weight','600')
+   .attr('font-family','Helvetica Neue,Arial,sans-serif')
+   .text(d => d.label);
 
   // Current point
   g.append('circle')
@@ -1858,11 +1859,10 @@ function renderFrontier(cur) {
 // ════════════════════════════════════════════════════════
 function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPen, demand) {
   const el = document.getElementById('svg-tipping');
-  const W = el.clientWidth || 600;
-  const H = 300;
-  const m = { top: 18, right: 24, bottom: 42, left: 54 };
+  const W = el.clientWidth || 700;
+  const H = 118;
+  const m = { top: 40, right: 28, bottom: 34, left: 28 };
   const iW = W - m.left - m.right;
-  const iH = H - m.top - m.bottom;
 
   const curve = tippingCurve(battery, interconn, demand);
   const crossing = findCrossing(curve);
@@ -1873,96 +1873,54 @@ function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPe
   svg.selectAll('*').remove();
   const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
 
-  const xd = [20, 220];
-  const allY = curve.flatMap(d => [d.nuclearLCOE, d.systemValue]);
-  const yd = [Math.min(0, d3.min(allY) - 8), d3.max(allY) + 10];
+  // Huidige mix = wind+zon-penetratie zoals de curve die zelf definieert (nuclear=0 in de
+  // sweep, dus de positiemarker toont uitsluitend wind+zon, los van de kern-instelling —
+  // consistent met "bij welke wind/zon-penetratie kantelt een EERSTE eenheid kern".
+  const curPenPct = Math.round((curWindPen + curSolarPen) * 100);
+  const allPen = curve.map(d => d.pen);
+  const dataMax = Math.max(d3.max(allPen), curPenPct, crossing ? crossing.pen : 0);
+  const domainMax = Math.max(100, Math.ceil((dataMax + 10) / 10) * 10);
 
-  const xSc = d3.scaleLinear().domain(xd).range([0, iW]);
-  const ySc = d3.scaleLinear().domain(yd).range([iH, 0]);
+  const xSc = d3.scaleLinear().domain([0, domainMax]).range([0, iW]);
+  const barY = 14, barH = 30;
 
-  g.append('g').attr('class','grid')
-   .call(d3.axisLeft(ySc).tickSize(-iW).tickFormat('').ticks(6));
-  g.append('g').attr('class','grid').attr('transform',`translate(0,${iH})`)
-   .call(d3.axisBottom(xSc).tickSize(-iH).tickFormat('').ticks(6));
+  g.append('rect')
+   .attr('x', 0).attr('y', barY).attr('width', iW).attr('height', barH)
+   .attr('fill', '#f0f0f0').attr('stroke', 'var(--rule)');
 
-  g.append('g').attr('class','axis').attr('transform',`translate(0,${iH})`)
-   .call(d3.axisBottom(xSc).ticks(6).tickFormat(d => d + '%'));
-  g.append('g').attr('class','axis')
-   .call(d3.axisLeft(ySc).ticks(6).tickFormat(d => '€' + d));
+  g.append('g').attr('transform', `translate(0,${barY + barH})`)
+   .call(d3.axisBottom(xSc).ticks(Math.min(10, domainMax / 10)).tickFormat(d => d + '%'))
+   .call(sel => sel.select('.domain').remove());
 
   g.append('text')
-   .attr('x', iW/2).attr('y', iH + 36)
-   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
-   .attr('font-family','Helvetica Neue,Arial,sans-serif')
-   .text('Wind + zon penetratie (% van jaarvraag)');
-  g.append('text')
-   .attr('transform','rotate(-90)').attr('x',-iH/2).attr('y',-42)
-   .attr('text-anchor','middle').attr('fill','#6b6b6b').attr('font-size',10)
-   .attr('font-family','Helvetica Neue,Arial,sans-serif')
-   .text('€/MWh');
+   .attr('x', iW / 2).attr('y', barY + barH + 30)
+   .attr('text-anchor', 'middle').attr('fill', '#6b6b6b').attr('font-size', 9.5)
+   .attr('font-family', 'Helvetica Neue,Arial,sans-serif')
+   .text('Wind + zon-penetratie (% van jaarvraag)');
 
-  // Shaded "verlieszone" past crossing
   if (crossing) {
-    g.append('rect')
-     .attr('x', xSc(crossing.pen)).attr('y', 0)
-     .attr('width', Math.max(0, iW - xSc(crossing.pen))).attr('height', iH)
-     .attr('fill', '#b52a1c').attr('opacity', 0.06);
-    g.append('text')
-     .attr('x', iW - 6).attr('y', 16)
-     .attr('text-anchor','end').attr('fill','#b52a1c').attr('font-size',9)
-     .attr('font-family','Helvetica Neue,Arial,sans-serif').attr('opacity',0.8)
-     .text('kostprijs kern > geschatte systeemwaarde');
-  }
-
-  const lineNuclear = d3.line()
-    .x(d => xSc(d.pen)).y(d => ySc(d.nuclearLCOE)).curve(d3.curveMonotoneX);
-  const lineValue = d3.line()
-    .x(d => xSc(d.pen)).y(d => ySc(d.systemValue)).curve(d3.curveMonotoneX);
-
-  g.append('path').datum(curve)
-   .attr('fill','none').attr('stroke','#b52a1c').attr('stroke-width', 2.5)
-   .attr('d', lineNuclear);
-
-  g.append('path').datum(curve)
-   .attr('fill','none').attr('stroke','#1a1a1a').attr('stroke-width', 2.5)
-   .attr('d', lineValue);
-
-  // Crossing marker
-  if (crossing) {
+    const cx = xSc(Math.min(crossing.pen, domainMax));
     g.append('line')
-     .attr('x1', xSc(crossing.pen)).attr('x2', xSc(crossing.pen))
-     .attr('y1', 0).attr('y2', iH)
-     .attr('stroke', '#b52a1c').attr('stroke-width', 1)
-     .attr('stroke-dasharray', '4,3').attr('opacity', 0.6);
-
-    g.append('circle')
-     .attr('cx', xSc(crossing.pen)).attr('cy', ySc(crossing.value))
-     .attr('r', 6).attr('fill', '#b52a1c').attr('stroke', '#fff').attr('stroke-width', 1.5);
-
+     .attr('x1', cx).attr('x2', cx).attr('y1', barY - 10).attr('y2', barY + barH + 10)
+     .attr('stroke', '#8b5e34').attr('stroke-width', 2).attr('stroke-dasharray', '4,3');
     g.append('text')
-     .attr('x', xSc(crossing.pen))
-     .attr('y', iH - 8)
-     .attr('text-anchor', crossing.pen > 170 ? 'end' : 'middle')
-     .attr('fill', '#b52a1c').attr('font-size', 10).attr('font-weight', 700)
-     .attr('font-family','Helvetica Neue,Arial,sans-serif')
-     .text(`Kantelpunt: ${Math.round(crossing.pen)}% VRE`);
+     .attr('x', cx).attr('y', barY - 16)
+     .attr('text-anchor', crossing.pen > domainMax * 0.85 ? 'end' : 'middle')
+     .attr('fill', '#8b5e34').attr('font-size', 10.5).attr('font-weight', 700)
+     .attr('font-family', 'Helvetica Neue,Arial,sans-serif')
+     .text(`Omslagpunt: ${Math.round(crossing.pen)}%`);
   }
 
-  // Current position marker
-  const curTotalPen = Math.round((curWindPen + curSolarPen + curNuclearPen * 0.3) * 100);
-  const clampedPen = Math.max(20, Math.min(220, curTotalPen));
-  // find nearest curve point for y-interpolation
-  const nearest = curve.reduce((a,b) => Math.abs(b.pen - clampedPen) < Math.abs(a.pen - clampedPen) ? b : a);
-
+  const curX = xSc(Math.min(curPenPct, domainMax));
   g.append('circle')
-   .attr('cx', xSc(clampedPen)).attr('cy', ySc(nearest.nuclearLCOE))
-   .attr('r', 7).attr('fill', '#1a1a1a').attr('stroke', '#b52a1c').attr('stroke-width', 2);
-
+   .attr('cx', curX).attr('cy', barY + barH / 2).attr('r', 7.5)
+   .attr('fill', 'var(--ink)').attr('stroke', '#fff').attr('stroke-width', 2);
   g.append('text')
-   .attr('x', xSc(clampedPen) + 10).attr('y', ySc(nearest.nuclearLCOE) - 8)
-   .attr('fill', '#1a1a1a').attr('font-size', 9).attr('font-weight', 700)
-   .attr('font-family','Helvetica Neue,Arial,sans-serif')
-   .text('Huidige mix');
+   .attr('x', curX).attr('y', barY - 16)
+   .attr('text-anchor', curPenPct > domainMax * 0.85 ? 'end' : (curPenPct < domainMax * 0.15 ? 'start' : 'middle'))
+   .attr('fill', 'var(--ink)').attr('font-size', 10.5).attr('font-weight', 700)
+   .attr('font-family', 'Helvetica Neue,Arial,sans-serif')
+   .text(`Huidige mix: ${curPenPct}%`);
 
   return crossing;
 }
@@ -2234,15 +2192,15 @@ function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFr
     lines.push(`<strong>Meer wind drukt de waarde van wind zelf:</strong> de effectieve kostprijs stijgt van €117 naar €${r.windEff}/MWh (+€${r.windDelta}) — dit heet kannibalisering. Hoe meer overschot-uren in het systeem (nu ${Math.round(r.surplusFrac*100)}% van de overschot-uren), hoe hoger het financieringsrisico dat banken inprijzen.`);
   }
 
-  // Kern kannibalisering + kantelpunt — alleen relevant als kern ook echt in de mix zit
+  // Kern kannibalisering + omslagpunt — alleen relevant als kern ook echt in de mix zit
   if (nuclear > 0) {
     if (crossing) {
       const vrePct = Math.round(vrePenFrac * 100);
       const pastCrossing = vrePct >= crossing.pen;
       if (pastCrossing) {
-        lines.push(`<strong>Kantelpunt:</strong> bij ${vrePct}% wind+zon-penetratie is het systeem al voorbij het kantelpunt van ${Math.round(crossing.pen)}% (bouwaanname: €${P.nuclearBase}/MWh). Vanaf hier ligt de geschatte effectieve kostprijs van extra kernvermogen boven de geschatte systeemwaarde die het op dat moment nog toevoegt — of dat gewenst is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid).`);
+        lines.push(`<strong>Omslagpunt:</strong> bij ${vrePct}% wind+zon-penetratie is het systeem al voorbij het omslagpunt van ${Math.round(crossing.pen)}% (bouwaanname: €${P.nuclearBase}/MWh). Vanaf hier ligt de geschatte effectieve kostprijs van extra kernvermogen boven de geschatte systeemwaarde die het op dat moment nog toevoegt — of dat gewenst is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid).`);
       } else {
-        lines.push(`Bij de huidige ${vrePct}% wind+zon-penetratie zit het systeem nog onder het kantelpunt van ${Math.round(crossing.pen)}% (bouwaanname: €${P.nuclearBase}/MWh). De geschatte systeemwaarde van extra kerncapaciteit ligt hier nog boven de kostprijs — die marge krimpt wel naarmate wind en zon verder groeien richting 2040.`);
+        lines.push(`Bij de huidige ${vrePct}% wind+zon-penetratie zit het systeem nog onder het omslagpunt van ${Math.round(crossing.pen)}% (bouwaanname: €${P.nuclearBase}/MWh). De geschatte systeemwaarde van extra kerncapaciteit ligt hier nog boven de kostprijs — die marge krimpt wel naarmate wind en zon verder groeien richting 2040.`);
       }
     }
     if (r.nuclearDeltaLCOE > 20) {
@@ -2501,6 +2459,14 @@ document.getElementById('btn-pin-reference').addEventListener('click', () => {
     `Referentie: ${referenceMix.wind} GW wind, +${referenceMix.solar} GW zon (extra), ${referenceMix.nuclear.toFixed(1)} GW kern, ${referenceMix.battery} GWh batterij, +${referenceMix.interconn} GW interconnectie (extra), ${referenceMix.gasccs}% Gas+CCS`;
   update();
 });
+
+// Kern-toggle-knoppen synchroniseren met P.nuclearBaseFOAK/Serial, i.p.v. losstaande
+// hardcoded waarden in de HTML — voorkomt dat de knoppen uit de pas gaan lopen als de
+// parameters ooit worden bijgewerkt.
+document.getElementById('btn-nuc-foak').dataset.base = P.nuclearBaseFOAK;
+document.getElementById('btn-nuc-foak').textContent = `Westerse FOAK — €${P.nuclearBaseFOAK}`;
+document.getElementById('btn-nuc-serial').dataset.base = P.nuclearBaseSerial;
+document.getElementById('btn-nuc-serial').textContent = `Seriebouw — €${P.nuclearBaseSerial}`;
 
 update();
 window.addEventListener('resize', update);
