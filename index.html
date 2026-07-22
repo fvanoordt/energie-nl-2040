@@ -615,7 +615,7 @@
 
     <div class="controls-title">Elektriciteitsvraag 2040</div>
     <div class="control-group">
-      <div class="control-sublabel">TNO/PBL scenario — bepaalt penetratie en curtailment</div>
+      <div class="control-sublabel">TNO/PBL scenario — bepaalt effectieve penetratie en curtailment. Verandert dit alléén (zonder de sliders aan te passen), dan verschuiven de €/MWh-systeemkosten mee — zie about-pagina</div>
       <select id="sel-demand" style="
         width:100%; padding:0.4rem 0.5rem;
         font-family:'Helvetica Neue',Arial,sans-serif; font-size:0.75rem;
@@ -658,9 +658,9 @@
     <!-- KPI ROW -->
     <div class="kpi-row">
       <div class="kpi">
-        <span class="kpi-label">Systeemkosten</span>
+        <span class="kpi-label">Systeemkosten (aanbodzijde)</span>
         <span class="kpi-value neut" id="kpi-cost">—</span>
-        <span class="kpi-sub">€/MWh all-in, incl. kannibalisering</span>
+        <span class="kpi-sub">€/MWh all-in, incl. kannibalisering — excl. vraagzijde-netwerkkosten, zie voetnoot</span>
         <span class="kpi-sub" id="kpi-cost-delta" style="display:block; margin-top:0.3rem; font-weight:600;">—</span>
       </div>
       <div class="kpi">
@@ -873,9 +873,13 @@
       <tr><td>⚙️ Gas+CCS (variabel)</td><td>€135/MWh</td><td>Hogere capex CO₂-afvang/opslag/transport; afvangrate 90%; capaciteit apart</td></tr>
       <tr><td>⚙️ Batterijen + V2G</td><td>€10/MWh</td><td>Cycluskost incl. bidirectioneel laden EVs — toegepast op de daadwerkelijk geladen energie (niet op de GWh-capaciteit zelf), zichtbaar als aparte regel "Batterij (cycluskost)" in het Kostenopbouw-paneel</td></tr>
     </table>
+    <p style="font-size:0.78rem; color:var(--muted);"><strong>Mogelijke overlap bij wind offshore:</strong> SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag (hieronder) rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €7-8/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar klein (~€2-3/MWh). Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €17-50/MWh — vrijwel volledig nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten. Het aandeel dat dus mogelijk dubbel telt, is beperkt tot een paar euro bij lage/gematigde bouw; de kernboodschap van dit model (kannibalisering loopt sterk op bij hoge penetratie) staat erbuiten.</p>
 
     <h2>Systeemkosten in € miljard/jaar — vergelijking, geen norm</h2>
-    <p>Onder de Systeemkosten-KPI staat een verschil in € miljard/jaar t.o.v. een referentiescenario. Dat referentiescenario kies je zelf via de knop "Huidig scenario vastzetten als referentie" — standaard staat die op "Gebalanceerd", maar dat is een neutraal startpunt, geen ingebouwde norm voor wat een portfolio "zou moeten" kosten. Het verschil isoleert het effect van de portfoliokeuze: de referentie wordt herrekend met dezelfde vraag en dezelfde kern-bouwaanname als je huidige instelling, zodat je niet per ongeluk twee dingen tegelijk vergelijkt.</p>
+    <p>Onder de Systeemkosten-KPI staat een verschil in € miljard/jaar t.o.v. een referentiescenario. Dat referentiescenario kies je zelf via de knop "Huidig scenario vastzetten als referentie" — standaard staat die op "Gebalanceerd", maar dat is een neutraal startpunt, geen ingebouwde norm voor wat een portfolio "zou moeten" kosten. Het verschil isoleert het effect van de portfoliokeuze: de referentie wordt herrekend met dezelfde vraag en dezelfde kern-bouwaanname als je huidige instelling, zodat je niet per ongeluk twee dingen tegelijk vergelijkt. <strong>Verandert alleen de vraag (het Elektriciteitsvraag 2040-keuzemenu), dan verandert dit miljarden-verschil bewust niet</strong> — het isoleert namelijk specifiek de aanbodzijde-keuze, niet de vraagaanname. De systeemkosten-KPI zelf (€/MWh) reageert wél op de vraag, en vaak fors: zie hieronder waarom.</p>
+
+    <h2>Waarom een lagere vraag de €/MWh-kosten kan verhógen</h2>
+    <p>Verander je alleen het vraagscenario (bijv. van Midden naar Laag) zonder de sliders aan te passen, dan kunnen de systeemkosten per MWh flink stijgen — bij Gebalanceerd van €149 naar €177/MWh bij een overstap van 160 naar 120 TWh. Dat is geen omissie maar een reëel effect: dezelfde 22 GW wind en 38 GW zon die bij 160 TWh vraag een bepaald aandeel vormen, vormen bij 120 TWh vraag een aanzienlijk hóger aandeel — dezelfde capaciteit moet een kleinere taart dekken. Hogere effectieve penetratie betekent hogere kannibalisering (meer surplus-uren, meer curtailment) én hogere interconnectiekosten per geleverde MWh. Vaste infrastructuurkosten (capaciteitsmechanisme, interconnectie) worden bovendien over minder MWh omgeslagen. Kortom: een vraagscenario kiezen is niet neutraal ten opzichte van een reeds gekozen opwekmix — de twee zijn niet onafhankelijk, precies zoals de rest van dit model laat zien dat niets dat is.</p>
     <p><strong>Precisie:</strong> het bedrag is afgerond op €0,1 miljard en is indicatief — het model heeft, zoals hierboven en in de beperkingen beschreven, geen precisie op individuele-euro-niveau (curtailment-onderschatting, werkaannames voor het capaciteitsmechanisme, een vereenvoudigd correlatiemodel). Een miljardenbedrag oogt overtuigender dan een €/MWh-verschil, maar heeft dezelfde onderliggende onzekerheid — behandel het als orde van grootte, niet als exacte prognose.</p>
 
     <h2>Vermogensadequaatheid — endogene gasvloot</h2>
