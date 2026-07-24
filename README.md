@@ -16,7 +16,7 @@ Het model rekent geen technologie rijk of arm. Waar uitkomsten een technologie d
 De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwaardedepreciatie, 2013–2015), uitgebreid met:
 
 - **Kannibaliseringseffect op kapitaalkosten** — niet alleen de marktwaarde van stroom daalt bij hoge penetratie, ook de financieringskosten stijgen doordat banken het terugverdienrisico inprijzen via een hogere WACC
-- **Load duration curve in 4 segmenten** — verdeelt het jaar in schaarste, twee schouderconditie en overschot, waardoor curtailment realistisch wordt berekend per marktsegment
+- **Load duration curve in 5 segmenten** — verdeelt het jaar in schaarste, twee krapte-subsegmenten (dagcyclus vs. meerdaags — batterij helpt bij de eerste veel meer dan bij de tweede), matige overschot en hoge overschot, waardoor curtailment realistisch wordt berekend per marktsegment
 - **Vermogensadequaatheid met endogene gasvloot** — een aparte toets of er op het piekmoment genoeg beschikbaar vermogen staat, waarbij de benodigde gasvloot meebeweegt met de rest van de mix
 - **Capaciteitsmechanisme** — een expliciete, aparte kostenpost voor het in stand houden van die gasvloot, los van hoeveel gas daadwerkelijk draait
 - **Interconnectie-correlatiemodel** — vervangt een platte de-ratingaanname door een 2-groepen-model (gecorreleerde NW-Europese buren vs. Noorse waterkracht), gebaseerd op Malvaldi et al. (2017)
@@ -112,7 +112,7 @@ Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **ges
 | Kernenergie — seriebouw | €70/MWh | OECD (2020) ~$66/MWh voor niet-westerse series (7% discontovoet); Zuid-Korea/VAE-achtig |
 | Gas CCGT (variabel) | €77/MWh | Brandstof, CO₂, opex — capaciteit apart via capaciteitsmechanisme |
 | Gas+CCS (variabel) | €135/MWh | Hogere capex CO₂-afvang/opslag/transport; afvangrate 90%; capaciteit apart |
-| Batterijen + V2G | €10/MWh cycluskost | ~200 cycli/jaar; send-out 4-6 uur; incl. bidirectioneel laden EVs. Toegepast op de daadwerkelijk geladen energie, zichtbaar als aparte regel "Batterij (cycluskost)" in de kostenopbouw |
+| Batterijen + V2G | €95/MWh cycluskost | 2040-schatting (Storage Lab, Ember Energy); ~200 cycli/jaar; send-out 4-6 uur; incl. bidirectioneel laden EVs. Volledige LCOS — geen aparte kapitaalslast elders. Toegepast op de daadwerkelijk geladen energie, zichtbaar als aparte regel "Batterij (cycluskost)" in de kostenopbouw |
 
 **Mogelijke overlap bij wind offshore:** SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €7-8/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar klein (~€2-3/MWh). Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €17-50/MWh — vrijwel volledig nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten.
 
@@ -136,16 +136,19 @@ Standalone kosten missen het centrale probleem: naarmate penetratie stijgt, dale
 
 **Curtailment op 0% en toch een opslag hierboven is geen tegenstrijdigheid.** Curtailment meet wat er ná batterijlading en export nog fysiek wordt weggegooid. Kannibalisering meet hoe vaak en hoe hard de marktprijs instort door overaanbod, ongeacht wat er met die energie gebeurt. Een batterij die al het overschot volledig absorbeert, verplaatst de energie naar een later, duurder moment — maar de lage (soms nul-)prijs tijdens het surplus-uur heeft wel degelijk gegolden, en drukt zo de gemiddelde opbrengst van alles wat in dat uur draaide. Curtailment op 0% betekent dus "niets weggegooid", niet "geen prijsdruk gehad".
 
-### Load duration curve — 4 marktsegmenten
+### Load duration curve — 5 marktsegmenten
 
-De segmenten zijn benoemd naar marktconditie (schaarste of overschot), niet naar tijdstip — namen als "dal zomermiddag" suggereren een kort, zeldzaam venster terwijl het in werkelijkheid om duizenden uren per jaar gaat.
+De segmenten zijn benoemd naar marktconditie (schaarste, krapte of overschot), niet naar tijdstip — namen als "dal zomermiddag" suggereren een kort, zeldzaam venster terwijl het in werkelijkheid om duizenden uren per jaar gaat. Krapte-uren is opgesplitst in twee sub-segmenten (na een sessie met CIEP): persistentie-onderzoek naar windarme periodes (Kay et al. 2023, Noordzee; superstatistiek-literatuur naar windpersistentie) laat zien dat tekort-episodes ongeveer exponentieel verdeeld zijn qua duur — korte, dagcyclus-achtige tekorten komen vaker voor, maar langdurige meerdaagse tekorten eisen door hun lengte onevenredig veel uren op. Batterijen vangen het eerste type goed op, het tweede nauwelijks.
 
 | Segment | Uren/jaar | Marktconditie | Dominante bron |
 |---|---|---|---|
 | **Schaarste-uren** | ~500 | Weinig wind/zon, hoge vraag — *dark doldrums* | Gas(+CCS), kern, import |
+| **Krapte-uren (meerdaags)** | ~1.475 | Aanhoudend lagere wind over meerdere dagen, geen dagcyclus om op te laden | Gas, kern — batterij hier het minst nuttig |
+| **Krapte-uren (dagcyclus)** | ~1.700 | Zon weg (avond/nacht), wind rond gemiddeld — voorspelbaar dagpatroon | Batterij (voorkeur), wind, gas |
 | **Overschot-uren (matig)** | ~2.000 | Redelijk wind/zon, gemiddelde vraag — surplus mogelijk | Wind+zon, export, batterijlading |
-| **Krapte-uren (regulier)** | ~3.000 | Weinig zon, wisselend wind — structureel tekort | Wind, gas, batterij ontlading |
-| **Overschot-uren (hoog)** | ~3.260 | Veel wind/zon, lage vraag | Curtailment/export, batterijlading |
+| **Overschot-uren (hoog)** | ~3.085 | Veel wind/zon, lage vraag | Curtailment/export, batterijlading |
+
+*De knip tussen de twee krapte-segmenten (1.700/1.475 uur) is een beargumenteerde inschatting op basis van gepubliceerde persistentie-statistiek, geen berekening uit Nederlandse historische uurdata — dit model bevat geen meetreeks.*
 
 Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nachten binnen de krapte-uren. Export is beperkt omdat buurlanden op dezelfde uren hetzelfde surplus hebben (Europese correlatie).
 
@@ -153,7 +156,7 @@ Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nach
 
 Onder de LDC-grafiek in de tool staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd), en Gas(+CCS) evenmin. Rekensom: `(totalVRETWh − curtailment − export) / vraag`. Getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in `tests.js`.
 
-**Een tweede getal ernaast: klimaatneutraal aandeel.** "Niet-fossiel" is met opzet streng gedefinieerd, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.500 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), geen modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040": het Klimaatakkoord noemt 70% *hernieuwbaar* (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate): `niet-fossiel + gasCcsTWh × 0,90`, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.
+**Een tweede getal ernaast: klimaatneutraal aandeel.** "Niet-fossiel" is met opzet streng gedefinieerd, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.675 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), geen modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040": het Klimaatakkoord noemt 70% *hernieuwbaar* (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate): `niet-fossiel + gasCcsTWh × 0,90`, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.
 
 ### Interconnectiekosten (systeemkosten, los van adequacy-krediet)
 
@@ -206,7 +209,8 @@ Extra vraag boven het huidige niveau komt vooral van elektrificatie van warmte (
 
 Dit is een **beleidsvisualisatie-instrument**, geen vervanging voor volledige systeemstudies. Beperkingen:
 
-- Het model gebruikt 4 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor **structureel onderschat** (werkelijk 30-50% hoger dan de modeluitkomst). Dit betekent ook dat de systeemkosten aan de **conservatieve kant** zijn.
+- Het model gebruikt 5 marktsegmenten in plaats van een volledig uurresolutiemodel; curtailment wordt daardoor **structureel onderschat** (werkelijk 30-50% hoger dan de modeluitkomst). Dit betekent ook dat de systeemkosten aan de **conservatieve kant** zijn.
+- De knip tussen de twee krapte-subsegmenten (dagcyclus/meerdaags) is een beargumenteerde inschatting op basis van gepubliceerde persistentie-statistiek voor windarme periodes, geen berekening uit Nederlandse historische uurdata — dit model bevat geen meetreeks.
 - Prijscorrelaties tussen landen zijn gesimplificeerd tot een 2-groepen-model, niet een volledige correlatiematrix
 - **Nederland wordt behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen** — redispatch-kosten voor lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) en de bijbehorende regionale distributienet-investeringen zitten er niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten
 - **Geen expliciete verdringingsvolgorde bij overaanbod:** kern draait met een vaste capaciteitsfactor door alle marktsegmenten (ook overaanbod-uren) — de must-run-eigenschap van kern zit dus in de kannibaliseringsopslag en de totale curtailment, maar het model wijst niet toe wélke technologie (kern of wind/zon) in een gegeven uur zou moeten terugschakelen als er een merit-order- of dispatchprioriteit zou gelden
@@ -233,6 +237,8 @@ Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL
 - TenneT. *Interconnectoren: stroom zonder grenzen.* tennet.eu.
 - CBS. *Zonnestroom; vermogen en vermogensklasse, bedrijven en woningen, regio.* Geraadpleegd 2026.
 - Klimaatakkoord. *Elektriciteit.* klimaatakkoord.nl (70% hernieuwbaar-doel 2030).
+- Kay, G. et al. (2023). *Variability in North Sea wind energy and the potential for prolonged winter wind drought.* Atmospheric Science Letters.
+- Storage Lab. *Levelized cost of storage — 2040-projectie.* storage-lab.com.
 - PBL. *Klimaat- en Energieverkenning (KEV).* Meest recente raming.
 - NL Kabinetsbrief (2025). *SDE++ tenderprijzen windenergie op zee.*
 
