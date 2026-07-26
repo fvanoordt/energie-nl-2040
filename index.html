@@ -169,8 +169,8 @@
     transition: background 0.12s;
     border-radius: 2px;
   }
-  .scenario-btn:hover, .nuc-cost-btn:hover, .pin-btn:hover  { background: var(--bg); }
-  .scenario-btn.active, .nuc-cost-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .scenario-btn:hover, .nuc-cost-btn:hover, .gas-price-btn:hover, .pin-btn:hover  { background: var(--bg); }
+  .scenario-btn.active, .nuc-cost-btn.active, .gas-price-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
   .pin-btn {
     font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -185,13 +185,13 @@
   }
 
   .toggle-row { display: flex; flex-direction: row; gap: 0.35rem; }
-  .toggle-row .nuc-cost-btn {
+  .toggle-row .nuc-cost-btn, .toggle-row .gas-price-btn {
     flex: 1; text-align: center; font-size: 0.66rem; padding: 0.4rem 0.4rem;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     border: 1px solid var(--rule); background: transparent; cursor: pointer;
     color: var(--ink); transition: background 0.12s; border-radius: 2px;
   }
-  .toggle-row .nuc-cost-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .toggle-row .nuc-cost-btn.active, .toggle-row .gas-price-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
   /* ── CHART AREA ── */
   .chart-area { display: flex; flex-direction: column; gap: 1.4rem; }
@@ -602,12 +602,21 @@
 
     <div class="control-group">
       <div class="control-label">
-        Gasbackup als CCS
+        Gas
         <span class="control-val" style="color:var(--gasccs)" id="lbl-gasccs">30%</span>
       </div>
       <div class="control-sublabel">Aandeel gasbackup met CO₂-afvang i.p.v. kaal gas</div>
       <div class="slider-row">
         <input type="range" class="gasccs-s" id="sl-gasccs" min="0" max="100" value="30" step="10">
+      </div>
+      <div class="control-sublabel" style="margin-top:0.5rem">Gasprijsscenario (bepaalt gas-LCOE overal in de tool)</div>
+      <div class="toggle-row">
+        <button class="gas-price-btn" id="btn-gas-low" data-var="50" data-ccs="108" data-ref="62">Laag — €50</button>
+        <button class="gas-price-btn active" id="btn-gas-mid" data-var="77" data-ccs="135" data-ref="95">Midden — €77</button>
+        <button class="gas-price-btn" id="btn-gas-high" data-var="115" data-ccs="173" data-ref="142">Hoog — €115</button>
+      </div>
+      <div class="control-sublabel" style="margin-top:0.4rem; line-height:1.5;">
+        Weerspiegelt reële marktvolatiliteit (TTF-gas: ~€20-26/MWh eind 2025 tot &gt;€100/MWh bij aanhoudende schaarste, PBL KEV-bandbreedte). De CCS-meerkost (afvang/opslag/transport) blijft in alle drie gelijk — alleen de brandstof+CO₂-component schaalt mee. Volledige onderbouwing: about-pagina.
       </div>
     </div>
 
@@ -869,10 +878,11 @@
       <tr><td>🔬 Zon</td><td>€45/MWh</td><td>Huidige tenderprijzen utility-scale</td></tr>
       <tr><td>🔬 Kernenergie — Westerse FOAK</td><td>€160/MWh</td><td>Hinkley Point C-achtig: eerste bouw in decennia, kostenoverschrijdingen; excl. extra infrastructuur</td></tr>
       <tr><td>🔬 Kernenergie — seriebouw</td><td>€70/MWh</td><td>OECD (2020) ~$66/MWh voor niet-westerse series (7% discontovoet); Zuid-Korea/VAE-achtig, ingespeelde toeleveringsketen. Zie toggle in de besturing — bepaalt de kern-LCOE overal in de tool</td></tr>
-      <tr><td>⚙️ Gas CCGT (variabel)</td><td>€77/MWh</td><td>Brandstof, CO₂, opex — capaciteit nu apart (zie hieronder)</td></tr>
-      <tr><td>⚙️ Gas+CCS (variabel)</td><td>€135/MWh</td><td>Hogere capex CO₂-afvang/opslag/transport; afvangrate 90%; capaciteit apart</td></tr>
+      <tr><td>🔬 Gas CCGT (variabel)</td><td>€50 / €77 / €115/MWh</td><td>Laag/Midden/Hoog — brandstof+CO₂+opex, weerspiegelt TTF-marktvolatiliteit (~€20-26/MWh eind 2025 tot &gt;€100/MWh bij aanhoudende schaarste). Toggle in de besturing — bepaalt de gas-LCOE overal in de tool. Capaciteit apart (zie hieronder)</td></tr>
+      <tr><td>🔬 Gas+CCS (variabel)</td><td>€108 / €135 / €173/MWh</td><td>Zelfde drie scenario's + een vaste CCS-meerkost van €58 (afvang/opslag/transport, schaalt niet mee met de brandstofprijs); afvangrate 90%; capaciteit apart</td></tr>
       <tr><td>🔬 Batterijen + V2G</td><td>€95/MWh</td><td>Volledige cycluskost (LCOS, 2040-schatting) incl. bidirectioneel laden EVs — toegepast op de daadwerkelijk geladen energie (niet op de GWh-capaciteit zelf), zichtbaar als aparte regel "Batterij (cycluskost)" in het Kostenopbouw-paneel. Geen aparte kapitaalslast elders — dit ís de volledige kostprijs.</td></tr>
     </table>
+    <p style="font-size:0.78rem; color:var(--muted);"><strong>Waarom gas wél een prijsscenario heeft en wind/zon/kern niet:</strong> die laatste drie lopen via LCOE + de eigen kannibaliseringscurve van dit model — geen van beide is ooit tegen een waargenomen marktprijs getoetst. Gas is de enige technologie waar dit model iets in de buurt van een marktprijs-benadering gebruikt (brandstof+CO₂, met TTF als impliciete referentie), en gasprijzen zijn nu eenmaal aantoonbaar volatiel (van ~€20/MWh tot >€100/MWh binnen enkele jaren) — vandaar dat alleen hier een expliciete bandbreedte zinvol is. De CCS-meerkost blijft in alle drie scenario's exact €58, omdat die over capex voor afvang/opslag/transport gaat, niet over brandstof.</p>
     <p style="font-size:0.78rem; color:var(--muted);"><strong>Mogelijke overlap bij wind offshore:</strong> SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag (hieronder) rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €7-8/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar klein (~€2-3/MWh). Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €17-50/MWh — vrijwel volledig nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten. Het aandeel dat dus mogelijk dubbel telt, is beperkt tot een paar euro bij lage/gematigde bouw; de kernboodschap van dit model (kannibalisering loopt sterk op bij hoge penetratie) staat erbuiten.</p>
 
     <h2>Systeemkosten in € miljard/jaar — vergelijking, geen norm</h2>
@@ -1069,8 +1079,31 @@ const P = {
   nuclearBaseFOAK:   160,  // westerse first-of-a-kind (Hinkley Point C-achtig): eerste bouw in decennia, kostenoverschrijdingen
   nuclearBaseSerial: 70,   // seriebouw-ervaring (Zuid-Korea/VAE-achtig): OECD (2020) rapporteert ~$66/MWh voor niet-westerse series bij 7% discontovoet; Barakah (VAE, geïmporteerde Koreaanse technologie) ligt door turnkey-opslag hoger dan Korea's eigen bouwkosten — €70 is een afgerond werkcijfer, geen precieze NL-schatting
   nuclearBase:     160,   // actieve waarde — wordt door de UI-toggle overschreven, default FOAK
-  gasCost:         95,    // CCGT zonder CCS — referentieprijs (all-in) voor import-/systeemwaarde-berekeningen elders in het model
-  gasVarCost:      77,    // CCGT zonder CCS — zuiver variabele kosten (brandstof, CO₂, opex); capaciteit nu apart via capaciteitsmechanisme
+
+  // Gasprijsscenario's — Laag/Midden/Hoog, zelfde patroon als de kern-bouwtoggle. Weerspiegelt
+  // reële TTF-marktvolatiliteit: van ~€20-26/MWh (LNG-overschot, dieptepunt eind 2025 / Goldman
+  // Sachs-projectie 2027) tot >€100/MWh bij aanhoudende schaarste (ECB-raming €87-106/MWh TTF
+  // tijdens de 2026 Midden-Oosten-escalatie). PBL (KEV) publiceert zelf een laag/midden/hoog-
+  // bandbreedte voor gas- en elektriciteitsprijzen 2025-2040, al kon de onderliggende spreadsheet
+  // niet worden uitgelezen — onderstaande is een marktdata-afgeleide schatting, geen letterlijk
+  // PBL-cijfer. De CCS-meerkost (€58: afvang/opslag/transport) is een vaste kostenpost die niet
+  // met de brandstofprijs meebeweegt — alleen brandstof+CO₂ (het grootste deel van gasVarCost)
+  // schaalt mee, en gasCost (de all-in referentieprijs elders in het model) schaalt evenredig mee.
+  gasVarCostLow:     50,
+  gasVarCostMid:     77,   // huidige aanname, ongewijzigd
+  gasVarCostHigh:    115,
+  gasVarCost:        77,   // actieve waarde — wordt door de UI-toggle overschreven, default Midden
+
+  gasCcsVarCostLow:  108,  // 50 + vaste CCS-marge van 58
+  gasCcsVarCostMid:  135,
+  gasCcsVarCostHigh: 173,  // 115 + 58
+  gasCcsVarCost:     135,
+
+  gasCostLow:        62,   // all-in referentieprijs voor import-/systeemwaarde-berekeningen elders in het model
+  gasCostMid:        95,
+  gasCostHigh:       142,
+  gasCost:           95,
+
   // Batterijkosten: dit is de VOLLEDIGE kostprijs per gecyclede MWh (geen aparte
   // kapitaalslast elders in het model), dus dit moet de volledige levelized cost of
   // storage (LCOS) dragen, niet alleen een marginale slijtagekost. 2040-ramingen (Storage
@@ -1082,7 +1115,6 @@ const P = {
   batteryCycle:    95,
 
   // Gas + CCS — zuiver variabele kosten; capaciteit nu apart via capaciteitsmechanisme
-  gasCcsVarCost:       135,
   gasCcsCaptureRate:   0.90,
 
   // ── CAPACITEITSMECHANISME ──────────────────────────────
@@ -2586,6 +2618,17 @@ document.querySelectorAll('.nuc-cost-btn').forEach(btn => {
   });
 });
 
+document.querySelectorAll('.gas-price-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.gas-price-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    P.gasVarCost    = +btn.dataset.var;
+    P.gasCcsVarCost = +btn.dataset.ccs;
+    P.gasCost       = +btn.dataset.ref;
+    update();
+  });
+});
+
 document.getElementById('btn-pin-reference').addEventListener('click', () => {
   referenceMix = {
     wind:      +document.getElementById('sl-wind').value,
@@ -2608,6 +2651,20 @@ document.getElementById('btn-nuc-foak').dataset.base = P.nuclearBaseFOAK;
 document.getElementById('btn-nuc-foak').textContent = `Westerse FOAK — €${P.nuclearBaseFOAK}`;
 document.getElementById('btn-nuc-serial').dataset.base = P.nuclearBaseSerial;
 document.getElementById('btn-nuc-serial').textContent = `Seriebouw — €${P.nuclearBaseSerial}`;
+
+// Zelfde synchronisatie voor de drie gas-prijsknoppen
+document.getElementById('btn-gas-low').dataset.var = P.gasVarCostLow;
+document.getElementById('btn-gas-low').dataset.ccs = P.gasCcsVarCostLow;
+document.getElementById('btn-gas-low').dataset.ref = P.gasCostLow;
+document.getElementById('btn-gas-low').textContent = `Laag — €${P.gasVarCostLow}`;
+document.getElementById('btn-gas-mid').dataset.var = P.gasVarCostMid;
+document.getElementById('btn-gas-mid').dataset.ccs = P.gasCcsVarCostMid;
+document.getElementById('btn-gas-mid').dataset.ref = P.gasCostMid;
+document.getElementById('btn-gas-mid').textContent = `Midden — €${P.gasVarCostMid}`;
+document.getElementById('btn-gas-high').dataset.var = P.gasVarCostHigh;
+document.getElementById('btn-gas-high').dataset.ccs = P.gasCcsVarCostHigh;
+document.getElementById('btn-gas-high').dataset.ref = P.gasCostHigh;
+document.getElementById('btn-gas-high').textContent = `Hoog — €${P.gasVarCostHigh}`;
 
 update();
 window.addEventListener('resize', update);
