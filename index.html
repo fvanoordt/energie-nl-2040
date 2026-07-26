@@ -796,6 +796,9 @@
         <strong style="font-size:1.05rem; color:var(--ink)">Klimaatneutraal aandeel: <span id="ldc-climateneutral-pct">—</span>%</strong>
         <br>
         <span style="color:#6b6b6b; font-size:0.72rem;">idem, plus het afgevangen deel van Gas+CCS (90% capture rate) — sluit aan bij het officiële "klimaatneutraal energiesysteem 2040/2050"-doel, dat kern én afgevangen CO₂ toestaat. Ter referentie: het Klimaatakkoord-doel is 70% <em>hernieuwbaar</em> (excl. kern) in 2030, niet 90-100% niet-fossiel in 2040 — en zelfs dat 70%-doel is in de laatste KEV-raming al bijgesteld naar 60%.</span>
+      </div>
+    </div>
+
     <!-- TIPPING POINT CURVE -->
     <div class="chart-panel">
       <div class="panel-eyebrow">Het omslagpunt</div>
@@ -815,9 +818,6 @@
       <div class="legend">
         <div class="legend-item"><div class="leg-dot" style="background:#5b7a99"></div>Snelscenario (naam bij het punt)</div>
         <div class="legend-item"><div class="leg-dot" style="background:var(--ink); border:2px solid var(--accent); border-radius:50%; width:11px; height:11px;"></div>Huidige instelling</div>
-      </div>
-    </div>
-
       </div>
     </div>
 
@@ -841,7 +841,7 @@
   <br><br>
   <strong>Kern-bouwaanname (toggle):</strong> €160/MWh (Westerse FOAK, Hinkley Point C-achtig) versus €70/MWh (seriebouw-ervaring, OECD 2020 ~$66/MWh voor niet-westerse series) zijn geen bandbreedte om één schatting maar twee losstaande bouwrealiteiten — de toggle in de besturing bepaalt welke overal in de tool wordt gebruikt, inclusief het omslagpunt in de kernenergiegrafiek.
   <br><br>
-  <strong>Batterij:</strong> cycluskost €95/MWh (2040-schatting; geen apart V2G-tarief — batterij en V2G worden in dit model identiek geprijsd). Dit is de vólledige kostprijs (er is geen aparte kapitaalslast elders in het model) — zie about-pagina voor de onderbouwing. Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040.
+  <strong>Batterij:</strong> cycluskost €95/MWh (2040-schatting; geen apart V2G-tarief — batterij en V2G worden in dit model identiek geprijsd). Dit is de vólledige kostprijs (er is geen aparte kapitaalslast elders in het model) — zie about-pagina voor de onderbouwing. Batterijcapaciteit begrensd op ~200 cycli/jaar en 4-6 uur send-out vermogen — realistisch voor utiliteitsopslag 2040. Ontlading is 10% lager dan lading (round-trip-rendement) — de kostprijs wordt berekend op de geladen energie, niet op de kleinere hoeveelheid die er weer uitkomt.
   <br><br>
   <strong>Curtailment/export:</strong> in perioden met hoog VRE-aanbod hebben buurlanden (DE, BE, DK) hetzelfde surplus, waardoor exportwaarde minimaal is en curtailment de dominante uitkomst is. <strong>Onderschatting curtailment:</strong> dit model gebruikt 5 gemiddelde marktsegmenten in plaats van uurresolutiedata. Daardoor worden piekuren binnen elk segment uitgemiddeld en wordt curtailment structureel onderschat — werkelijke waarden liggen naar verwachting 30-50% hoger dan wat het model intern berekent. De Curtailment/export-KPI toont daarom al de gecorrigeerde bandbreedte, niet het rauwe modelgetal (dat staat er wel nog bij, in de subtekst als "model zelf: X%") — de systeemkosten elders in de tool zijn niettemin nog gebaseerd op het rauwe, lagere getal en dus aan de conservatieve kant.
   <br><br>
@@ -1472,28 +1472,33 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
     segments: [
       { name: 'Schaarste-uren', sublabel: 'weinig wind/zon, hoge vraag', hours: P.segA_hours,
         demand: Math.round(dA*10)/10,  vre: Math.round(vreA*10)/10,
+        wind: Math.round(windA*10)/10, solar: Math.round(solarA*10)/10, nuc: Math.round(nucA*10)/10,
         gas: Math.round(gasGapA*10)/10, batt: Math.round(battDischargeA*10)/10,
         import: Math.round(interconnImportA*10)/10 },
       { name: 'Krapte-uren (meerdaags)', sublabel: 'aanhoudend weinig wind', hours: P.segB2b_hours,
         demand: Math.round(dB2b*10)/10, vre: Math.round(vreB2b*10)/10,
+        wind: Math.round(windB2b*10)/10, solar: Math.round(solarB2b*10)/10, nuc: Math.round(nucB2b*10)/10,
         gas: Math.round(gasGapB2b*10)/10, batt: Math.round(battDischargeB2b*10)/10,
         export: Math.round(exportB2b*10)/10,
         curtail: Math.round(curtailB2b*10)/10,
         import: 0 },
       { name: 'Krapte-uren (dagcyclus)', sublabel: 'zon weg, wind gemiddeld', hours: P.segB2a_hours,
         demand: Math.round(dB2a*10)/10, vre: Math.round(vreB2a*10)/10,
+        wind: Math.round(windB2a*10)/10, solar: Math.round(solarB2a*10)/10, nuc: Math.round(nucB2a*10)/10,
         gas: Math.round(gasGapB2a*10)/10, batt: Math.round(battDischargeB2a*10)/10,
         export: Math.round(exportB2a*10)/10,
         curtail: Math.round(curtailB2a*10)/10,
         import: 0 },
       { name: 'Overschot-uren (matig)', sublabel: 'redelijk wind/zon, gemiddelde vraag', hours: P.segB1_hours,
         demand: Math.round(dB1*10)/10, vre: Math.round(vreB1*10)/10,
-        gas: 0, batt: -Math.round(battCharge*0.3*10)/10,
+        wind: Math.round(windB1*10)/10, solar: Math.round(solarB1*10)/10, nuc: Math.round(nucB1*10)/10,
+        gas: 0, batt: -Math.round(battCharge*0.25*10)/10,
         export: Math.round(exportB1*10)/10,
         curtail: Math.round(curtailB1*10)/10 },
       { name: 'Overschot-uren (hoog)', sublabel: 'veel wind/zon, lage vraag', hours: P.segC_hours,
         demand: Math.round(dC*10)/10,  vre: Math.round(vreC*10)/10,
-        gas: 0, batt: -Math.round(battCharge*0.7*10)/10,
+        wind: Math.round(windC*10)/10, solar: Math.round(solarC*10)/10, nuc: Math.round(nucC*10)/10,
+        gas: 0, batt: -Math.round(battCharge*0.60*10)/10,
         export: Math.round(exportC*10)/10,
         curtail: Math.round(curtailC*10)/10 },
     ]
@@ -1886,11 +1891,32 @@ function renderFrontier(cur) {
   // Als de huidige instelling exact met een scenario samenvalt, wordt dat scenario's eigen
   // label overgeslagen — anders staan er twee labels op precies hetzelfde punt.
   const matched = frontierPts.find(p => Math.abs(p.x - cur.hrsImport) < 0.5 && Math.abs(p.y - cur.totalCost) < 0.5);
-  const sorted = [...frontierPts].sort((a, b) => ySc(a.y) - ySc(b.y));
+
+  // Kleine pixel-jitter als twee scenariopunten vrijwel samenvallen (bijv. Max wind en
+  // Batterij-optimum delen zon/kern/interconnectie in hun eigen definitie en komen daardoor
+  // bij veel vraag/Gas+CCS-instellingen dicht bij elkaar uit) — anders versmelten twee
+  // stippen tot één onduidelijke vlek.
+  const jitter = {};
+  frontierPts.forEach((d, i) => {
+    let dxJ = 0, dyJ = 0;
+    frontierPts.forEach((o, j) => {
+      if (i === j) return;
+      const ddx = xSc(d.x) - xSc(o.x), ddy = ySc(d.y) - ySc(o.y);
+      const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+      if (dist > 0.01 && dist < 9) {
+        dxJ += (ddx / dist) * 4.5;
+        dyJ += (ddy / dist) * 4.5;
+      } else if (dist <= 0.01 && i > j) {
+        dxJ += 5;
+      }
+    });
+    jitter[d.label] = { dx: dxJ, dy: dyJ };
+  });
+
   g.selectAll('.fp')
    .data(frontierPts).enter().append('circle')
    .attr('class','fp')
-   .attr('cx', d => xSc(d.x)).attr('cy', d => ySc(d.y))
+   .attr('cx', d => xSc(d.x) + jitter[d.label].dx).attr('cy', d => ySc(d.y) + jitter[d.label].dy)
    .attr('r', 5.5)
    .attr('fill', '#5b7a99')
    .attr('opacity', 0.85)
@@ -1899,8 +1925,8 @@ function renderFrontier(cur) {
   g.selectAll('.fp-label')
    .data(frontierPts.filter(d => d !== matched)).enter().append('text')
    .attr('class','fp-label')
-   .attr('x', d => xSc(d.x))
-   .attr('y', d => ySc(d.y) + (sorted.indexOf(d) % 2 === 0 ? -11 : 20))
+   .attr('x', d => xSc(d.x) + jitter[d.label].dx)
+   .attr('y', d => ySc(d.y) + jitter[d.label].dy - 11)
    .attr('text-anchor','middle')
    .attr('fill','#3a5670').attr('font-size',9.5).attr('font-weight','600')
    .attr('font-family','Helvetica Neue,Arial,sans-serif')
@@ -1964,8 +1990,16 @@ function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPe
    .attr('font-family', 'Helvetica Neue,Arial,sans-serif')
    .text('Wind + zon-penetratie (% van jaarvraag)');
 
+  const curX = xSc(Math.min(curPenPct, domainMax));
+  const crossX = crossing ? xSc(Math.min(crossing.pen, domainMax)) : null;
+  // Als de twee labels dicht bij elkaar liggen (bijv. seriebouw-omslagpunt ~70% en een
+  // Gebalanceerd-mix van 84%), voorkomt dit dat ze elkaar overlappen: het omslagpunt-label
+  // gaat dan boven de balk, het huidige-mix-label eronder.
+  const labelsClose = crossX !== null && Math.abs(curX - crossX) < 90;
+  const curLabelY = labelsClose ? barY + barH + 26 : barY - 16;
+
   if (crossing) {
-    const cx = xSc(Math.min(crossing.pen, domainMax));
+    const cx = crossX;
     g.append('line')
      .attr('x1', cx).attr('x2', cx).attr('y1', barY - 10).attr('y2', barY + barH + 10)
      .attr('stroke', '#8b5e34').attr('stroke-width', 2).attr('stroke-dasharray', '4,3');
@@ -1977,12 +2011,11 @@ function renderTipping(battery, interconn, curWindPen, curSolarPen, curNuclearPe
      .text(`Omslagpunt: ${Math.round(crossing.pen)}%`);
   }
 
-  const curX = xSc(Math.min(curPenPct, domainMax));
   g.append('circle')
    .attr('cx', curX).attr('cy', barY + barH / 2).attr('r', 7.5)
    .attr('fill', 'var(--ink)').attr('stroke', '#fff').attr('stroke-width', 2);
   g.append('text')
-   .attr('x', curX).attr('y', barY - 16)
+   .attr('x', curX).attr('y', curLabelY)
    .attr('text-anchor', curPenPct > domainMax * 0.85 ? 'end' : (curPenPct < domainMax * 0.15 ? 'start' : 'middle'))
    .attr('fill', 'var(--ink)').attr('font-size', 10.5).attr('font-weight', 700)
    .attr('font-family', 'Helvetica Neue,Arial,sans-serif')
@@ -2013,7 +2046,10 @@ function renderLDC(ldc) {
 
   const segs = ldc.segments;
   const names = segs.map(s => s.name);
-  const maxVal = d3.max(segs, s => s.demand) * 1.15;
+  // De grafiekhoogte moet niet alleen de vraag dekken, maar ook de rauwe productie (vóór
+  // curtailment) — bij veel curtailment (Overschot-uren hoog) ligt s.vre ruim boven s.demand,
+  // en zonder dit stak de "−X TWh curtail/export"-annotatie boven de grafiek uit.
+  const maxVal = Math.max(d3.max(segs, s => s.demand), d3.max(segs, s => s.vre || 0)) * 1.18;
 
   const xSc = d3.scaleBand().domain(names).range([0, iW]).padding(0.16);
   const ySc = d3.scaleLinear().domain([0, maxVal]).range([iH, 0]);
@@ -2066,8 +2102,17 @@ function renderLDC(ldc) {
   segs.forEach(s => {
     const x  = xSc(s.name);
     const bw = xSc.bandwidth();
+    // De brutoproductie (s.vre = wind+zon+kern) wordt eerst verkleind met wat is weggegooid
+    // (curtailment) of geëxporteerd, en dat verlies wordt proportioneel verdeeld over wind/
+    // zon/kern naar hun eigen aandeel — het model houdt niet bij wélke technologie exact
+    // gecurtaild wordt, dus dit is de eerlijkste beschikbare aanname.
+    const rawVre = s.vre || 0;
+    const shownVre = Math.max(0, rawVre - (s.curtail || 0) - (s.export || 0));
+    const shrink = rawVre > 0 ? shownVre / rawVre : 0;
     const layers = [
-      { key: 'vre',    val: Math.max(0, s.vre - (s.curtail || 0) - (s.export || 0)), col: '#1a6fa3' },
+      { key: 'wind',   val: (s.wind  || 0) * shrink, col: '#1a6fa3' },
+      { key: 'solar',  val: (s.solar || 0) * shrink, col: '#d4900a' },
+      { key: 'nuc',    val: (s.nuc   || 0) * shrink, col: '#b52a1c' },
       { key: 'gas',    val: s.gas    || 0, col: '#4a6358' },
       { key: 'batt',   val: s.batt > 0 ? s.batt : 0, col: '#1e8a4a' },
       { key: 'import', val: s.import || 0, col: '#7b3fa0' },
@@ -2224,16 +2269,29 @@ function renderAdequacy(adq) {
   const barH = 40;
   const barY = (iH - barH) / 2;
 
+  // De som van de apart afgeronde onderdelen kan een fractie (~0,1-0,3 GW) afwijken van het
+  // vereiste vermogen, puur door onafhankelijke afronding — niet omdat er echt een gat zit
+  // (de gasvloot is juist zo ontworpen dat 'ie dit sluit). Zonder correctie oogt dat als een
+  // wit gaatje tussen balk en vereiste-lijn, wat een tekort suggereert dat er niet is. Bij een
+  // klein verschil (afrondingsschaal) laten we de laatste balk exact doorlopen tot de lijn;
+  // bij een écht groter verschil (bijv. de 4 GW-ondergrens van de gasvloot bindt en er is
+  // bewust meer vermogen dan nodig) raken we niets aan.
+  const totalComponents = values.reduce((a, b) => a + b, 0);
+  const gapToRequired = adq.requiredGW - totalComponents;
+  const snapLastSegment = gapToRequired > 0 && gapToRequired < 0.6;
+
   let cum = 0;
   keys.forEach((k, i) => {
     const v = values[i];
+    const isLast = i === keys.length - 1;
+    const segEnd = isLast && snapLastSegment ? adq.requiredGW : cum + v;
     g.append('rect')
      .attr('x', xSc(cum)).attr('y', barY)
-     .attr('width', Math.max(0, xSc(cum + v) - xSc(cum) - 1)).attr('height', barH)
+     .attr('width', Math.max(0, xSc(segEnd) - xSc(cum) - 1)).attr('height', barH)
      .attr('fill', adequacyColors[k]);
-    if (xSc(cum + v) - xSc(cum) > 26) {
+    if (xSc(segEnd) - xSc(cum) > 26) {
       g.append('text')
-       .attr('x', xSc(cum) + (xSc(cum + v) - xSc(cum))/2).attr('y', barY + barH/2 + 4)
+       .attr('x', xSc(cum) + (xSc(segEnd) - xSc(cum))/2).attr('y', barY + barH/2 + 4)
        .attr('text-anchor','middle').attr('fill','#fff')
        .attr('font-size', 9.5).attr('font-weight','700')
        .attr('font-family','Helvetica Neue,Arial,sans-serif')
