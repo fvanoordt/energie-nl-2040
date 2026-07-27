@@ -1,7 +1,7 @@
 # Energieportfolio Nederland 2040
-### Interactief systeemkostenmodel voor de elektriciteitstransitie
+### Interactief systeemkostenmodel — en leerinstrument over systeemdenken in de elektriciteitstransitie
 
-> *Geen enkele technologie in dit systeem staat op zichzelf: meer wind drukt de prijs van wind, meer kern verandert wat batterijen waard zijn, meer interconnectie verschuift een probleem eerder dan dat het verdwijnt. Welke mix van wind, zon, batterijen, kernenergie, interconnectie en gas(+CCS) daaruit volgt, en wat die kost, is precies wat dit model laat zien.*
+> *Door de instellingen te variëren wordt zichtbaar waarom geen enkele technologie in dit systeem op zichzelf staat. Meer wind drukt de prijs van wind zelf. Kern die tijdens overaanbod doorproduceert, drukt zijn eigen terugverdientijd. Meer interconnectie verschuift een probleem eerder dan dat het verdwijnt. Dit instrument maakt die interactie zichtbaar voor de hele portfolio tegelijk. Het berekent de systeemkosten en onderlinge effecten van elke gekozen mix — geen optimale of aanbevolen uitkomst.*
 
 **→ [Open de tool](https://jouwnaam.github.io/energie-nl-2040)**
 
