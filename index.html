@@ -667,9 +667,9 @@
     <!-- KPI ROW -->
     <div class="kpi-row">
       <div class="kpi">
-        <span class="kpi-label">Systeemkosten (aanbodzijde)</span>
+        <span class="kpi-label">Systeemkosten (opwek)</span>
         <span class="kpi-value neut" id="kpi-cost">—</span>
-        <span class="kpi-sub">€/MWh all-in, incl. kannibalisering — excl. vraagzijde-netwerkkosten, zie voetnoot</span>
+        <span class="kpi-sub">€/MWh all-in, incl. kannibalisering — excl. transportnetten (net op zee, hoogspanning) en vraagzijde, zie voetnoot</span>
         <span class="kpi-sub" id="kpi-cost-delta" style="display:block; margin-top:0.3rem; font-weight:600;">—</span>
       </div>
       <div class="kpi">
@@ -834,7 +834,7 @@
 </div>
 
 <div class="footnote" id="footnote">
-  <strong>Systeemkosten — reikwijdte:</strong> dit model omvat aanbodzijde-effecten: curtailment, flexibiliteitspremie, capaciteitsmechanisme en interconnectie-infrastructuur. Vraagzijde-netwerkkosten — verzwaring van regionale netten voor warmtepompen, EV-laadinfrastructuur en industriële elektrificiatie — zijn niet meegenomen. Deze kosten zijn grotendeels technologieneutraal: ze komen sowieso, ongeacht de gekozen opwekmix, en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern daardoor nauwelijks. <strong>Nederland wordt in dit model behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen</strong> — redispatch-kosten om lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) op te lossen zitten er dus niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten (zie disclaimer, about-pagina).
+  <strong>Systeemkosten — reikwijdte:</strong> dit model rekent aan de opwek-kant: curtailment, flexibiliteitspremie, capaciteitsmechanisme en grensoverschrijdende interconnectie (import/export met buurlanden). Het binnenlandse transportnet — zowel de aanlanding van wind op zee als het hoogspanningsnet op land — én vraagzijde-distributienetten (warmtepompen, EV-laadinfrastructuur, industriële elektrificatie) vallen buiten scope. Zie about-pagina voor de omvang hiervan (FIEN26-cijfers) en waarom dit niet voor elke technologie even neutraal is. <strong>Nederland wordt in dit model behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen</strong> — redispatch-kosten om lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) op te lossen zitten er dus niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten (zie disclaimer, about-pagina).
   <br><br>
   <strong>Methodiek — kannibalisering:</strong> effectieve LCOE = standalone LCOE × (1 + kannibalisatiefactor). Kannibalisatiefactor wind: gebaseerd op Hirth (2013/2015) value factor curves, gecalibreerd op €117/MWh basisprijs (NL kabinetsbrief 2025) en geschatte WACC-opslag bij lage verwachte marktprijzen. Kannibalisatiefactor kern: idem, maar extra gewogen voor 25-jarige blootstelling aan wind/zon-rijke markt + infrastructuurkosten (kabels, koelwater, netaansluiting zware last).
   <br><br>
@@ -870,6 +870,16 @@
     <p style="font-size:0.75rem; color:var(--muted); border-left:3px solid var(--rule); padding-left:0.7rem;">
       Elk getal hieronder is gemerkt met zijn herkomst: 🔬 = direct ontleend aan een bron (literatuur, overheidscijfer, marktdata) · 📊 = berekend/gekalibreerd binnen dit model, deels op basis van zo'n bron · ⚙️ = werkaanname of expert-inschatting, (nog) niet aan een externe bron te toetsen.
     </p>
+
+    <div style="border:1.5px solid var(--ink); border-radius:3px; padding:1rem 1.2rem; margin:1.3rem 0; background:#fafafa;">
+      <h2 style="margin-top:0;">Wat dit model niet beprijst: grote infrastructuur</h2>
+      <p>Dit model rekent aan de opwek-kant: LCOE, kannibalisering, capaciteitsmechanisme, grensoverschrijdende interconnectie. Drie categorieën grote infrastructuur vallen daarbuiten — en anders dan vraagzijde-distributienetten zijn de eerste twee niet technologieneutraal: ze hangen specifiek aan de technologie die ze veroorzaakt, niet aan de portfoliokeuze als geheel.</p>
+      <p><strong>Net op Zee (aanlanding wind op zee):</strong> de kabels en platforms die windstroom van zee naar de kust brengen. Volgens FIEN26 (Netbeheer Nederland/PwC, maart 2026) gaat het om circa €22,6 mld tot 2040 — sterk afhankelijk van het gekozen aanlandingsscenario (30 GW versus 40 GW verschilt op zichzelf al €34 mld). Dit is aanbodzijde-infrastructuur die specifiek aan wind offshore hangt, niet aan zon, kern of batterij. Ontbreekt deze kost, dan oogt wind in dit model relatief goedkoper dan in werkelijkheid het geval is.</p>
+      <p><strong>Kern-specifieke locatie-infrastructuur:</strong> een kerncentrale vraagt, afhankelijk van de uiteindelijke locatie, mogelijk aanzienlijke investeringen in koelwatervoorzieningen en een netaansluiting op maat. Dit model gebruikt een generieke LCOE (€160/€70 per MWh, zie Technologiekosten) die geen locatiespecifieke aansluitkosten bevat — simpelweg omdat de locatie van het kabinetsplan nog niet definitief is en dus niet te kwantificeren.</p>
+      <p><strong>Binnenlands hoogspanningstransport (EHS/HS/TS):</strong> het vervoer van stroom dwars door het land, van opwek- naar verbruikslocaties. Volgens FIEN26 circa €54,5 mld tot 2040 — een gemengde post, deels toe te schrijven aan opwek-transport en deels aan vraagdistributie, en daarom lastig eenduidig aan één technologie of aan "aanbodzijde" dan wel "vraagzijde" toe te wijzen.</p>
+      <p>Ter vergelijking: vraagzijde-distributienetten (MS/LS — regionale netverzwaring voor warmtepompen, EV-laadinfrastructuur, industriële elektrificatie) zijn wél grotendeels technologieneutraal — circa €134,4 mld volgens FIEN26, maar deze kosten komen sowieso, ongeacht welke opwekmix je kiest, en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern daardoor nauwelijks. Dat maakt ze terecht buiten scope voor wat dit model wél probeert te laten zien — al drukken ze in werkelijkheid wel degelijk op de totale energierekening.</p>
+      <p style="font-size:0.78rem; color:var(--muted);">Bron voor alle bovenstaande bedragen: <em>Financiële Impact van het Energiebeleid voor Netbeheerders 2026</em> (FIEN26), PwC Strategy& in opdracht van Netbeheer Nederland, 27 maart 2026. Totale netto-investeringsopgave elektriciteit 2026-2040 volgens dat rapport: €212 mld, met een sensitiviteitsbandbreedte van €169-302 mld — de bedragen hierboven zijn dus indicatief, niet een precieze voorspelling.</p>
+    </div>
 
     <h2>Technologiekosten</h2>
     <table>

@@ -29,7 +29,7 @@ De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwa
 
 ### Zes KPI's per portfoliomix
 
-> **Reikwijdte systeemkosten:** dit model omvat aanbodzijde-effecten (curtailment, flexibiliteitspremie, interconnectie-infrastructuur, capaciteitsmechanisme). Vraagzijde-netwerkkosten voor warmtepompen, EV en industriële elektrificatie zijn buiten scope qua netwerkkosten — de vráág die warmtepompen genereren zit wél in het model (zie "Elektriciteitsvraag 2040" hieronder). Nederland wordt behandeld als één knooppunt zonder interne transportbeperkingen ("koperen plaat") — redispatch-kosten voor lokale netcongestie zitten er dus niet in (zie Beperkingen).
+> **Reikwijdte systeemkosten:** dit model rekent aan de opwek-kant (curtailment, flexibiliteitspremie, capaciteitsmechanisme, grensoverschrijdende interconnectie). Het binnenlandse transportnet — aanlanding wind op zee én hoogspanningsnet op land — én vraagzijde-distributienetten (warmtepompen, EV, industriële elektrificatie) zijn buiten scope qua netwerkkosten — de vráág die warmtepompen genereren zit wél in het model (zie "Elektriciteitsvraag 2040" hieronder). Zie "Wat dit model niet beprijst: grote infrastructuur" verderop voor de omvang hiervan (FIEN26-cijfers) en waarom dit niet voor elke technologie even neutraal is. Nederland wordt behandeld als één knooppunt zonder interne transportbeperkingen ("koperen plaat") — redispatch-kosten voor lokale netcongestie zitten er dus niet in (zie Beperkingen).
 
 | KPI | Wat het meet |
 |---|---|
@@ -96,6 +96,22 @@ Bij hoge VRE-penetratie draait de gasvloot te weinig uren om zichzelf via de ene
 ### Het omslagpunt
 
 Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit omslagpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 70-71% wind+zon-penetratie.
+
+---
+
+## Wat dit model niet beprijst: grote infrastructuur
+
+Dit model rekent aan de opwek-kant: LCOE, kannibalisering, capaciteitsmechanisme, grensoverschrijdende interconnectie. Drie categorieën grote infrastructuur vallen daarbuiten — en anders dan vraagzijde-distributienetten zijn de eerste twee niet technologieneutraal: ze hangen specifiek aan de technologie die ze veroorzaakt, niet aan de portfoliokeuze als geheel.
+
+**Net op Zee (aanlanding wind op zee):** de kabels en platforms die windstroom van zee naar de kust brengen. Volgens FIEN26 (Netbeheer Nederland/PwC, maart 2026) gaat het om circa €22,6 mld tot 2040 — sterk afhankelijk van het gekozen aanlandingsscenario (30 GW versus 40 GW verschilt op zichzelf al €34 mld). Dit is aanbodzijde-infrastructuur die specifiek aan wind offshore hangt, niet aan zon, kern of batterij. Ontbreekt deze kost, dan oogt wind in dit model relatief goedkoper dan in werkelijkheid het geval is.
+
+**Kern-specifieke locatie-infrastructuur:** een kerncentrale vraagt, afhankelijk van de uiteindelijke locatie, mogelijk aanzienlijke investeringen in koelwatervoorzieningen en een netaansluiting op maat. Dit model gebruikt een generieke LCOE (€160/€70 per MWh) die geen locatiespecifieke aansluitkosten bevat — simpelweg omdat de locatie van het kabinetsplan nog niet definitief is en dus niet te kwantificeren.
+
+**Binnenlands hoogspanningstransport (EHS/HS/TS):** het vervoer van stroom dwars door het land, van opwek- naar verbruikslocaties. Volgens FIEN26 circa €54,5 mld tot 2040 — een gemengde post, deels toe te schrijven aan opwek-transport en deels aan vraagdistributie, en daarom lastig eenduidig aan één technologie of aan "aanbodzijde" dan wel "vraagzijde" toe te wijzen.
+
+Ter vergelijking: vraagzijde-distributienetten (MS/LS — regionale netverzwaring voor warmtepompen, EV-laadinfrastructuur, industriële elektrificatie) zijn wél grotendeels technologieneutraal — circa €134,4 mld volgens FIEN26, maar deze kosten komen sowieso, ongeacht welke opwekmix je kiest, en beïnvloeden de onderlinge vergelijking tussen wind, zon en kern daardoor nauwelijks. Dat maakt ze terecht buiten scope voor wat dit model wél probeert te laten zien — al drukken ze in werkelijkheid wel degelijk op de totale energierekening.
+
+*Bron voor alle bovenstaande bedragen: Financiële Impact van het Energiebeleid voor Netbeheerders 2026 (FIEN26), PwC Strategy& in opdracht van Netbeheer Nederland, 27 maart 2026. Totale netto-investeringsopgave elektriciteit 2026-2040 volgens dat rapport: €212 mld, met een sensitiviteitsbandbreedte van €169-302 mld — de bedragen hierboven zijn dus indicatief, niet een precieze voorspelling.*
 
 ---
 
