@@ -800,13 +800,15 @@
         <div class="legend-item" style="color:#999; font-size:0.72rem;">* Overschot-uren (matig): bij lage bouw ook een klein tekort mogelijk — dan vult gas dat aan, geen gat in de balk</div>
       </div>
       <div class="kpi-sub" style="margin-top:0.8rem; padding-top:0.7rem; border-top:1px solid var(--rule);">
-        <strong style="font-size:1.05rem; color:var(--ink)">Niet-fossiel aandeel van de jaarvraag: <span id="ldc-nonfossil-pct">—</span>%</strong>
+        <strong style="font-size:1.05rem; color:var(--ink)">Niet-fossiel aandeel van de jaarvraag: <span id="ldc-nonfossil-pct">—</span>%*</strong>
         <br>
         <span style="color:#6b6b6b; font-size:0.72rem;">wind + zon + kern + batterij (die zelf alleen niet-fossiele elektronen opslaat en teruglevert) — exclusief import (herkomst onbekend/gemengd) en Gas(+CCS)</span>
         <br><br>
-        <strong style="font-size:1.05rem; color:var(--ink)">Klimaatneutraal aandeel: <span id="ldc-climateneutral-pct">—</span>%</strong>
+        <strong style="font-size:1.05rem; color:var(--ink)">Klimaatneutraal aandeel: <span id="ldc-climateneutral-pct">—</span>%*</strong>
         <br>
         <span style="color:#6b6b6b; font-size:0.72rem;">idem, plus het afgevangen deel van Gas+CCS (90% capture rate) — sluit aan bij het officiële "klimaatneutraal energiesysteem 2040/2050"-doel, dat kern én afgevangen CO₂ toestaat. Ter referentie: het Klimaatakkoord-doel is 70% <em>hernieuwbaar</em> (excl. kern) in 2030, niet 90-100% niet-fossiel in 2040 — en zelfs dat 70%-doel is in de laatste KEV-raming al bijgesteld naar 60%.</span>
+        <br><br>
+        <span style="color:#999; font-size:0.72rem;">* Beide percentages zijn vermoedelijk een lichte onderschatting — indicatief 3-5 procentpunt. De wind-capaciteitsfactor per segment is een directe, kwalitatieve schatting, niet afgeleid uit een volledige Weibull-verdeling van windsnelheden. Door de vorm van de vermogenscurve van een turbine (sterk oplopend tot aan de rated speed, dan vlak) onderschat dat vooral de Krapte-segmenten — precies waar dit verschil telt, want daar vult gas nu aan wat er in werkelijkheid al iets meer wind zou zijn. Zie about-pagina.</span>
       </div>
     </div>
 
@@ -968,6 +970,7 @@
     <h2>Niet-fossiel aandeel van de jaarvraag</h2>
     <p>Direct onder de grafiek hierboven staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie (<code>totalVRETWh</code>) wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd — mogelijk deels fossiel bij de buren), en Gas(+CCS) evenmin. Rekensom: <code>(totalVRETWh − curtailment − export) / vraag</code>. Dit is getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in <code>tests.js</code>.</p>
     <p><strong>Waarom een tweede getal ernaast staat:</strong> "niet-fossiel" (strikt gedefinieerd, wind+zon+kern+batterij) is met opzet een strenge maatstaf, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.675 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), niet een modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040" — het Klimaatakkoord noemt 70% <em>hernieuwbaar</em> (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate, zie Technologiekosten): <code>niet-fossiel + gasCcsTWh × 0,90</code>, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.</p>
+    <p><strong>Bekende resterende onderschatting (~3-5 procentpunt):</strong> de wind-capaciteitsfactor per segment is direct en kwalitatief gekozen ("hoe winderig is dit segment"), niet afgeleid uit een volledige Weibull-verdeling van windsnelheden geïntegreerd over de vermogenscurve van een turbine. Die curve is sterk oplopend (ruwweg met de derde macht van de windsnelheid) tot aan de rated speed, en vervolgens vlak. Bij een gemiddelde windsnelheid ín dat oplopende deel levert een volledige verdeling structureel méér energie op dan je zou schatten door simpelweg "het vermogen bij de gemiddelde windsnelheid" te nemen — Jensen's ongelijkheid, een bekend effect in windenergie-onderzoek. Een illustratieve berekening met reële Noordzee Weibull-parameters (K13-platform, vorm k≈2,2, schaal≈9 m/s) laat het effect zien: rond de 8 m/s gemiddelde windsnelheid is het verschil ordegrootte een factor 2 (14% vs. 29% capaciteitsfactor). Dit treft vooral de <strong>Krapte-segmenten</strong> (waar de curve nog convex is) — niet Overschot-uren (hoog), waar de gemiddelde windsnelheid al dicht bij de rated speed ligt en de curve juist afvlakt (een naïeve schatting kan dáár eerder te hóóg dan te laag uitvallen). Een voorzichtige, illustratieve gevoeligheidstest (Krapte-segmenten +33-35%, conservatief t.o.v. het volledige berekende effect) laat de niet-fossiel- en klimaatneutraal-percentages met circa 3-5 procentpunt stijgen. Dit is nog niet doorgevoerd in het model zelf: daarvoor is een gevalideerde naafhoogte-Weibull-verdeling (~100-140m, moderne turbines) nodig, plus een verdedigbare vertaling van marktsegment naar windsnelheidsbereik — de hierboven gebruikte bron meet op een lagere hoogte dan moderne turbinenaven. Tot die validatie er is: reken bij "waarom kom ik niet boven de 75-77%"-discussies met een indicatieve +3 à +5 procentpunt.</p>
 
     <h2>Interconnectiekosten</h2>
     <p>Interconnectie is geen gratis optie: <strong>€1,75 mld/GW</strong> infrastructuur (gemiddelde €1,5–2 mrd, geannualiseerd over 40 jaar), plus een importpremie die oploopt bij Europabrede windstilte — als Nederland importeert tijdens dark doldrums, zijn Duitsland, België en Denemarken vaak in dezelfde situatie.</p>
@@ -2242,14 +2245,20 @@ function renderLDC(ldc) {
        .text(`→ export: ${s.export} TWh`);
     }
 
-    // Curtailment (hashed, above demand line if present)
+    // Curtailment (hashed, above demand line if present) — bij een klein curtailment-bedrag
+    // ligt vre vlak boven de vraag, waardoor dit label en het vraag-label anders overlappen.
+    const demandLabelY = ySc(s.demand) - 5;
     if (s.curtail > 0) {
       g.append('rect')
        .attr('x', x).attr('y', ySc(s.vre))
        .attr('width', bw).attr('height', Math.max(0, ySc(s.vre - s.curtail) - ySc(s.vre)))
        .attr('fill', 'url(#hatch)').attr('stroke','#999').attr('stroke-width',0.5);
+      let curtailLabelY = ySc(s.vre) - 4;
+      if (Math.abs(curtailLabelY - demandLabelY) < 14) {
+        curtailLabelY = demandLabelY - 14;
+      }
       g.append('text')
-       .attr('x', x + bw/2).attr('y', ySc(s.vre) - 4)
+       .attr('x', x + bw/2).attr('y', curtailLabelY)
        .attr('text-anchor','middle').attr('fill','#888').attr('font-size',9)
        .attr('font-family','Helvetica Neue,Arial,sans-serif')
        .text(`−${s.curtail} TWh curtail/export`);
@@ -2257,7 +2266,7 @@ function renderLDC(ldc) {
 
     // Demand label
     g.append('text')
-     .attr('x', x + bw/2).attr('y', ySc(s.demand) - 5)
+     .attr('x', x + bw/2).attr('y', demandLabelY)
      .attr('text-anchor','middle').attr('fill','#1a1a1a').attr('font-size',9)
      .attr('font-weight','700').attr('font-family','Helvetica Neue,Arial,sans-serif')
      .text(`Vraag: ${s.demand} TWh`);
