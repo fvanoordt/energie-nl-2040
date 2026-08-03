@@ -796,6 +796,8 @@
         <div class="legend-item"><div class="leg-line" style="background:#1e8a4a"></div>Batterij ↕</div>
         <div class="legend-item"><div class="leg-line" style="background:#a0c4e8"></div>Export naar buurlanden</div>
         <div class="legend-item"><div class="leg-line" style="background:#ccc; border:1px dashed #999"></div>Curtailment/export — in praktijk grotendeels curtailment (buurlanden zelfde surplus)</div>
+        <div class="legend-item" style="color:#999; font-size:0.72rem;">Balkbreedte volgt het aantal uren/jaar (gedempt) — een echte load duration curve heeft geen gelijke segmenten</div>
+        <div class="legend-item" style="color:#999; font-size:0.72rem;">* Overschot-uren (matig): bij lage bouw ook een klein tekort mogelijk — dan vult gas dat aan, geen gat in de balk</div>
       </div>
       <div class="kpi-sub" style="margin-top:0.8rem; padding-top:0.7rem; border-top:1px solid var(--rule);">
         <strong style="font-size:1.05rem; color:var(--ink)">Niet-fossiel aandeel van de jaarvraag: <span id="ldc-nonfossil-pct">—</span>%</strong>
@@ -893,13 +895,13 @@
       <tr><td>🔬 Batterijen + V2G</td><td>€95/MWh</td><td>Volledige cycluskost (LCOS, 2040-schatting) incl. bidirectioneel laden EVs — toegepast op de daadwerkelijk geladen energie (niet op de GWh-capaciteit zelf), zichtbaar als aparte regel "Batterij (cycluskost)" in het Kostenopbouw-paneel. Geen aparte kapitaalslast elders — dit ís de volledige kostprijs.</td></tr>
     </table>
     <p style="font-size:0.78rem; color:var(--muted);"><strong>Waarom gas wél een prijsscenario heeft en wind/zon/kern niet:</strong> die laatste drie lopen via LCOE + de eigen kannibaliseringscurve van dit model — geen van beide is ooit tegen een waargenomen marktprijs getoetst. Gas is de enige technologie waar dit model iets in de buurt van een marktprijs-benadering gebruikt (brandstof+CO₂, met TTF als impliciete referentie), en gasprijzen zijn nu eenmaal aantoonbaar volatiel (van ~€20/MWh tot >€100/MWh binnen enkele jaren) — vandaar dat alleen hier een expliciete bandbreedte zinvol is. De CCS-meerkost blijft in alle drie scenario's exact €58, omdat die over capex voor afvang/opslag/transport gaat, niet over brandstof.</p>
-    <p style="font-size:0.78rem; color:var(--muted);"><strong>Mogelijke overlap bij wind offshore:</strong> SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag (hieronder) rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €7-8/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar klein (~€2-3/MWh). Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €17-50/MWh — vrijwel volledig nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten. Het aandeel dat dus mogelijk dubbel telt, is beperkt tot een paar euro bij lage/gematigde bouw; de kernboodschap van dit model (kannibalisering loopt sterk op bij hoge penetratie) staat erbuiten.</p>
+    <p style="font-size:0.78rem; color:var(--muted);"><strong>Mogelijke overlap bij wind offshore:</strong> SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag (hieronder) rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €17-24/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar nog altijd bescheiden (~€12-19/MWh) ten opzichte van wat er bij hogere penetratie bijkomt. Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €26-85/MWh — grotendeels nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten. Het aandeel dat dus mogelijk dubbel telt, is beperkt tot de eerste €5-8/MWh bij minimale bouw; de kernboodschap van dit model (kannibalisering loopt sterk op bij hoge penetratie) staat erbuiten.</p>
 
     <h2>Systeemkosten in € miljard/jaar — vergelijking, geen norm</h2>
     <p>Onder de Systeemkosten-KPI staat een verschil in € miljard/jaar t.o.v. een referentiescenario. Dat referentiescenario kies je zelf via de knop "Huidig scenario vastzetten als referentie" — standaard staat die op "Gebalanceerd", maar dat is een neutraal startpunt, geen ingebouwde norm voor wat een portfolio "zou moeten" kosten. Het verschil isoleert het effect van de portfoliokeuze: de referentie wordt herrekend met dezelfde vraag en dezelfde kern-bouwaanname als je huidige instelling, zodat je niet per ongeluk twee dingen tegelijk vergelijkt. <strong>Verandert alleen de vraag (het Elektriciteitsvraag 2040-keuzemenu), dan verandert dit miljarden-verschil bewust niet</strong> — het isoleert namelijk specifiek de aanbodzijde-keuze, niet de vraagaanname. De systeemkosten-KPI zelf (€/MWh) reageert wél op de vraag, en vaak fors: zie hieronder waarom.</p>
 
     <h2>Waarom een lagere vraag de €/MWh-kosten kan verhógen</h2>
-    <p>Verander je alleen het vraagscenario (bijv. van Midden naar Laag) zonder de sliders aan te passen, dan kunnen de systeemkosten per MWh flink stijgen — bij Gebalanceerd van €149 naar €177/MWh bij een overstap van 160 naar 120 TWh. Dat is geen omissie maar een reëel effect: dezelfde 22 GW wind en 38 GW zon die bij 160 TWh vraag een bepaald aandeel vormen, vormen bij 120 TWh vraag een aanzienlijk hóger aandeel — dezelfde capaciteit moet een kleinere taart dekken. Hogere effectieve penetratie betekent hogere kannibalisering (meer surplus-uren, meer curtailment) én hogere interconnectiekosten per geleverde MWh. Vaste infrastructuurkosten (capaciteitsmechanisme, interconnectie) worden bovendien over minder MWh omgeslagen. Kortom: een vraagscenario kiezen is niet neutraal ten opzichte van een reeds gekozen opwekmix — de twee zijn niet onafhankelijk, precies zoals de rest van dit model laat zien dat niets dat is.</p>
+    <p>Verander je alleen het vraagscenario (bijv. van Midden naar Laag) zonder de sliders aan te passen, dan kunnen de systeemkosten per MWh flink stijgen — bij Gebalanceerd van €167 naar €197/MWh bij een overstap van 160 naar 120 TWh. Dat is geen omissie maar een reëel effect: dezelfde 22 GW wind en 38 GW zon die bij 160 TWh vraag een bepaald aandeel vormen, vormen bij 120 TWh vraag een aanzienlijk hóger aandeel — dezelfde capaciteit moet een kleinere taart dekken. Hogere effectieve penetratie betekent hogere kannibalisering (meer surplus-uren, meer curtailment) én hogere interconnectiekosten per geleverde MWh. Vaste infrastructuurkosten (capaciteitsmechanisme, interconnectie) worden bovendien over minder MWh omgeslagen. Kortom: een vraagscenario kiezen is niet neutraal ten opzichte van een reeds gekozen opwekmix — de twee zijn niet onafhankelijk, precies zoals de rest van dit model laat zien dat niets dat is.</p>
     <p><strong>Precisie:</strong> het bedrag is afgerond op €0,1 miljard en is indicatief — het model heeft, zoals hierboven en in de beperkingen beschreven, geen precisie op individuele-euro-niveau (curtailment-onderschatting, werkaannames voor het capaciteitsmechanisme, een vereenvoudigd correlatiemodel). Een miljardenbedrag oogt overtuigender dan een €/MWh-verschil, maar heeft dezelfde onderliggende onzekerheid — behandel het als orde van grootte, niet als exacte prognose.</p>
 
     <h2>Vermogensadequaatheid — endogene gasvloot</h2>
@@ -935,17 +937,17 @@
     </table>
 
     <h2>Twee kern-bouwrealiteiten, geen bandbreedte</h2>
-    <p>Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen. Het zijn twee aantoonbaar verschillende bouwrealiteiten: Westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen en herhaalde constructie op één ontwerp (Barakah: kosten van eenheid 4 lagen ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma <em>zou kunnen</em> opleveren, niet wat een eerste 1-2 centrales op zichzelf bereiken. De toggle in de besturing verandert de kern-LCOE overal in de tool (kostenopbouw, KPI's, omslagpuntgrafiek) — inclusief het omslagpunt zelf, dat bij €160 al bij de laagste geteste penetratie ligt en pas bij €70 rond 70-71% wind+zon-penetratie uitkomt.</p>
+    <p>Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen. Het zijn twee aantoonbaar verschillende bouwrealiteiten: Westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen en herhaalde constructie op één ontwerp (Barakah: kosten van eenheid 4 lagen ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma <em>zou kunnen</em> opleveren, niet wat een eerste 1-2 centrales op zichzelf bereiken. De toggle in de besturing verandert de kern-LCOE overal in de tool (kostenopbouw, KPI's, omslagpuntgrafiek) — inclusief het omslagpunt zelf, dat bij €160 al bij de laagste geteste penetratie ligt en pas bij €70 rond 55% wind+zon-penetratie uitkomt.</p>
 
     <h2>Kannibaliseringsopslag</h2>
     <p>Standalone LCOE's missen het centrale probleem: naarmate penetratie stijgt, dalen marktprijzen precies op de uren dat een technologie produceert. Dit verlengt terugverdientijden en verhoogt via hogere WACC de effectieve kapitaalkosten.</p>
     <p><strong>Precisering:</strong> het model bevat geen aparte, oplopende WACC-variabele die je in de broncode zou kunnen terugvinden. Marktwaardedepreciatie (lagere realisatieprijs) en het hogere financieringsrisico (hogere WACC) zijn samen verwerkt in één opslagfactor per technologie — de tabel hieronder. Dat is een bewuste vereenvoudiging: de twee effecten zijn in de praktijk moeilijk te scheiden en werken in dezelfde richting, maar het betekent wel dat "WACC" hier een verklarend concept is, geen apart gemodelleerde grootheid.</p>
-    <p><strong>Waarom deze tekst het over marktprijzen heeft, terwijl het model ze niet berekent:</strong> bij 6,4 GW wind (vandaag, geen nieuwbouw) is er vrijwel geen overschot — de opslag op wind bedraagt €5/MWh. Bij 35 GW (het maximumscenario van deze tool) loopt het overschot-aandeel in de overschot-uren op tot 56%, en stijgt diezelfde opslag naar €51/MWh. Die stijging komt volledig uit een volumeverhouding — TWh overschot gedeeld door TWh vraag — vermenigvuldigd met een vaste, vooraf gekalibreerde parameter (45% bij vol overschot, zie tabel hieronder); er wordt nergens een marktprijs berekend. Waarom dan toch over marktprijzen praten? Omdat dát de werkelijke, onderliggende reden is waaróm meer overschot een technologie duurder maakt: in de praktijk daalt de day-ahead-prijs tijdens overaanbod-uren, soms tot nul of negatief, en die prijsval treft alle MWh die op dat moment wordt geproduceerd — niet alleen de MWh die uiteindelijk wordt gecurtailed. Curtailment is het uiterste symptoom van datzelfde prijseffect (de prijs is zo laag dat er geen koper meer is), niet de oorzaak zelf. De vaste parameters hieronder zijn ooit gekalibreerd tegen Hirth's marktwaarde-onderzoek (2013/2015) — de marktprijslogica zit dus wél verwerkt, maar in die kalibratie, niet in een live berekening. Precies zoals de rest van dit model laat zien dat niets op zichzelf staat: ook de aannames achter de aannames zijn geen losse getallen, maar afgeleid van een onderliggend mechanisme.</p>
+    <p><strong>Waarom deze tekst het over marktprijzen heeft, terwijl het model ze niet berekent:</strong> bij 6,4 GW wind (vandaag, geen nieuwbouw) is er vrijwel geen overschot — de opslag op wind bedraagt €5/MWh. Bij 35 GW (het maximumscenario van deze tool) loopt het overschot-aandeel in de overschot-uren op tot 84%, en stijgt diezelfde opslag naar €68/MWh. Die stijging komt volledig uit een volumeverhouding — TWh overschot gedeeld door TWh vraag — vermenigvuldigd met een vaste, vooraf gekalibreerde parameter (45% bij vol overschot, zie tabel hieronder); er wordt nergens een marktprijs berekend. Waarom dan toch over marktprijzen praten? Omdat dát de werkelijke, onderliggende reden is waaróm meer overschot een technologie duurder maakt: in de praktijk daalt de day-ahead-prijs tijdens overaanbod-uren, soms tot nul of negatief, en die prijsval treft alle MWh die op dat moment wordt geproduceerd — niet alleen de MWh die uiteindelijk wordt gecurtailed. Curtailment is het uiterste symptoom van datzelfde prijseffect (de prijs is zo laag dat er geen koper meer is), niet de oorzaak zelf. De vaste parameters hieronder zijn ooit gekalibreerd tegen Hirth's marktwaarde-onderzoek (2013/2015) — de marktprijslogica zit dus wél verwerkt, maar in die kalibratie, niet in een live berekening. Precies zoals de rest van dit model laat zien dat niets op zichzelf staat: ook de aannames achter de aannames zijn geen losse getallen, maar afgeleid van een onderliggend mechanisme.</p>
     <table>
       <tr><th>Technologie</th><th>Opslag: Gebalanceerd-scenario / max. binnen sliderbereik</th><th>Reden</th></tr>
-      <tr><td>📊 Wind</td><td>+15% / +27%</td><td>Gecorreleerde productie bij hoge windsnelheid</td></tr>
-      <tr><td>📊 Zon</td><td>+20% / +33%</td><td>Sterke dagcorrelatie, zomermiddag-concentratie</td></tr>
-      <tr><td>📊 Kern</td><td>+20% / +53%</td><td>25-jarige blootstelling + baseload-inflexibiliteit in flexibel systeem</td></tr>
+      <tr><td>📊 Wind</td><td>+22% / +39%</td><td>Gecorreleerde productie bij hoge windsnelheid</td></tr>
+      <tr><td>📊 Zon</td><td>+31% / +51%</td><td>Sterke dagcorrelatie, zomermiddag-concentratie</td></tr>
+      <tr><td>📊 Kern</td><td>+31% / +70%</td><td>25-jarige blootstelling + baseload-inflexibiliteit in flexibel systeem</td></tr>
     </table>
     <p style="font-size:0.75rem; color:var(--muted);">Dit zijn geteste waarden binnen het bereik van de sliders (niet de theoretische asymptoot van de onderliggende schaalparameters, die hoger ligt maar in de praktijk — door batterij-, gas- en interconnectie-absorptie — nooit wordt bereikt).</p>
     <p><strong>Interconnectie dempt dit niet gelijk voor wind en zon.</strong> Stiewe, Xu, Eicke & Hirth (2025) schatten in een panelanalyse van 30 Europese biedzones (2015-2023) dat interconnectie de eigen kannibalisering van wind sterker dempt dan het de prijsdruk van gecorreleerde buurlanden-opwek verergert — een reëel netto-voordeel. Voor zon vallen die twee effecten vrijwel exact tegen elkaar weg: <em>"these two effects almost exactly cancel each other out."</em> Het model past interconnectie-demping daarom voor wind vrijwel volledig toe, voor zon slechts voor een klein residu (10%).</p>
@@ -958,7 +960,7 @@
       <tr><td><strong>Schaarste-uren</strong></td><td>~500</td><td>Weinig wind/zon, hoge vraag — <em>dark doldrums</em></td><td>Gas(+CCS), kern, import</td></tr>
       <tr><td><strong>Krapte-uren (meerdaags)</strong></td><td>~1.475</td><td>Aanhoudend lagere wind over meerdere dagen, geen dagcyclus om op te laden</td><td>Gas, kern — batterij hier het minst nuttig</td></tr>
       <tr><td><strong>Krapte-uren (dagcyclus)</strong></td><td>~1.700</td><td>Zon weg (avond/nacht), wind rond gemiddeld — voorspelbaar dagpatroon</td><td>Batterij (voorkeur), wind, gas</td></tr>
-      <tr><td><strong>Overschot-uren (matig)</strong></td><td>~2.000</td><td>Redelijk wind/zon, gemiddelde vraag — surplus mogelijk</td><td>Wind+zon, export, batterijlading</td></tr>
+      <tr><td><strong>Overschot-uren (matig)</strong></td><td>~2.000</td><td>Redelijk wind/zon, gemiddelde vraag — surplus mogelijk, bij lage bouw ook een klein tekort mogelijk</td><td>Wind+zon, export, batterijlading (soms gas)</td></tr>
       <tr><td><strong>Overschot-uren (hoog)</strong></td><td>~3.085</td><td>Veel wind/zon, lage vraag</td><td>Curtailment/export, batterijlading</td></tr>
     </table>
     <p style="font-size:0.78rem; color:var(--muted);">De knip tussen de twee krapte-segmenten (1.700/1.475 uur, iets asymmetrisch i.p.v. 1.600/1.600) is een beargumenteerde inschatting op basis van gepubliceerde persistentie-statistiek, geen berekening uit Nederlandse historische uurdata — dit model bevat geen meetreeks, dus een exacte afleiding is hier niet mogelijk.</p>
@@ -1342,11 +1344,18 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   // Gewogen CF per segment — wind offshore heeft hogere CF dan onshore.
   // Krapte-uren (dagcyclus) heeft een iets hogere CF dan Krapte-uren (meerdaags) — dat
   // verschil ís precies waarom de twee apart bestaan (zie P-blok voor de onderbouwing).
-  const cfA    = offFrac*0.12*P.windOffCF + onFrac*0.12*P.windOnCF;
-  const cfB1   = offFrac*0.85*P.windOffCF + onFrac*0.70*P.windOnCF;
-  const cfB2a  = offFrac*0.50*P.windOffCF + onFrac*0.40*P.windOnCF; // dagcyclus
-  const cfB2b  = offFrac*0.38*P.windOffCF + onFrac*0.28*P.windOnCF; // meerdaags — lagere wind
-  const cfC    = offFrac*0.72*P.windOffCF + onFrac*0.60*P.windOnCF;
+  // Capacity factor per segment — direct afgeleid uit de eigen omschrijving van elk segment
+  // (niet teruggerekend vanuit een gewenst jaargemiddelde). Wind volgt een "duration curve"-
+  // redenering: van vrijwel windstil (Schaarste) tot behoorlijk winderig (Overschot-hoog),
+  // waarbij "Krapte-uren (dagcyclus)" expliciet is gedefinieerd als "wind gemiddeld" en dus
+  // dicht bij het jaargemiddelde moet liggen, niet eronder. Resultaat, ter controle achteraf
+  // (niet vooraf vastgelegd): het uur-gewogen gemiddelde komt uit op ~42% offshore / ~28%
+  // onshore — vrijwel exact de eerder gedocumenteerde nameplate-CF, zonder daarop te sturen.
+  const cfA    = offFrac*0.05 + onFrac*0.03;         // schaarste — vrijwel windstil
+  const cfB2b  = offFrac*0.14 + onFrac*0.09;         // meerdaags — aanhoudend laag
+  const cfB2a  = offFrac*0.30 + onFrac*0.20;         // dagcyclus — "wind gemiddeld"
+  const cfB1   = offFrac*0.46 + onFrac*0.31;         // matig — boven gemiddeld
+  const cfC    = offFrac*0.65 + onFrac*0.43;         // hoog — duidelijk winderig, geen 3.085 uur op rated vermogen
 
   // Wind per segment (GWh)
   const windA   = totalWindGW * cfA   * P.segA_hours   / 1000;
@@ -1355,12 +1364,23 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const windB2b = totalWindGW * cfB2b * P.segB2b_hours / 1000;
   const windC   = totalWindGW * cfC   * P.segC_hours   / 1000;
 
+  // Onshore-only generatie per segment (voor wOnS-weging in model()) — zelfde directe
+  // per-segment CF's als hierboven, maar alleen het onshore-aandeel (vaste 7 GW).
+  const windOnA   = P.windOnGW * 0.03 * P.segA_hours   / 1000;
+  const windOnB1  = P.windOnGW * 0.31 * P.segB1_hours  / 1000;
+  const windOnB2a = P.windOnGW * 0.20 * P.segB2a_hours / 1000;
+  const windOnB2b = P.windOnGW * 0.09 * P.segB2b_hours / 1000;
+  const windOnC   = P.windOnGW * 0.43 * P.segC_hours   / 1000;
+
   // Zon: piekt in B1 (zonnige daguren) en C (zomermiddag), vrijwel nul in A/B2a/B2b
-  const solarA   = solarGW * 0.02  * P.segA_hours   / 1000;
-  const solarB1  = solarGW * 0.32  * P.segB1_hours  / 1000;
+  // Zon per segment — eveneens direct afgeleid, niet teruggerekend. Corrigeert een eerdere
+  // inconsistentie: "Overschot-uren (hoog)" is per definitie "veel zon", dus moet een hógere
+  // waarde hebben dan "Overschot-uren (matig)" ("redelijk zon") — voorheen stond dit omgekeerd.
+  const solarA   = solarGW * 0.01  * P.segA_hours   / 1000;
+  const solarB1  = solarGW * 0.14  * P.segB1_hours  / 1000;
   const solarB2a = solarGW * 0.01  * P.segB2a_hours / 1000;
   const solarB2b = solarGW * 0.01  * P.segB2b_hours / 1000;
-  const solarC   = solarGW * 0.175 * P.segC_hours   / 1000;
+  const solarC   = solarGW * 0.20  * P.segC_hours   / 1000;
 
   // Kern: baseload (vrijwel constant)
   const nucA   = nuclearGW * P.nuclearCF * P.segA_hours   / 1000;
@@ -1391,6 +1411,9 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
 
   // Surplus/tekort per segment
   const rawSurplusB1 = Math.max(0, vreB1 - dB1);  // B1 kan surplus hebben!
+  // Met realistischere (lagere) CF's kan B1 ook een écht tekort hebben — met de oude,
+  // te hoge CF-aannames kwam dit nooit voor, dus was hier geen vangnet voor nodig.
+  const rawDeficitB1 = Math.max(0, dB1 - vreB1);
   const rawSurplusC  = Math.max(0, vreC  - dC);
   const rawDeficitA   = Math.max(0, dA   - vreA);
   const rawDeficitB2a = Math.max(0, dB2a - vreB2a);
@@ -1408,6 +1431,15 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const totalDeficit = rawDeficitA +
     Math.max(0, rawDeficitB2a - rawSurplusB2a * 0.5) +
     Math.max(0, rawDeficitB2b - rawSurplusB2b * 0.5);
+
+  // Batterijlading wordt evenredig verdeeld naar elk segment se aandeel in het WERKELIJKE
+  // surplus — niet naar een vaste verdeelsleutel. Met de herijkte, realistischere CF's kan
+  // een segment (bijv. Overschot-matig) soms geen surplus meer hebben; een vaste 25%-
+  // toewijzing zou dan energie "laden" uit een segment dat niets over heeft.
+  const chargeShareB1  = totalSurplus > 0 ? rawSurplusB1  / totalSurplus : 0;
+  const chargeShareB2a = totalSurplus > 0 ? rawSurplusB2a / totalSurplus : 0;
+  const chargeShareB2b = totalSurplus > 0 ? rawSurplusB2b / totalSurplus : 0;
+  const chargeShareC   = totalSurplus > 0 ? rawSurplusC   / totalSurplus : 0;
 
   // Batterij: laadt uit B1+C(+beetje B2a/B2b) surplus, ontlaadt in A, B2a, B2b.
   // Batterij: max ~200 cycli/jaar (realistisch voor 2040 utiliteitsopslag)
@@ -1445,10 +1477,10 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const exportCapB2a = Math.min(interconnGW * P.segB2a_hours / 1000 * 0.3 * euCorrB1, rawSurplusB2a * 0.30);
   const exportCapB2b = Math.min(interconnGW * P.segB2b_hours / 1000 * 0.3 * euCorrB1, rawSurplusB2b * 0.30);
   const exportCapC   = Math.min(interconnGW * P.segC_hours   / 1000 * 0.5 * euCorrC,  rawSurplusC   * 0.25);
-  const exportB1  = Math.min(Math.max(0, rawSurplusB1  - battCharge*0.25), exportCapB1);
-  const exportB2a = Math.min(Math.max(0, rawSurplusB2a - battCharge*0.10), exportCapB2a);
-  const exportB2b = Math.min(Math.max(0, rawSurplusB2b - battCharge*0.05), exportCapB2b);
-  const exportC   = Math.min(Math.max(0, rawSurplusC   - battCharge*0.60), exportCapC);
+  const exportB1  = Math.min(Math.max(0, rawSurplusB1  - battCharge*chargeShareB1), exportCapB1);
+  const exportB2a = Math.min(Math.max(0, rawSurplusB2a - battCharge*chargeShareB2a), exportCapB2a);
+  const exportB2b = Math.min(Math.max(0, rawSurplusB2b - battCharge*chargeShareB2b), exportCapB2b);
+  const exportC   = Math.min(Math.max(0, rawSurplusC   - battCharge*chargeShareC), exportCapC);
 
   // Import in piek (A)
   const importCredit = interconnCorrelationCredit(windGW, solarGW);
@@ -1456,17 +1488,18 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const interconnImportA = Math.min(rawDeficitA - battDischargeA, importCapA);
 
   // Curtailment: wat overblijft na batterij + export
-  const curtailB1  = Math.max(0, rawSurplusB1  - battCharge*0.25 - exportB1);
-  const curtailB2a = Math.max(0, rawSurplusB2a - battCharge*0.10 - exportB2a);
-  const curtailB2b = Math.max(0, rawSurplusB2b - battCharge*0.05 - exportB2b);
-  const curtailC   = Math.max(0, rawSurplusC   - battCharge*0.60 - exportC);
+  const curtailB1  = Math.max(0, rawSurplusB1  - battCharge*chargeShareB1 - exportB1);
+  const curtailB2a = Math.max(0, rawSurplusB2a - battCharge*chargeShareB2a - exportB2a);
+  const curtailB2b = Math.max(0, rawSurplusB2b - battCharge*chargeShareB2b - exportB2b);
+  const curtailC   = Math.max(0, rawSurplusC   - battCharge*chargeShareC - exportC);
   const curtailmentTWh = curtailB1 + curtailB2a + curtailB2b + curtailC;
 
   // Gas gat
   const gasGapA   = Math.max(0, rawDeficitA   - battDischargeA   - interconnImportA);
+  const gasGapB1  = rawDeficitB1;  // geen batterij/import-toewijzing aan dit segment — gas vangt het op, zoals overal elders in het model de "vult aan wat overblijft"-rol van gas
   const gasGapB2a = Math.max(0, rawDeficitB2a - battDischargeB2a);
   const gasGapB2b = Math.max(0, rawDeficitB2b - battDischargeB2b);
-  const totalGasGap = gasGapA + gasGapB2a + gasGapB2b;
+  const totalGasGap = gasGapA + gasGapB1 + gasGapB2a + gasGapB2b;
 
   const totalVRE = totalVREraw;
   const curtailmentRate = totalVRE > 0 ? curtailmentTWh / totalVRE : 0;
@@ -1493,6 +1526,9 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
 
   return {
     totalVRETWh:     Math.round(totalVRE * 10) / 10,
+    windTWh:         Math.round((windA + windB1 + windB2a + windB2b + windC) * 10) / 10,
+    windOnTWh:       Math.round((windOnA + windOnB1 + windOnB2a + windOnB2b + windOnC) * 10) / 10,
+    solarTWh:        Math.round((solarA + solarB1 + solarB2a + solarB2b + solarC) * 10) / 10,
     curtailmentTWh:  Math.round(curtailmentTWh * 10) / 10,
     curtailmentRate: Math.round(curtailmentRate * 100),
     curtailmentFraction: curtailmentRate,  // precies, ongeafgerond — voor gebruik in kostenformules
@@ -1532,16 +1568,16 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
         export: Math.round(exportB2a*10)/10,
         curtail: Math.round(curtailB2a*10)/10,
         import: 0 },
-      { name: 'Overschot-uren (matig)', sublabel: 'redelijk wind/zon, gemiddelde vraag', hours: P.segB1_hours,
+      { name: 'Overschot-uren (matig)', sublabel: 'redelijk wind/zon, gemiddelde vraag*', hours: P.segB1_hours,
         demand: Math.round(dB1*10)/10, vre: Math.round(vreB1*10)/10,
         wind: Math.round(windB1*10)/10, solar: Math.round(solarB1*10)/10, nuc: Math.round(nucB1*10)/10,
-        gas: 0, batt: -Math.round(battCharge*0.25*10)/10,
+        gas: Math.round(gasGapB1*10)/10, batt: -Math.round(battCharge*chargeShareB1*10)/10,
         export: Math.round(exportB1*10)/10,
         curtail: Math.round(curtailB1*10)/10 },
       { name: 'Overschot-uren (hoog)', sublabel: 'veel wind/zon, lage vraag', hours: P.segC_hours,
         demand: Math.round(dC*10)/10,  vre: Math.round(vreC*10)/10,
         wind: Math.round(windC*10)/10, solar: Math.round(solarC*10)/10, nuc: Math.round(nucC*10)/10,
-        gas: 0, batt: -Math.round(battCharge*0.60*10)/10,
+        gas: 0, batt: -Math.round(battCharge*chargeShareC*10)/10,
         export: Math.round(exportC*10)/10,
         curtail: Math.round(curtailC*10)/10 },
     ]
@@ -1611,12 +1647,16 @@ function adequacyCheck(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, dema
 //  CORE MODEL (nu gebouwd bovenop LDC)
 // ════════════════════════════════════════════════════════
 function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
-  // Wind: offshore (instelbaar) + onshore (vaste 7 GW basis)
-  const windOffTWh = wind          * P.windOffCF * 8.76;
-  const windOnTWh  = P.windOnGW   * P.windOnCF  * 8.76;
-  const windTWh    = windOffTWh + windOnTWh;
-  const solarTWh   = solar   * P.solarCF   * 8.76;
-  const nuclearTWh = nuclear * P.nuclearCF * 8.76;
+  // ── LOAD DURATION CURVE — eerst draaien: dit is nu de enige bron van waarheid voor
+  // hoeveel wind/zon/kern er daadwerkelijk wordt opgewekt. Eerder bestond hiernaast nog een
+  // aparte, platte berekening (vermogen × nameplate-CF × 8760 uur) die structureel afweek
+  // van wat de segmenten zelf opleverden — tot 38% te hoog voor wind, 21% te laag voor zon.
+  // Die afwijking werkte door in de LCOE-weging (wS/sS) en dus in de hoofdkosten-KPI.
+  const ldc = runLDC(wind, solar, nuclear, battery, interconn, demand);
+
+  const windTWh    = ldc.windTWh;
+  const solarTWh   = ldc.solarTWh;
+  const nuclearTWh = ldc.nuclearTotalTWh;
 
   const windPen    = windTWh    / demand;
   const solarPen   = solarTWh   / demand;
@@ -1628,9 +1668,6 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
     Math.log(1 + interconn / P.interconnSat) / Math.log(1 + 1);
   const euSurplusPenalty = Math.max(0, (totalPen - 1.25) * 0.35);
   const ib = Math.max(0, rawInterconn - euSurplusPenalty);
-
-  // ── LOAD DURATION CURVE — eerst draaien, dan kannibalisatie afleiden ──
-  const ldc = runLDC(wind, solar, nuclear, battery, interconn, demand);
 
   // Niet-fossiel aandeel van de jaarvraag: wind + zon + kern + batterij (die zelf alleen
   // wind/zon/kern-elektronen opslaat en teruglevert — geen dubbeltelling, want curtailment
@@ -1681,7 +1718,7 @@ function model(wind, solar, nuclear, battery, interconn, gasCcsShare, demand) {
   const gasPlainAllIn = P.gasVarCost;
 
   // Onshore wind: vaste TWh-bijdrage tegen eigen (lagere) effectieve LCOE
-  const wOnS = Math.min(windOnTWh / demand, 0.95) * (1 - curtailmentRate * 0.4);
+  const wOnS = Math.min(ldc.windOnTWh / demand, 0.95) * (1 - curtailmentRate * 0.4);
 
   // Adequacy check bepaalt de benodigde (endogene) gasvloot — zie adequacyCheck().
   const adequacy = adequacyCheck(wind, solar, nuclear, battery, interconn, demand);
@@ -2094,7 +2131,23 @@ function renderLDC(ldc) {
   // en zonder dit stak de "−X TWh curtail/export"-annotatie boven de grafiek uit.
   const maxVal = Math.max(d3.max(segs, s => s.demand), d3.max(segs, s => s.vre || 0)) * 1.18;
 
-  const xSc = d3.scaleBand().domain(names).range([0, iW]).padding(0.16);
+  // Balkbreedte naar uren/jaar — een load duration curve hoort variabele breedte te hebben,
+  // niet gelijke. Vierkantswortel-schaal (niet lineair) als tussenweg: Schaarste-uren (500u)
+  // wordt zichtbaar smaller dan Overschot-hoog (3.085u), maar blijft breed genoeg voor zijn
+  // eigen label — een strikt lineaire schaal zou dat label onleesbaar smal maken.
+  const gapPx = 10;
+  const weights = segs.map(s => Math.sqrt(s.hours));
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  const availW = iW - gapPx * (segs.length - 1);
+  const barWidths = weights.map(w => (w / totalWeight) * availW);
+  const xPos = {}, xWidth = {};
+  let cumX = 0;
+  segs.forEach((s, i) => {
+    xPos[s.name] = cumX;
+    xWidth[s.name] = barWidths[i];
+    cumX += barWidths[i] + gapPx;
+  });
+
   const ySc = d3.scaleLinear().domain([0, maxVal]).range([iH, 0]);
 
   g.append('g').attr('class','grid')
@@ -2105,9 +2158,10 @@ function renderLDC(ldc) {
   // Custom X-as labels: naam (over 2 regels als er een "(...)"-deel is) / uren·jaar / voorbeeld.
   // Vijf smallere balken (was vier) + langere namen zoals "Krapte-uren (dagcyclus)" pasten niet
   // meer op één regel binnen de balkbreedte — vandaar de knip op de parenthese i.p.v. kortere,
-  // arbitrair ingekorte tekst.
+  // arbitrair ingekorte tekst. Labels mogen iets buiten hun eigen (smallere) balk uitsteken —
+  // zolang ze niet in het label van de buurbalk lopen, wat bij deze schaal niet gebeurt.
   segs.forEach(s => {
-    const x = xSc(s.name) + xSc.bandwidth() / 2;
+    const x = xPos[s.name] + xWidth[s.name] / 2;
     const labelG = g.append('g').attr('transform', `translate(${x},${iH + 15})`);
     const parenMatch = s.name.match(/^(.+?)\s*(\(.+\))$/);
     if (parenMatch) {
@@ -2143,8 +2197,8 @@ function renderLDC(ldc) {
   });
 
   segs.forEach(s => {
-    const x  = xSc(s.name);
-    const bw = xSc.bandwidth();
+    const x  = xPos[s.name];
+    const bw = xWidth[s.name];
     // De brutoproductie (s.vre = wind+zon+kern) wordt eerst verkleind met wat is weggegooid
     // (curtailment) of geëxporteerd, en dat verlies wordt proportioneel verdeeld over wind/
     // zon/kern naar hun eigen aandeel — het model houdt niet bij wélke technologie exact
