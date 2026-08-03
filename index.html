@@ -2451,7 +2451,7 @@ function insight(wind, solar, nuclear, battery, interconn, r, crossing, vrePenFr
       }
     }
     if (r.nuclearDeltaLCOE > 20) {
-      lines.push(`<strong>Kern wordt duurder naarmate wind en zon groeien:</strong> de effectieve kostprijs stijgt van €${P.nuclearBase} naar €${r.nuclearEff}/MWh (+€${r.nuclearDeltaLCOE}) — hetzelfde kannibaliseringseffect als bij wind, maar sterker. Een kerncentrale heeft een lange looptijd nodig om terug te verdienen, en in die latere jaren liggen de marktprijzen structureel lager.`);
+      lines.push(`<strong>Kern wordt duurder naarmate wind en zon groeien:</strong> de effectieve kostprijs stijgt van €${P.nuclearBase} naar €${r.nuclearEff}/MWh (+€${r.nuclearDeltaLCOE}) — hetzelfde kannibaliseringseffect als bij wind, maar sterker. Een kerncentrale heeft een lange looptijd nodig om terug te verdienen; hoe meer wind en zon er in latere jaren bijkomen, hoe lager de verwachte opbrengst in die jaren — en hoe hoger het financieringsrisico dat banken inprijzen.`);
     } else {
       lines.push(`Bij de huidige wind/zon-instelling is kern-kannibalisering beperkt (+€${r.nuclearDeltaLCOE}/MWh). Voeg meer wind of zon toe om het effect te zien.`);
     }
