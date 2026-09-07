@@ -169,8 +169,8 @@
     transition: background 0.12s;
     border-radius: 2px;
   }
-  .scenario-btn:hover, .nuc-cost-btn:hover, .gas-price-btn:hover, .pin-btn:hover  { background: var(--bg); }
-  .scenario-btn.active, .nuc-cost-btn.active, .gas-price-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .scenario-btn:hover, .nuc-cost-btn:hover, .gas-price-btn:hover, .batt-cycle-btn:hover, .pin-btn:hover  { background: var(--bg); }
+  .scenario-btn.active, .nuc-cost-btn.active, .gas-price-btn.active, .batt-cycle-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
   .pin-btn {
     font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -185,13 +185,13 @@
   }
 
   .toggle-row { display: flex; flex-direction: row; gap: 0.35rem; }
-  .toggle-row .nuc-cost-btn, .toggle-row .gas-price-btn {
+  .toggle-row .nuc-cost-btn, .toggle-row .gas-price-btn, .toggle-row .batt-cycle-btn {
     flex: 1; text-align: center; font-size: 0.66rem; padding: 0.4rem 0.4rem;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     border: 1px solid var(--rule); background: transparent; cursor: pointer;
     color: var(--ink); transition: background 0.12s; border-radius: 2px;
   }
-  .toggle-row .nuc-cost-btn.active, .toggle-row .gas-price-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .toggle-row .nuc-cost-btn.active, .toggle-row .gas-price-btn.active, .toggle-row .batt-cycle-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
   /* ── CHART AREA ── */
   .chart-area { display: flex; flex-direction: column; gap: 1.4rem; }
@@ -587,6 +587,15 @@
       <div class="slider-row">
         <input type="range" class="battery-s" id="sl-battery" min="5" max="50" value="20" step="5">
       </div>
+      <div class="control-sublabel" style="margin-top:0.5rem">Cyclusaanname (bepaalt hoeveel de batterij jaarlijks kan verschuiven)</div>
+      <div class="toggle-row">
+        <button class="batt-cycle-btn active" id="btn-cyc-low" data-cycles="200">Laag (V2G-zwaar) — 200</button>
+        <button class="batt-cycle-btn" id="btn-cyc-mid" data-cycles="275">Midden — 275</button>
+        <button class="batt-cycle-btn" id="btn-cyc-high" data-cycles="350">Hoog (grid-zwaar) — 350</button>
+      </div>
+      <div class="control-sublabel" style="margin-top:0.4rem; line-height:1.5;">
+        Aggregaat over de hele schuif hierboven (grote grid-batterijen + V2G samen, niet apart instelbaar). Toegewijde utility-scale arbitragebatterijen halen doorgaans 300-365+ cycli/jaar; V2G is beperkter doordat de auto er ook nog mee moet rijden.
+      </div>
     </div>
 
     <div class="control-group">
@@ -895,6 +904,7 @@
       <tr><td>🔬 Gas CCGT (variabel)</td><td>€50 / €77 / €115/MWh</td><td>Laag/Midden/Hoog — brandstof+CO₂+opex, weerspiegelt TTF-marktvolatiliteit (~€20-26/MWh eind 2025 tot &gt;€100/MWh bij aanhoudende schaarste). Toggle in de besturing — bepaalt de gas-LCOE overal in de tool. Capaciteit apart (zie hieronder)</td></tr>
       <tr><td>🔬 Gas+CCS (variabel)</td><td>€108 / €135 / €173/MWh</td><td>Zelfde drie scenario's + een vaste CCS-meerkost van €58 (afvang/opslag/transport, schaalt niet mee met de brandstofprijs); afvangrate 90%; capaciteit apart</td></tr>
       <tr><td>🔬 Batterijen + V2G</td><td>€95/MWh</td><td>Volledige cycluskost (LCOS, 2040-schatting) incl. bidirectioneel laden EVs — toegepast op de daadwerkelijk geladen energie (niet op de GWh-capaciteit zelf), zichtbaar als aparte regel "Batterij (cycluskost)" in het Kostenopbouw-paneel. Geen aparte kapitaalslast elders — dit ís de volledige kostprijs.</td></tr>
+      <tr><td>🔬 Batterij-cyclusaanname</td><td>200 / 275 / 350 cycli/jaar</td><td>Toggle in de besturing — aggregaat over grid-batterijen + V2G samen. Toegewijde utility-scale arbitragebatterijen halen doorgaans 1-2 cycli/dag (300-365+/jaar); V2G is beperkter doordat de auto er ook nog mee moet rijden, richting 100-200/jaar voor het grid-aandeel. Bepaalt hoeveel de batterij jaarlijks in totaal kan verschuiven (<code>batterij-GWh × cycli / 1000</code>).</td></tr>
     </table>
     <p style="font-size:0.78rem; color:var(--muted);"><strong>Waarom gas wél een prijsscenario heeft en wind/zon/kern niet:</strong> die laatste drie lopen via LCOE + de eigen kannibaliseringscurve van dit model — geen van beide is ooit tegen een waargenomen marktprijs getoetst. Gas is de enige technologie waar dit model iets in de buurt van een marktprijs-benadering gebruikt (brandstof+CO₂, met TTF als impliciete referentie), en gasprijzen zijn nu eenmaal aantoonbaar volatiel (van ~€20/MWh tot >€100/MWh binnen enkele jaren) — vandaar dat alleen hier een expliciete bandbreedte zinvol is. De CCS-meerkost blijft in alle drie scenario's exact €58, omdat die over capex voor afvang/opslag/transport gaat, niet over brandstof.</p>
     <p style="font-size:0.78rem; color:var(--muted);"><strong>Mogelijke overlap bij wind offshore:</strong> SDE++-basisbedragen (waar het €117/MWh-cijfer vandaan komt) bevatten sinds 2025 een profiel- en onbalansfactor die specifiek corrigeert voor het feit dat windproductie samenvalt met lagere marktprijzen — feitelijk al een vorm van kannibalisering, voor een nabije-termijn bouwscenario. Onze eigen kannibaliseringsopslag (hieronder) rekent daar bovenop verder. Getest effect: bij het huidige geïnstalleerde vermogen (6,4 GW, geen nieuwbouw) voegt onze opslag €5/MWh toe; bij zo'n 15-20 GW (een plausibele aanname achter het SDE++-cijfer) €17-24/MWh — het verschil, en dus het reële dubbeltellingsrisico, is daar nog altijd bescheiden (~€12-19/MWh) ten opzichte van wat er bij hogere penetratie bijkomt. Bij de hogere penetraties die dit model juist onderzoekt (22-35 GW) loopt de opslag op tot €26-85/MWh — grotendeels nieuwe informatie die een SDE++-cijfer voor een 15-20 GW-scenario onmogelijk al kan bevatten. Het aandeel dat dus mogelijk dubbel telt, is beperkt tot de eerste €5-8/MWh bij minimale bouw; de kernboodschap van dit model (kannibalisering loopt sterk op bij hoge penetratie) staat erbuiten.</p>
@@ -917,6 +927,7 @@
     </table>
     <p><strong>De KPI "Benodigd back-upvermogen" en de "Gas-vloot" in de balk tonen bewust twee verschillende getallen van dezélfde vloot.</strong> De KPI toont de nameplate-capaciteit die gebouwd moet worden. De balk toont het kredietvermogen dat daarvan meetelt voor de adequacy-toets — 90% van de nameplate (vergelijkbare, maar niet identieke, de-rating als bij kern: 92%). Geen tegenstrijdigheid: "hoeveel moet je bouwen" en "hoeveel daarvan telt mee" zijn twee vragen met een net iets ander antwoord.</p>
     <p><strong>Batterij-GWh omhoog draaien beweegt de adequacy-balk minder dan je zou verwachten — dat is geen bug.</strong> Voor deze toets telt niet de energie-inhoud van de batterij (GWh), maar het vermogen dat hij gedurende de aangenomen ontlaadduur van 5 uur kan leveren (× 85% korting voor meerdaagse schaarste). 15 GWh extra batterij levert dus maar (15/5) × 0,85 ≈ 2,6 GW extra kredietvermogen op — een sprong van 75% in GWh wordt maar een paar GW in vermogen. De vereiste-vermogen-lijn zelf verandert hierdoor nooit (gas vult per definitie exact aan wat ontbreekt) — wat wél beweegt is de omvang van de gasvloot en de bijbehorende kost.</p>
+    <p><strong>Waarom de batterij in Krapte-uren (dagcyclus) verhoudingsgewijs het meest doet:</strong> de ontlading over de drie tekort-segmenten (Schaarste, Krapte-dagcyclus, Krapte-meerdaags) wordt verdeeld naar expliciete gewichten (0,5 / 1,6 / 0,4) — niet naar hoe ernstig het tekort is, maar naar hoe goed een batterij met maar 4-6 uur ontlaadvermogen bij dát type tekort past. Dagcyclus is een kort, dagelijks terugkerend gat — precies waar een korte-duur-batterij voor gemaakt is. Schaarste en meerdaags zijn beide uitgerekte gebeurtenissen (potentieel dagenlang) die de ontlaadduur van een batterij ver overstijgen, ongeacht hun ernst. Een eerder geteste strikte "eerst Schaarste, dan de rest"-volgorde liet Schaarste vrijwel alle batterijcapaciteit opsouperen, zelfs bij 45 GWh — deze gewogen verdeling voorkomt dat.</p>
 
     <h2>Interconnectie-correlatiemodel (Malvaldi et al.)</h2>
     <p>Een vlakke de-ratingaanname voor interconnectie doet geen recht aan twee dingen. Ten eerste: NL-interconnectie is niet één ding. TenneT zelf: de vier landverbindingen met Duitsland en twee met België wisselen samen "bijna 12 GW" uit. Daar komen de onderzeese kabels bij: BritNed (VK, 1,0 GW) en COBRAcable (Denemarken, 0,7 GW) — samen ~13,7 GW die naar landen loopt die tijdens een Nederlandse dark doldrum vaak zélf ook nauwelijks wind hebben: Malvaldi et al. (2017) laten zien dat windcorrelatie tussen naburige Noordwest-Europese landen sterk is en pas geleidelijk afneemt met afstand. Alleen de Noorse koppeling (NorNed, 0,7 GW) draait op een fundamenteel ander opslagmedium: waterkracht, beschikbaar ongeacht Nederlandse windcondities — maar dat is nog geen 5% van de totale ~14,4 GW interconnectiecapaciteit.</p>
@@ -1129,6 +1140,18 @@ const P = {
   // Nog niet meegenomen: een "marginale" gebruikskost bovenop deze all-in LCOS (vergelijkbaar
   // met de openstaande vraag bij Gas+CCS) — volgt in een latere update.
   batteryCycle:    95,
+
+  // Cycli/jaar — aggregaat over de hele batterij-GWh-schuif (grote grid-batterijen + V2G
+  // samen, niet apart instelbaar). Toegewijde utility-scale arbitragebatterijen halen
+  // doorgaans 1-2 cycli/dag (300-365+/jaar); V2G is beperkter, omdat de auto er ook nog
+  // gewoon mee moet rijden — de rijbehoefte en acceptatie van extra batterijslijtage van de
+  // eigenaar begrenzen dat richting 100-200/jaar voor het grid-aandeel specifiek. Laag/
+  // Midden/Hoog weerspiegelt een aggregaat-mix die respectievelijk meer V2G-zwaar, gemengd,
+  // of meer grid-batterij-zwaar is.
+  battCyclesLow:   200,  // huidige aanname, ongewijzigd — V2G-zwaar aggregaat
+  battCyclesMid:   275,
+  battCyclesHigh:  350,
+  battCycles:      200,  // actieve waarde — wordt door de UI-toggle overschreven, default Laag
 
   // Gas + CCS — zuiver variabele kosten; capaciteit nu apart via capaciteitsmechanisme
   gasCcsCaptureRate:   0.90,
@@ -1445,24 +1468,28 @@ function runLDC(windGW, solarGW, nuclearGW, batteryGWh, interconnGW, demand) {
   const chargeShareC   = totalSurplus > 0 ? rawSurplusC   / totalSurplus : 0;
 
   // Batterij: laadt uit B1+C(+beetje B2a/B2b) surplus, ontlaadt in A, B2a, B2b.
-  // Batterij: max ~200 cycli/jaar (realistisch voor 2040 utiliteitsopslag)
+  // Cycli/jaar via P.battCycles (Laag/Midden/Hoog-toggle, zie P-blok voor onderbouwing).
   // Send-out beperkt tot 4-6 uur → dagelijks laden beperkt door vermogen, niet energie
-  const battCyclesPerYear = 200;
+  const battCyclesPerYear = P.battCycles;
   const battChargeMax = batteryGWh * battCyclesPerYear / 1000;
   // Vermogenslimiet: batterij laadt max ~0.5C → beperkt absorptie op piekmomenten
   const battCharge = Math.min(totalSurplus * 0.55, battChargeMax);
-  // Verdeel ontlading pro rata deficit (zelfde stijl als voorheen), met een voorkeursgewicht
-  // voor Krapte-uren (dagcyclus) t.o.v. (meerdaags) — dat gewicht ís precies het punt van de
-  // knip: batterij kan het dagcyclus-segment beter opvangen. Een strikte "eerst A, dan de rest"
-  // volgorde bleek A vrijwel altijd alle capaciteit te laten opsouperen (getest: zelfs bij 45
-  // GWh/Batterij-optimum bleef er niets over voor de krapte-segmenten) — dat maakt de knip
-  // zelf onzichtbaar, dus in plaats daarvan een gewogen verdeling over alle drie.
-  const wB2a = rawDeficitB2a * 1.4;
-  const wB2b = rawDeficitB2b * 0.6;
-  const weightedTotal = rawDeficitA + wB2a + wB2b;
+  // Verdeel ontlading pro rata deficit, met expliciete gewichten per segment — gebaseerd op
+  // hoe goed een batterij met maar 4-6 uur ontlaadvermogen bij dát type tekort past, niet op
+  // hoe ernstig het tekort is. Dagcyclus is een kort, dagelijks terugkerend gat — precies
+  // waar een korte-duur-batterij voor gemaakt is. Schaarste en meerdaags zijn beide uitgerekte
+  // gebeurtenissen (potentieel dagenlang) die de ontlaadduur van een batterij ver overstijgen,
+  // ongeacht hun ernst — vandaar een lager gewicht voor allebei, niet alleen voor meerdaags.
+  // Een strikte "eerst A, dan de rest"-volgorde bleek eerder A vrijwel alles te laten
+  // opsouperen (getest: zelfs bij 45 GWh bleef er niets over voor de krapte-segmenten) — dat
+  // maakt de knip zelf onzichtbaar, dus in plaats daarvan een gewogen verdeling over alle drie.
+  const wA   = rawDeficitA   * 0.5;
+  const wB2a = rawDeficitB2a * 1.6;
+  const wB2b = rawDeficitB2b * 0.4;
+  const weightedTotal = wA + wB2a + wB2b;
   const battAvail = battCharge * 0.9;
   const battDischargeA = weightedTotal > 0
-    ? Math.min(battAvail, rawDeficitA) * (rawDeficitA / weightedTotal) : 0;
+    ? Math.min(battAvail, rawDeficitA) * (wA / weightedTotal) : 0;
   const battRemainAfterA = battAvail - battDischargeA;
   const battDischargeB2a = weightedTotal > 0
     ? Math.min(battRemainAfterA, rawDeficitB2a) * (wB2a / (wB2a + wB2b || 1)) : 0;
@@ -2704,6 +2731,15 @@ document.querySelectorAll('.gas-price-btn').forEach(btn => {
   });
 });
 
+document.querySelectorAll('.batt-cycle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.batt-cycle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    P.battCycles = +btn.dataset.cycles;
+    update();
+  });
+});
+
 document.getElementById('btn-pin-reference').addEventListener('click', () => {
   referenceMix = {
     wind:      +document.getElementById('sl-wind').value,
@@ -2740,6 +2776,14 @@ document.getElementById('btn-gas-high').dataset.var = P.gasVarCostHigh;
 document.getElementById('btn-gas-high').dataset.ccs = P.gasCcsVarCostHigh;
 document.getElementById('btn-gas-high').dataset.ref = P.gasCostHigh;
 document.getElementById('btn-gas-high').textContent = `Hoog — €${P.gasVarCostHigh}`;
+
+// Zelfde synchronisatie voor de drie batterij-cyclusknoppen
+document.getElementById('btn-cyc-low').dataset.cycles = P.battCyclesLow;
+document.getElementById('btn-cyc-low').textContent = `Laag (V2G-zwaar) — ${P.battCyclesLow}`;
+document.getElementById('btn-cyc-mid').dataset.cycles = P.battCyclesMid;
+document.getElementById('btn-cyc-mid').textContent = `Midden — ${P.battCyclesMid}`;
+document.getElementById('btn-cyc-high').dataset.cycles = P.battCyclesHigh;
+document.getElementById('btn-cyc-high').textContent = `Hoog (grid-zwaar) — ${P.battCyclesHigh}`;
 
 update();
 window.addEventListener('resize', update);
