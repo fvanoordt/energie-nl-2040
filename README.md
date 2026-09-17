@@ -20,25 +20,41 @@ De methodiek is gebaseerd op het werk van **Lion Hirth** (value factor / marktwa
 - **Vermogensadequaatheid met endogene gasvloot** — een aparte toets of er op het piekmoment genoeg beschikbaar vermogen staat, waarbij de benodigde gasvloot meebeweegt met de rest van de mix
 - **Capaciteitsmechanisme** — een expliciete, aparte kostenpost voor het in stand houden van die gasvloot, los van hoeveel gas daadwerkelijk draait
 - **Interconnectie-correlatiemodel** — vervangt een platte de-ratingaanname door een 2-groepen-model (gecorreleerde NW-Europese buren vs. Noorse waterkracht), gebaseerd op Malvaldi et al. (2017)
-- **Volledige systeemkosten** — inclusief netcongestie, curtailment/export, flexibiliteitspremie, interconnectie-infrastructuur en importpremie
+- **Curtailment toegewezen per opweksoort** — inclusief kern, met een lager gewicht dan wind en zon; kern op nul zetten zou een impliciete pro-kern-aanname zijn (zie verderop)
+- **Drie expliciete scenariotoggles** — kern-bouwrealiteit (FOAK vs. seriebouw), gasprijsniveau (laag/midden/hoog) en batterij-cyclusaanname (200/275/350 per jaar), zodat de gevoeligste aannames zichtbaar instelbaar zijn in plaats van verstopt
+- **Aanbodzijde-systeemkosten** — curtailment/export, flexibiliteitspremie, interconnectie-infrastructuur en importpremie. Uitdrukkelijk *niet* compleet: netcongestie, redispatch, het binnenlandse transportnet en vraagzijde-distributienetten vallen buiten scope (zie Beperkingen)
 - **Nederlandse parameters voor 2040** — geen fictief land, maar reële getallen
 
 ---
 
 ## Wat het model berekent
 
-### Zes KPI's per portfoliomix
+### Drie KPI's per portfoliomix
 
 > **Reikwijdte systeemkosten:** dit model rekent aan de opwek-kant (curtailment, flexibiliteitspremie, capaciteitsmechanisme, grensoverschrijdende interconnectie). Het binnenlandse transportnet — aanlanding wind op zee én hoogspanningsnet op land — én vraagzijde-distributienetten (warmtepompen, EV, industriële elektrificatie) zijn buiten scope qua netwerkkosten — de vráág die warmtepompen genereren zit wél in het model (zie "Elektriciteitsvraag 2040" hieronder). Zie "Wat dit model niet beprijst: grote infrastructuur" verderop voor de omvang hiervan (FIEN26-cijfers) en waarom dit niet voor elke technologie even neutraal is. Nederland wordt behandeld als één knooppunt zonder interne transportbeperkingen ("koperen plaat") — redispatch-kosten voor lokale netcongestie zitten er dus niet in (zie Beperkingen).
 
 | KPI | Wat het meet |
 |---|---|
-| Systeemkosten | €/MWh all-in, inclusief kannibalisering en capaciteitsmechanisme |
+| Systeemkosten (opwek) | €/MWh all-in, inclusief kannibalisering en capaciteitsmechanisme |
 | Curtailment / export | % weggegooid of geëxporteerd — 0% betekent niet automatisch "geen kannibalisering", zie toelichting verderop |
-| Kernmeerkosten | €/MWh extra t.o.v. zelfde leveringszekerheid zonder kern — alleen zichtbaar als kern > 0 GW |
-| Interconnectiekosten | €/MWh infrastructuur + importpremie |
-| Gas+CCS variabel | €/MWh — puur variabele kosten; de capaciteitscomponent is verhuisd naar het capaciteitsmechanisme |
 | Benodigd back-upvermogen | GW gasvloot die endogeen nodig is om het vereiste piekvermogen te dekken, plus de bijbehorende kostprijs via het capaciteitsmechanisme |
+
+Eerder stonden hier zes KPI's. Drie zijn verplaatst, om twee redenen:
+
+- **Kernmeerkosten** stond als enige technologie in een eigen KPI-slot, zonder een even prominente tegenhanger voor wind of zon — terwijl het onderliggende mechanisme (kannibalisering) voor alle drie geldt. Dat suggereerde een asymmetrie die er in het model niet is. Deze informatie staat nu in het Kannibaliserings-delta-paneel, náást wind en zon.
+- **Interconnectiekosten** en **Gas+CCS variabel** stonden ook al als aparte posten in de kostenopbouw. Twee keer hetzelfde getal in een andere vorm maakte beide moeilijker te lezen.
+
+### Volgorde van de panelen
+
+De tool leest van samenvatting naar verdieping:
+
+1. **KPI's + duiding** — de drie kerncijfers, met een tekstuele interpretatie eronder
+2. **Wanneer is er te veel, wanneer te weinig** — energiebalans per marktsegment, met daaronder de productie per opweksoort (inclusief curtailment apart) en het niet-fossiel/klimaatneutraal aandeel
+3. **Kannibaliserings-delta** — waarom dezelfde technologie duurder wordt naarmate je er meer van bouwt, voor wind, zon én kern
+4. **Dark doldrums + Vermogensadequaatheid** — leveringszekerheid op het piekmoment, met een expliciete callout over afhankelijkheid van het buitenland
+5. **Kostenopbouw** — waar het geld heen gaat, in zes categorieën
+
+Twee panelen zijn uit de hoofdflow gehaald: de **omslagpunt-grafiek** (voegde weinig toe aan wat de kannibaliserings-delta al laat zien — de berekening zelf komt nog terug in de duiding) en de **vijf-snelscenario's-vergelijking** ("efficient frontier"). Die laatste varieerde zes instellingen tegelijk tussen de scenario's, waardoor niet af te lezen was welke keuze welk verschil veroorzaakte — dat nodigde uit tot simpele conclusies die het model juist niet ondersteunt. De snelscenario-knoppen zelf blijven gewoon bestaan.
 
 ### Dark doldrums — leveringszekerheid in concrete uren
 
@@ -97,7 +113,7 @@ Bij hoge VRE-penetratie draait de gasvloot te weinig uren om zichzelf via de ene
 
 ### Het omslagpunt
 
-Eén van de grafieken toont waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit omslagpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 55% wind+zon-penetratie.
+De tool berekent waar de **effectieve LCOE van kernenergie** de **geschatte systeemwaarde van firm capacity** overstijgt (energiewaarde plus een marginale capaciteitswaarde, afgeleid uit dezelfde adequacy-engine als hierboven). Dit is een beschrijving, geen oordeel: of een investering voorbij dat punt "gewenst" is, hangt af van afwegingen die dit model niet meeneemt (leveringszekerheid, strategische autonomie, industriebeleid). Zie ook "Twee kern-bouwrealiteiten" hieronder — dit omslagpunt ligt bij de huidige westerse first-of-a-kind-aanname (€160/MWh) al bij de laagste geteste penetratie, en pas bij een seriebouw-aanname (€70/MWh) rond 55% wind+zon-penetratie. Dit stond eerder als aparte grafiek in de tool, maar voegde weinig toe aan wat de kannibaliserings-delta al laat zien; het komt nu terug in de duiding onder de KPI's.
 
 ---
 
@@ -139,7 +155,17 @@ Ter vergelijking: vraagzijde-distributienetten (MS/LS — regionale netverzwarin
 
 ### Twee kern-bouwrealiteiten, geen bandbreedte
 
-Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen qua uitkomst. Het zijn twee aantoonbaar verschillende bouwrealiteiten: westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen (Barakah: eenheid 4 kostte ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma *zou kunnen* opleveren, niet wat 1-2 centrales op zichzelf bereiken. De toggle in de tool bepaalt welke aanname overal wordt gebruikt (kostenopbouw, KPI's, omslagpuntgrafiek).
+Het verschil tussen €160 en €70/MWh is geen onzekerheidsmarge rond één schatting — een bandbreedte ertussen (bijv. €130) zou de facto nog steeds bij het €160-niveau uitkomen qua uitkomst. Het zijn twee aantoonbaar verschillende bouwrealiteiten: westerse first-of-a-kind-projecten (Hinkley Point C, Vogtle, Flamanville — eerste bouw in decennia, kostenoverschrijdingen) versus Zuid-Koreaans/Emirati seriebouw met een ingespeelde toeleveringsketen (Barakah: eenheid 4 kostte ~40% van eenheid 1). Een eerste Nederlands programma van 1-2 centrales na decennia zonder nieuwbouw heeft die leercurve niet — het seriebouw-cijfer laat zien wat een langjarig, herhaald bouwprogramma *zou kunnen* opleveren, niet wat 1-2 centrales op zichzelf bereiken. De toggle in de tool bepaalt welke aanname overal wordt gebruikt (kostenopbouw, KPI's, kannibaliserings-delta, duiding).
+
+### Curtailment toegewezen per opweksoort — ook aan kern
+
+Onder de energiebalans-grafiek staat per opweksoort hoeveel er is opgewekt en hoeveel daarvan is weggegooid of geëxporteerd. Die toewijzing gebeurt evenredig naar productie binnen elk segment, maar met een **lager gewicht voor kern (0,35 tegenover 1,0 voor wind en zon)**. Beide uitersten zouden niet neutraal zijn:
+
+**Kern op nul zetten zou een impliciete pro-kern-aanname zijn.** Kerncentrales regelen bij overaanbod aantoonbaar terug: de Franse vloot doet dit dagelijks, met een gemiddelde output-schommeling die opliep van 1,5 GW (2022) naar 6 GW (2025) — Modo Energy concludeert dat kern daar "geen vaste basislast meer is, maar onderdeel van de dagelijkse balancering". De Franse toezichthouder CRE stelt expliciet dat EDF output moet terugregelen zodra marktprijzen onder de variabele kosten zakken of negatief worden. Bloomberg documenteerde het effect letterlijk: bij negatieve prijzen door hoge wind- en zonproductie legde EDF reactoren stil.
+
+**Kern hetzelfde gewicht geven zou de technische realiteit negeren.** De load-following-marge van een kernvloot ligt rond 15-40% van het geïnstalleerd vermogen — ruim, maar begrensd. De marginale kosten van kern (~€8/MWh volgens CRE) liggen bovendien hóger dan die van wind en zon, waardoor kern in de merit order later aan de beurt is.
+
+Gewicht 0,35 is een werkaanname tussen die twee uitersten in, geen precieze afleiding. Effect bij het Gebalanceerd-scenario: circa 29% van de windproductie en 35% van de zonproductie wordt gecurtaild of geëxporteerd, tegenover circa 7% van de kernproductie. Deze toewijzing verandert niets aan het *totale* curtailment — alleen aan welke technologie het toegerekend krijgt.
 
 ### Kannibaliseringsopslag (effectieve LCOE)
 
@@ -183,7 +209,7 @@ Curtailment ontstaat in de overschot-uren (matig én hoog) én op winderige nach
 
 ### Niet-fossiel aandeel van de jaarvraag
 
-Onder de LDC-grafiek in de tool staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment) of geëxporteerd, vóórdat het als "dekt de vraag" wordt geteld. Import telt niet mee (herkomst onbekend/gemengd), en Gas(+CCS) evenmin. Rekensom: `(totalVRETWh − curtailment − export) / vraag`. Getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag) in `tests.js`.
+Onder de LDC-grafiek in de tool staat het percentage van de jaarvraag dat wordt gedekt door wind + zon + kern + batterij. Geen dubbeltelling: de batterij slaat alleen wind/zon/kern-elektronen op en verschuift die in tijd — de brutoproductie wordt eerst gecorrigeerd voor wat wordt weggegooid (curtailment), geëxporteerd, of verloren gaat als omzettingsverlies in de batterij (10% van wat er geladen wordt), vóórdat het als "dekt de vraag" wordt geteld. Dat laatste is geen detail: die energie is wél opgewekt en niet weggegooid, maar bereikt de vraag nooit — zonder die aftrek sluit de energiebalans niet. Import telt niet mee (herkomst onbekend/gemengd), en Gas(+CCS) evenmin. Rekensom: `(totalVRETWh − curtailment − export − batterijverlies) / vraag`. Getest op sluitende optelling (niet-fossiel + gas + import ≈ 100% van de vraag, binnen 0,5 TWh) in `tests.js`.
 
 **Een tweede getal ernaast: klimaatneutraal aandeel.** "Niet-fossiel" is met opzet streng gedefinieerd, en juist daardoor lastig voorbij de 70-75% te krijgen binnen realistische scenario's — dat weerspiegelt een reëel probleem (de ~3.675 uur/jaar schaarste/krapte waar marginale extra wind/zon weinig aan doet), geen modelfout. Het officiële Nederlandse beleidsdoel is bovendien geen "90-100% niet-fossiel in 2040": het Klimaatakkoord noemt 70% *hernieuwbaar* (excl. kern) in 2030, en 2040/2050 is geformuleerd als "klimaatneutraal energiesysteem", wat kernenergie én gas met CCS (afgevangen CO₂ telt niet als uitstoot) expliciet toestaat. Zelfs het 70%-doel voor 2030 is in de laatste KEV-raming (PBL) al bijgesteld van 72% naar 60%, vooral door vertraging bij wind op zee. Het "klimaatneutraal aandeel" telt daarom ook het afgevangen deel van Gas+CCS mee (90% capture rate): `niet-fossiel + gasCcsTWh × 0,90`, gedeeld door de vraag — een bredere maatstaf die dichter bij het echte beleidskader ligt.
 
@@ -244,7 +270,7 @@ Dit is een **beleidsvisualisatie-instrument**, geen vervanging voor volledige sy
 - De knip tussen de twee krapte-subsegmenten (dagcyclus/meerdaags) is een beargumenteerde inschatting op basis van gepubliceerde persistentie-statistiek voor windarme periodes, geen berekening uit Nederlandse historische uurdata — dit model bevat geen meetreeks.
 - Prijscorrelaties tussen landen zijn gesimplificeerd tot een 2-groepen-model, niet een volledige correlatiematrix
 - **Nederland wordt behandeld als één knooppunt ("koperen plaat"), zonder interne transportbeperkingen** — redispatch-kosten voor lokale netcongestie (bijv. Noord- vs. Zuid-Nederland) en de bijbehorende regionale distributienet-investeringen zitten er niet in en komen in werkelijkheid nog bovenop de hier getoonde systeemkosten
-- **Geen expliciete verdringingsvolgorde bij overaanbod:** kern draait met een vaste capaciteitsfactor door alle marktsegmenten (ook overaanbod-uren) — de must-run-eigenschap van kern zit dus in de kannibaliseringsopslag en de totale curtailment, maar het model wijst niet toe wélke technologie (kern of wind/zon) in een gegeven uur zou moeten terugschakelen als er een merit-order- of dispatchprioriteit zou gelden
+- **Vereenvoudigde verdringingsvolgorde bij overaanbod:** kern draait met een vaste capaciteitsfactor door alle marktsegmenten, maar curtailment/export wordt sinds kort wél aan kern toegewezen — met een lager gewicht (0,35) dan aan wind en zon, op basis van de technische load-following-marge van een kernvloot (~15-40%) en de hogere marginale kosten. Dit is een gewogen benadering, geen uurlijkse merit-order-dispatch: het model bepaalt niet per uur welke eenheid precies terugschakelt
 - **WACC is geen aparte variabele:** marktwaardedepreciatie en de hogere financieringskosten (WACC) bij lage verwachte marktprijzen zijn samen verwerkt in één kannibaliseringsopslag per technologie, niet als twee los gemodelleerde effecten
 - De benodigde gasvloot heeft een ondergrens van 4 GW (strategische reserve) die niet verder onderbouwd is dan een werkaanname
 - Het capaciteitsmechanisme-prijsniveau (€45.000/MW/jaar) is een oriënterende werkaanname, geen NL-specifieke schatting
@@ -270,6 +296,9 @@ Voor beleidsbeslissingen: raadpleeg ENTSO-E TYNDP, ECN/TNO systeemstudies en PBL
 - Klimaatakkoord. *Elektriciteit.* klimaatakkoord.nl (70% hernieuwbaar-doel 2030).
 - Kay, G. et al. (2023). *Variability in North Sea wind energy and the potential for prolonged winter wind drought.* Atmospheric Science Letters.
 - Storage Lab. *Levelized cost of storage — 2040-projectie.* storage-lab.com.
+- Modo Energy (2025). *France's grid is shifting. Can nuclear keep up?* — nucleaire flexibiliteit Franse vloot.
+- CRE (Commission de régulation de l'énergie, 2025) — marginale kosten en load-following-verplichting Franse kernvloot.
+- NESO / Modo Energy (UK) — constraint-kosten en curtailmentvolumes Verenigd Koninkrijk.
 - PBL. *Klimaat- en Energieverkenning (KEV).* Meest recente raming.
 - NL Kabinetsbrief (2025). *SDE++ tenderprijzen windenergie op zee.*
 
